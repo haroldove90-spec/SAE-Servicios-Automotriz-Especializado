@@ -172,12 +172,12 @@ export function getSaeHtml(
     const isYes = val === true;
     const isNo = val === false;
     return `
-      <span style="display: inline-flex !important; align-items: center !important; gap: 8px !important; font-size: 10px !important;">
+      <span style="display: inline-flex !important; align-items: center !important; gap: 6px !important; font-size: 10px !important;">
         <span style="display: inline-flex !important; align-items: center !important; gap: 3px !important;">
-          Sí <span style="display: inline-block !important; width: 14px !important; height: 14px !important; border: 1.5px solid #000000 !important; text-align: center !important; line-height: 12px !important; font-weight: bold !important; font-size: 10px !important; color: #000000 !important; background-color: #FFFFFF !important;">${isYes ? 'X' : ''}</span>
+          Sí <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 14px !important; height: 14px !important; border: 1.5px solid #000000 !important; font-weight: 900 !important; font-size: 10px !important; line-height: 1 !important; color: #000000 !important; background-color: #FFFFFF !important; box-sizing: border-box !important; text-align: center !important;">${isYes ? 'X' : ''}</span>
         </span>
         <span style="display: inline-flex !important; align-items: center !important; gap: 3px !important;">
-          No <span style="display: inline-block !important; width: 14px !important; height: 14px !important; border: 1.5px solid #000000 !important; text-align: center !important; line-height: 12px !important; font-weight: bold !important; font-size: 10px !important; color: #000000 !important; background-color: #FFFFFF !important;">${isNo ? 'X' : (!val ? 'X' : '')}</span>
+          No <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 14px !important; height: 14px !important; border: 1.5px solid #000000 !important; font-weight: 900 !important; font-size: 10px !important; line-height: 1 !important; color: #000000 !important; background-color: #FFFFFF !important; box-sizing: border-box !important; text-align: center !important;">${isNo ? 'X' : (!val ? 'X' : '')}</span>
         </span>
       </span>
     `;
@@ -188,17 +188,9 @@ export function getSaeHtml(
       
       <!-- Top Header Section -->
       <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important;">
-        <!-- Left: Logo & Subtitle -->
-        <div style="display: flex !important; align-items: center !important; gap: 12px !important;">
-          <img src="${logoUrl}" crossorigin="anonymous" style="height: 48px !important; width: auto !important; object-fit: contain !important;" alt="SAE Logo" />
-          <div style="display: flex !important; flex-direction: column !important; justify-content: center !important;">
-            <div style="font-weight: 900 !important; font-size: 13px !important; color: #D32F2F !important; text-transform: uppercase !important; letter-spacing: 0.3px !important; font-family: sans-serif !important;">
-              SERVICIO AUTOMOTRIZ ESPECIALIZADO
-            </div>
-            <div style="font-size: 11px !important; color: #0084CA !important; font-weight: bold !important; font-style: italic !important; margin-top: 1px !important;">
-              ¡La escudería que te lleva seguro a tu destino!
-            </div>
-          </div>
+        <!-- Left: Logo (includes SAE logo image) -->
+        <div style="display: flex !important; align-items: center !important;">
+          <img src="${logoUrl}" crossorigin="anonymous" style="height: 38px !important; width: auto !important; object-fit: contain !important;" alt="SAE Logo" />
         </div>
         
         <!-- Right: Folio Capsule Box -->
