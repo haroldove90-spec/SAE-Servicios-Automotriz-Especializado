@@ -354,56 +354,34 @@ export function getSaeHtml(
       <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; margin-bottom: 8px !important; flex: 1 !important;">
         
         <!-- Left Side Column: 3. Descripción del servicio -->
-        <div style="display: flex !important; flex-direction: column !important; justify-content: space-between !important;">
-          <div>
-            <img src="${barra3Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 8px !important;" alt="3. Descripción del servicio" />
+        <div style="display: flex !important; flex-direction: column !important; justify-content: flex-start !important;">
+          <img src="${barra3Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 8px !important;" alt="3. Descripción del servicio" />
 
-            <!-- Underlined Service Description rows matching paper form with LARGER TEXT -->
-            <div style="margin-bottom: 8px !important;">
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 22px !important; padding-bottom: 2px !important; font-size: 13px !important; font-weight: bold !important; color: #000000 !important; line-height: 1.3 !important;">
-                ${order.reportedFailure || 'Servicio General'}
-              </div>
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 4px !important;"></div>
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 4px !important;"></div>
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 4px !important;"></div>
+          <!-- Underlined Service Description rows matching paper form with LARGER TEXT -->
+          <div style="margin-bottom: 12px !important;">
+            <div style="border-bottom: 1px solid #000000 !important; min-height: 22px !important; padding-bottom: 2px !important; font-size: 13px !important; font-weight: bold !important; color: #000000 !important; line-height: 1.3 !important;">
+              ${order.reportedFailure || 'Servicio General'}
             </div>
-
-            <!-- FIRMA DEL CLIENTE: Abajo del texto de descripción del servicio -->
-            <div style="text-align: center !important; margin: 8px 0 12px 0 !important;">
-              ${order.clientSignature ? `
-                <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 48px !important; max-width: 160px !important; margin: 0 auto 2px auto !important; display: block !important;" />
-              ` : `
-                <div style="height: 38px !important;"></div>
-              `}
-              <div style="border-top: 1px solid #000000 !important; width: 85% !important; margin: 0 auto 2px auto !important;"></div>
-              <div style="font-weight: bold !important; font-size: 10px !important; text-transform: uppercase !important;">Nombre y Firma del Cliente</div>
-              <div style="font-size: 8px !important; font-style: italic !important; color: #374151 !important;">(Acepto Condiciones y presupuesto)</div>
-            </div>
-
-            <!-- Fecha, Hora, Técnico -->
-            <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; font-size: 10.5px !important; margin-bottom: 6px !important;">
-              <div style="display: flex !important; align-items: baseline !important;">
-                <strong style="margin-right: 4px !important;">Fecha:</strong>
-                <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; font-weight: bold !important;">${dateStr}</span>
-              </div>
-              <div style="display: flex !important; align-items: baseline !important;">
-                <strong style="margin-right: 4px !important;">Hora:</strong>
-                <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; font-weight: bold !important;">${timeStr}</span>
-              </div>
-            </div>
-            <div style="display: flex !important; align-items: baseline !important; font-size: 10.5px !important; margin-bottom: 8px !important;">
-              <strong style="margin-right: 4px !important;">Técnico:</strong>
-              <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important;">${mechanicName}</span>
-            </div>
+            <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 6px !important;"></div>
+            <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 6px !important;"></div>
+            <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 6px !important;"></div>
+            <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 6px !important;"></div>
           </div>
 
-          <!-- FIRMA DEL ASESOR: En donde estaba la firma del cliente (abajo a la izquierda) -->
-          <div style="text-align: center !important; padding-top: 6px !important; margin-top: auto !important;">
-            <div style="height: 38px !important; display: flex !important; align-items: flex-end !important; justify-content: center !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; padding-bottom: 2px !important;">
-              ${advisorName}
+          <!-- Fecha, Hora, Técnico -->
+          <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; font-size: 10.5px !important; margin-bottom: 8px !important;">
+            <div style="display: flex !important; align-items: baseline !important;">
+              <strong style="margin-right: 4px !important;">Fecha:</strong>
+              <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; font-weight: bold !important;">${dateStr}</span>
             </div>
-            <div style="border-top: 1px solid #000000 !important; width: 85% !important; margin: 0 auto 2px auto !important;"></div>
-            <div style="font-weight: bold !important; font-size: 10px !important; text-transform: uppercase !important;">Nombre y Firma del Asesor / Recepción</div>
+            <div style="display: flex !important; align-items: baseline !important;">
+              <strong style="margin-right: 4px !important;">Hora:</strong>
+              <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; font-weight: bold !important;">${timeStr}</span>
+            </div>
+          </div>
+          <div style="display: flex !important; align-items: baseline !important; font-size: 10.5px !important; margin-bottom: 8px !important;">
+            <strong style="margin-right: 4px !important;">Técnico:</strong>
+            <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important;">${mechanicName}</span>
           </div>
         </div>
 
@@ -423,6 +401,33 @@ export function getSaeHtml(
             <p style="margin: 0 0 3px 0 !important;">9. Se cobrarán $300.00 (trescientos pesos 00/100 M.N.) diarios por concepto de pensión si el auto no es recogido después de 24 horas de haber recibido la notificación de terminado el trabajo.</p>
             <p style="margin: 0 0 3px 0 !important;">10. El cliente renuncia a recoger las partes usadas que fueron retiradas de la unidad, si no son solicitadas al momento de la entrega de su vehículo ________________________</p>
           </div>
+        </div>
+      </div>
+
+      <!-- Bottom Signatures (Firma del Cliente & Firma del Asesor / Recepción) arranged horizontally side-by-side -->
+      <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 36px !important; margin-top: auto !important; margin-bottom: 8px !important; padding: 0 12px !important;">
+        <!-- Firma del Cliente -->
+        <div style="text-align: center !important;">
+          <div style="height: 42px !important; display: flex !important; align-items: flex-end !important; justify-content: center !important;">
+            ${order.clientSignature ? `
+              <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 42px !important; max-width: 180px !important; margin: 0 auto !important; display: block !important;" />
+            ` : `
+              <div style="height: 38px !important;"></div>
+            `}
+          </div>
+          <div style="border-top: 1px solid #000000 !important; width: 85% !important; margin: 2px auto 2px auto !important;"></div>
+          <div style="font-weight: bold !important; font-size: 10px !important; text-transform: uppercase !important;">Nombre y Firma del Cliente</div>
+          <div style="font-size: 8px !important; font-style: italic !important; color: #374151 !important;">(Acepto Condiciones y presupuesto)</div>
+        </div>
+
+        <!-- Firma del Asesor / Recepción -->
+        <div style="text-align: center !important;">
+          <div style="height: 42px !important; display: flex !important; align-items: flex-end !important; justify-content: center !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; padding-bottom: 2px !important;">
+            ${advisorName}
+          </div>
+          <div style="border-top: 1px solid #000000 !important; width: 85% !important; margin: 2px auto 2px auto !important;"></div>
+          <div style="font-weight: bold !important; font-size: 10px !important; text-transform: uppercase !important;">Nombre y Firma del Asesor / Recepción</div>
+          <div style="font-size: 8px !important; font-style: italic !important; color: #374151 !important;">(Servicio Automotriz Especializado)</div>
         </div>
       </div>
 
