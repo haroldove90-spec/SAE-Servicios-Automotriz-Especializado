@@ -1,0 +1,35 @@
+{
+  "short_name": "SAE",
+  "name": "Servicio Automotriz Especializado",
+  "icons": [
+    {
+      "src": "https://appdesignproyectos.com/saeicono.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://appdesignproyectos.com/saeicono.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://appdesignproyectos.com/saeicono.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://appdesignproyectos.com/saeicono.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#010101",
+  "theme_color": "#8D6A28",
+  "display": "standalone",
+  "orientation": "any"
+}

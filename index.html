@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Servicio Automotriz Especializado</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="https://appdesignproyectos.com/saeicono.png" />
+    <meta name="theme-color" content="#8D6A28" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SAE" />
+    <link rel="apple-touch-icon" href="https://appdesignproyectos.com/saeicono.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        // If embedded in preview iframe or Cloud Run development host, unregister active SWs to prevent stale script caching errors
+        const isEmbedded = window.self !== window.top || location.hostname.includes('run.app');
+        if (isEmbedded) {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const registration of registrations) {
+              registration.unregister().catch(() => {});
+            }
+          }).catch(() => {});
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+              .then((reg) => {
+                console.log('Service Worker registered successfully:', reg.scope);
+              })
+              .catch((err) => console.log('Service Worker registration skipped:', err));
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
+

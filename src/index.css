@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Base Body Styles - Immersive `#010101` background with gold radial glow */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  background-color: #010101 !important;
+  color: #FFFFFF !important;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+body {
+  background-image: radial-gradient(circle at 50% 0%, #1e160a 0%, #010101 80%) !important;
+  background-attachment: fixed;
+}
+
+/* 🎨 ALL CONTAINERS, CARDS, PANELS TO DARK GLASS */
+.bg-white,
+.bg-slate-50,
+.bg-slate-100,
+.bg-slate-200,
+.bg-amber-50,
+.bg-amber-100,
+.bg-orange-50,
+.bg-yellow-50,
+.bg-indigo-50,
+.bg-blue-50,
+.bg-emerald-50,
+.bg-green-50,
+.bg-red-50,
+.bg-pink-50 {
+  background-color: #121216 !important;
+  background-image: none !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Remove bright gradient backgrounds from tailwind headers */
+[class*="from-amber-"],
+[class*="to-orange-"],
+[class*="from-slate-"],
+[class*="to-slate-"],
+[class*="from-indigo-"],
+[class*="to-blue-"] {
+  background-image: none !important;
+  background-color: #16151A !important;
+}
+
+/* Card Shadow and Borders */
+.shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 🔤 HIGH CONTRAST TEXT COLORS */
+h1, h2, h3, h4, h5, h6,
+.text-slate-900,
+.text-slate-800,
+.text-slate-700,
+.text-slate-950,
+.text-gray-900,
+.text-gray-800,
+.text-gray-700 {
+  color: #FFFFFF !important;
+}
+
+.text-slate-600,
+.text-slate-500,
+.text-gray-600,
+.text-gray-500 {
+  color: #CBD5E1 !important; /* Silver gray for secondary text */
+}
+
+.text-slate-400,
+.text-slate-300,
+.text-gray-400 {
+  color: #94A3B8 !important;
+}
+
+/* Gold Accent Text */
+.text-amber-900,
+.text-amber-800,
+.text-amber-700,
+.text-amber-600,
+.text-amber-500,
+.text-yellow-600,
+.text-yellow-500 {
+  color: #F8B232 !important;
+}
+
+/* Emerald Accent Text */
+.text-emerald-900,
+.text-emerald-800,
+.text-emerald-700,
+.text-emerald-600,
+.text-green-600 {
+  color: #34D399 !important;
+}
+
+/* Red Accent Text */
+.text-red-900,
+.text-red-800,
+.text-red-700,
+.text-red-600 {
+  color: #F87171 !important;
+}
+
+/* 🏆 BUTTON STYLES */
+.bg-amber-600, 
+.bg-amber-500,
+.bg-indigo-600,
+.bg-blue-600,
+.bg-emerald-600,
+.bg-emerald-500 {
+  background-color: #8D6A28 !important;
+  color: #FFFFFF !important;
+  border-color: #8D6A28 !important;
+}
+
+.hover\:bg-amber-700:hover, 
+.hover\:bg-amber-600:hover,
+.hover\:bg-indigo-700:hover,
+.hover\:bg-blue-700:hover,
+.hover\:bg-emerald-700:hover {
+  background-color: #B48835 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 15px rgba(141, 106, 40, 0.4) !important;
+}
+
+/* Secondary Buttons */
+button.bg-white,
+.bg-white.text-slate-700,
+.bg-slate-100.text-slate-600 {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Global Border Colors */
+.border, 
+.border-slate-100, 
+.border-slate-200, 
+.border-slate-300, 
+.border-amber-200,
+.border-amber-300 {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 📥 FORM INPUTS, SELECTS, TEXTAREAS */
+input, select, textarea {
+  background-color: #0A0A0E !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 8px !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #94A3B8 !important;
+  opacity: 1 !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #F8B232 !important;
+  box-shadow: 0 0 0 2px rgba(248, 178, 50, 0.25) !important;
+  outline: none !important;
+}
+
+select option {
+  background-color: #0D0D12 !important;
+  color: #FFFFFF !important;
+}
+
+/* Table styling */
+table {
+  background-color: transparent !important;
+}
+
+thead tr {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+th {
+  color: #F8B232 !important;
+}
+
+tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+td {
+  color: #FFFFFF !important;
+}
+
+/* --- SAE SERVICE ORDER PDF GENERATION RESET --- */
+#sae-pdf-render-root, #sae-pdf-render-root * {
+  color: #111827 !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-color: #9CA3AF !important;
+}
+
+#sae-pdf-render-root {
+  background-color: #FFFFFF !important;
+}
+
+#sae-pdf-render-root .sae-crimson-bg {
+  background-color: #A21C26 !important;
+  color: #FFFFFF !important;
+}
+
+#sae-pdf-render-root .sae-crimson-text {
+  color: #A21C26 !important;
+}
+
+#sae-pdf-render-root .sae-blue-text {
+  color: #1D4ED8 !important;
+}
+
+#sae-pdf-render-root .sae-light-bg {
+  background-color: #F3F4F6 !important;
+}
+
+#sae-pdf-render-root .sae-white-bg {
+  background-color: #FFFFFF !important;
+}
+
+#sae-pdf-render-root .sae-white-text {
+  color: #FFFFFF !important;
+}
