@@ -212,41 +212,41 @@ export function getSaeHtml(
       <div style="margin-bottom: 8px !important;">
         <img src="${barra1Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 5px !important;" alt="1. Datos del cliente" />
         
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 5px 22px !important; font-size: 11px !important; padding: 0 4px !important;">
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Cliente:</strong>
-            <span style="flex: 1 !important; font-weight: bold !important; line-height: 1.1 !important;">${client?.name || ''}</span>
+        <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 6px 22px !important; font-size: 11px !important; padding: 0 4px !important;">
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Cliente:</strong>
+            <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${client?.name || ''}</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">E-Mail:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${client?.email || ''}</span>
-          </div>
-
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Tel. Cel:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${client?.phone || ''}</span>
-          </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Tel:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${client?.telFijo || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">E-Mail:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${client?.email || ''}</span>
           </div>
 
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Calle:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${client?.calle || client?.address || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Tel. Cel:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${client?.phone || ''}</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">C.P.:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${client?.cp || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Tel:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${client?.telFijo || ''}</span>
           </div>
 
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Colonia:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${client?.colonia || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Calle:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${client?.calle || client?.address || ''}</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Alcaldía:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${client?.alcaldia || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">C.P.:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${client?.cp || ''}</span>
+          </div>
+
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Colonia:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${client?.colonia || ''}</span>
+          </div>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Alcaldía:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${client?.alcaldia || ''}</span>
           </div>
         </div>
       </div>
@@ -256,35 +256,35 @@ export function getSaeHtml(
         <img src="${barra2Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 5px !important;" alt="2. Datos del auto" />
 
         <!-- Auto fields row 1 & 2 -->
-        <div style="display: grid !important; grid-template-columns: 1.2fr 1fr 1fr 0.8fr !important; gap: 5px 12px !important; font-size: 11px !important; padding: 0 4px !important; margin-bottom: 8px !important;">
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1.1 !important;">Auto:</strong>
-            <span style="flex: 1 !important; font-weight: bold !important; line-height: 1.1 !important;">${vehicle?.brand || ''}</span>
+        <div style="display: grid !important; grid-template-columns: 1.2fr 1fr 1fr 0.8fr !important; gap: 6px 12px !important; font-size: 11px !important; padding: 0 4px !important; margin-bottom: 8px !important;">
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Auto:</strong>
+            <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${vehicle?.brand || ''}</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1.1 !important;">Modelo:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${vehicle?.model || ''} (${vehicle?.year || ''})</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Modelo:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.model || ''} (${vehicle?.year || ''})</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1.1 !important;">Placas:</strong>
-            <span style="flex: 1 !important; font-weight: bold !important; line-height: 1.1 !important;">${vehicle?.plate || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Placas:</strong>
+            <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${vehicle?.plate || ''}</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1.1 !important;">Kms:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Kms:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}</span>
           </div>
 
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important; grid-column: span 2 !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1.1 !important;">No. de Serie:</strong>
-            <span style="flex: 1 !important; font-family: monospace !important; font-size: 10.5px !important; line-height: 1.1 !important;">${vehicle?.serie || vehicle?.vin || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important; grid-column: span 2 !important;">
+            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">No. de Serie:</strong>
+            <span style="flex: 1 !important; font-family: monospace !important; font-size: 10.5px !important; line-height: 1 !important;">${vehicle?.serie || vehicle?.vin || ''}</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1.1 !important;">Motor:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${vehicle?.motor || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Motor:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.motor || ''}</span>
           </div>
-          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1.1 !important;">Color:</strong>
-            <span style="flex: 1 !important; line-height: 1.1 !important;">${vehicle?.color || ''}</span>
+          <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+            <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Color:</strong>
+            <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.color || ''}</span>
           </div>
         </div>
 
@@ -350,13 +350,13 @@ export function getSaeHtml(
           <div>
             <!-- Inspección Componentes de Motor & Objetos de Valor -->
             <div style="display: flex !important; flex-direction: column !important; gap: 5px !important; padding: 0 2px !important; font-size: 10.5px !important; margin-bottom: 8px !important;">
-              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-                <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Inspección Componentes de Motor</strong>
-                <span style="flex: 1 !important; line-height: 1.1 !important;">${order.checklist.inspeccionMotor || ''}</span>
+              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+                <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Inspección Componentes de Motor</strong>
+                <span style="flex: 1 !important; line-height: 1 !important;">${order.checklist.inspeccionMotor || ''}</span>
               </div>
-              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-                <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1.1 !important;">Objetos de Valor</strong>
-                <span style="flex: 1 !important; line-height: 1.1 !important;">${order.checklist.objetosValor || ''}</span>
+              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+                <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Objetos de Valor</strong>
+                <span style="flex: 1 !important; line-height: 1 !important;">${order.checklist.objetosValor || ''}</span>
               </div>
             </div>
 
@@ -365,7 +365,7 @@ export function getSaeHtml(
 
             <!-- Underlined Service Description rows matching paper form -->
             <div style="margin-bottom: 8px !important;">
-              <div style="border-bottom: 1.2px solid #000000 !important; min-height: 20px !important; padding-bottom: 2px !important; font-size: 11.5px !important; font-weight: bold !important; color: #000000 !important; line-height: 1.2 !important; display: flex !important; align-items: flex-end !important;">
+              <div style="border-bottom: 1.2px solid #000000 !important; min-height: 22px !important; padding-bottom: 5px !important; font-size: 11px !important; font-weight: bold !important; color: #000000 !important; line-height: 1 !important; display: flex !important; align-items: flex-end !important;">
                 <span>${order.reportedFailure || 'Servicio General'}</span>
               </div>
               <div style="border-bottom: 1.2px solid #000000 !important; height: 20px !important; margin-top: 5px !important;"></div>
@@ -376,18 +376,18 @@ export function getSaeHtml(
 
             <!-- Fecha, Hora, Técnico -->
             <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; font-size: 10.5px !important; margin-bottom: 6px !important;">
-              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-                <strong style="margin-right: 4px !important; line-height: 1.1 !important;">Fecha:</strong>
-                <span style="flex: 1 !important; font-weight: bold !important; line-height: 1.1 !important;">${dateStr}</span>
+              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+                <strong style="margin-right: 4px !important; line-height: 1 !important;">Fecha:</strong>
+                <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${dateStr}</span>
               </div>
-              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important;">
-                <strong style="margin-right: 4px !important; line-height: 1.1 !important;">Hora:</strong>
-                <span style="flex: 1 !important; font-weight: bold !important; line-height: 1.1 !important;">${timeStr}</span>
+              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
+                <strong style="margin-right: 4px !important; line-height: 1 !important;">Hora:</strong>
+                <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${timeStr}</span>
               </div>
             </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 2px !important; min-height: 20px !important; font-size: 10.5px !important; margin-bottom: 10px !important;">
-              <strong style="margin-right: 4px !important; line-height: 1.1 !important;">Técnico:</strong>
-              <span style="flex: 1 !important; line-height: 1.1 !important;">${mechanicName}</span>
+            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important; font-size: 10.5px !important; margin-bottom: 10px !important;">
+              <strong style="margin-right: 4px !important; line-height: 1 !important;">Técnico:</strong>
+              <span style="flex: 1 !important; line-height: 1 !important;">${mechanicName}</span>
             </div>
           </div>
 
@@ -416,11 +416,11 @@ export function getSaeHtml(
             <p style="margin: 0 0 3px 0 !important;">3. La empresa no se hace responsable por objetos de valor olvidados en el vehículo que no sean reportados a la administración.</p>
             <p style="margin: 0 0 3px 0 !important;">4. Si el automóvil requiere prueba de camino, el costo de la gasolina será cubierto por el cliente.</p>
             <p style="margin: 0 0 3px 0 !important;">5. En caso de accidente automovilístico y/o siniestro, el cliente autoriza hacer uso de la póliza del seguro del vehículo.</p>
-            <p style="margin: 0 0 3px 0 !important;">6. El costo por revisión y diagnóstico es de $350.00 (trescientos cincuenta pesos 00/100 M.N.) por hora. Para esta revisión se consideran <span style="border-bottom: 1px solid #000 !important; padding: 0 4px !important; font-weight: bold !important;">1.5</span> horas.<br/>El cliente firma de conformidad ___________________________</p>
+            <p style="margin: 0 0 3px 0 !important;">6. El costo por revisión y diagnóstico es de $350.00 (trescientos cincuenta pesos 00/100 M.N.) por hora. Para esta revisión se consideran <span style="display: inline-block !important; border-bottom: 1.2px solid #000000 !important; padding: 0 5px 2px 5px !important; font-weight: bold !important; line-height: 1 !important;">1.5</span> horas.<br/>El cliente firma de conformidad <span style="display: inline-block !important; width: 130px !important; border-bottom: 1.2px solid #000000 !important; height: 10px !important; vertical-align: bottom !important; margin-left: 3px !important;"></span></p>
             <p style="margin: 0 0 3px 0 !important;">7. En caso de que el presupuesto no sea aceptado, el cliente pagará exclusivamente el costo por revisión y diagnóstico.</p>
             <p style="margin: 0 0 3px 0 !important;">8. El prestador de servicio se obliga a devolver el automóvil en las condiciones que le fue entregado, exceptuando las consecuencias inevitables del diagnóstico.</p>
             <p style="margin: 0 0 3px 0 !important;">9. Se cobrarán $300.00 (trescientos pesos 00/100 M.N.) diarios por concepto de pensión si el auto no es recogido después de 24 horas de haber recibido la notificación de terminado el trabajo.</p>
-            <p style="margin: 0 0 3px 0 !important;">10. El cliente renuncia a recoger las partes usadas que fueron retiradas de la unidad, si no son solicitadas al momento de la entrega de su vehículo ________________________</p>
+            <p style="margin: 0 0 3px 0 !important;">10. El cliente renuncia a recoger las partes usadas que fueron retiradas de la unidad, si no son solicitadas al momento de la entrega de su vehículo <span style="display: inline-block !important; width: 110px !important; border-bottom: 1.2px solid #000000 !important; height: 10px !important; vertical-align: bottom !important; margin-left: 3px !important;"></span></p>
           </div>
         </div>
       </div>
