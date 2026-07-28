@@ -165,7 +165,7 @@ export function getSaeHtml(
   const barra1Url = "https://ebzsczwvurlwakfepkhf.supabase.co/storage/v1/object/public/barra01/barra01.png";
   const barra2Url = "https://ebzsczwvurlwakfepkhf.supabase.co/storage/v1/object/public/barra02/barra02.png";
   const barra3Url = "https://ebzsczwvurlwakfepkhf.supabase.co/storage/v1/object/public/barra03/barra03.png";
-  const barra4Url = "https://ebzsczwvurlwakfepkhf.supabase.co/storage/v1/object/public/barra04/barra04.png";
+  const barra4Url = "https://ebzsczwvurlwakfepkhf.supabase.co/storage/v1/object/sign/barra04/barra04.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mOTRlMTIxZS02NTY0LTRlYTMtOWU1My0wYjFlNDA1NjE1NGQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJiYXJyYTA0L2JhcnJhMDQucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NTI1ODU5OSwiZXhwIjoxODE2Nzk0NTk5fQ.gcVUvh-uD77pfkPTbCP5acxEc92vQw2AGabG8Qr8J7Y";
 
   // Checkbox helpers matching paper document [Sí] [No]
   const renderCheck = (val: boolean | undefined) => {
@@ -184,62 +184,64 @@ export function getSaeHtml(
   };
 
   return `
-    <div style="width: 720px !important; margin: 0 auto !important; font-family: 'Arial', 'Helvetica', sans-serif !important; color: #000000 !important; line-height: 1.25 !important; font-size: 10.5px !important; background-color: #FFFFFF !important; box-sizing: border-box !important; padding: 10px !important;">
+    <div style="width: 750px !important; min-height: 970px !important; margin: 0 auto !important; font-family: 'Arial', 'Helvetica', sans-serif !important; color: #000000 !important; line-height: 1.3 !important; font-size: 10.5px !important; background-color: #FFFFFF !important; box-sizing: border-box !important; padding: 12px 16px !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important;">
       
       <!-- Top Header Section -->
       <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important;">
         <!-- Left: Logo (includes SAE logo image) -->
         <div style="display: flex !important; align-items: center !important;">
-          <img src="${logoUrl}" crossorigin="anonymous" style="height: 38px !important; width: auto !important; object-fit: contain !important;" alt="SAE Logo" />
+          <img src="${logoUrl}" crossorigin="anonymous" style="height: 42px !important; width: auto !important; object-fit: contain !important;" alt="SAE Logo" />
         </div>
         
         <!-- Right: Folio Capsule Box -->
-        <div style="display: flex !important; align-items: center !important; gap: 6px !important;">
-          <span style="font-weight: bold !important; font-size: 14px !important; color: #000000 !important;">Folio</span>
-          <div style="border: 2px solid #000000 !important; border-radius: 18px !important; padding: 4px 16px !important; font-weight: 900 !important; font-size: 16px !important; color: #D32F2F !important; background-color: #FFFFFF !important; font-family: monospace !important; min-width: 80px !important; text-align: center !important;">
-            ${order.folio || order.id.replace('OS-', '')}
+        <div style="display: flex !important; align-items: center !important; gap: 8px !important;">
+          <span style="font-weight: bold !important; font-size: 15px !important; color: #000000 !important;">Folio</span>
+          <div style="display: flex !important; align-items: center !important; justify-content: center !important; border: 2px solid #000000 !important; border-radius: 20px !important; padding: 2px 18px !important; min-width: 95px !important; height: 32px !important; box-sizing: border-box !important; background-color: #FFFFFF !important;">
+            <span style="font-weight: 900 !important; font-size: 18px !important; color: #D32F2F !important; font-family: monospace, sans-serif !important; line-height: 1 !important; text-align: center !important; width: 100% !important;">
+              ${order.folio || order.id.replace('OS-', '')}
+            </span>
           </div>
         </div>
       </div>
 
       <!-- Section 1: Datos del cliente -->
       <div style="margin-bottom: 8px !important;">
-        <img src="${barra1Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 26px !important; object-fit: fill !important; display: block !important; margin-bottom: 5px !important;" alt="1. Datos del cliente" />
+        <img src="${barra1Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 5px !important;" alt="1. Datos del cliente" />
         
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px 20px !important; font-size: 10.5px !important; padding: 0 4px !important;">
+        <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 4px 22px !important; font-size: 11px !important; padding: 0 4px !important;">
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Cliente:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Cliente:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important; font-weight: bold !important;">${client?.name || ''}</span>
           </div>
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">E-Mail:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">E-Mail:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${client?.email || ''}</span>
           </div>
 
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Tel. Cel:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Tel. Cel:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${client?.phone || ''}</span>
           </div>
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Tel:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Tel:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${client?.telFijo || ''}</span>
           </div>
 
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Calle:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Calle:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${client?.calle || client?.address || ''}</span>
           </div>
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">C.P.:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">C.P.:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${client?.cp || ''}</span>
           </div>
 
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Colonia:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Colonia:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${client?.colonia || ''}</span>
           </div>
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Alcaldía:</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Alcaldía:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${client?.alcaldia || ''}</span>
           </div>
         </div>
@@ -247,10 +249,10 @@ export function getSaeHtml(
 
       <!-- Section 2: Datos del auto -->
       <div style="margin-bottom: 8px !important;">
-        <img src="${barra2Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 26px !important; object-fit: fill !important; display: block !important; margin-bottom: 5px !important;" alt="2. Datos del auto" />
+        <img src="${barra2Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 5px !important;" alt="2. Datos del auto" />
 
         <!-- Auto fields row 1 & 2 -->
-        <div style="display: grid !important; grid-template-columns: 1.2fr 1fr 1fr 0.8fr !important; gap: 3px 10px !important; font-size: 10.5px !important; padding: 0 4px !important; margin-bottom: 6px !important;">
+        <div style="display: grid !important; grid-template-columns: 1.2fr 1fr 1fr 0.8fr !important; gap: 4px 12px !important; font-size: 11px !important; padding: 0 4px !important; margin-bottom: 8px !important;">
           <div style="display: flex !important; align-items: baseline !important;">
             <strong style="white-space: nowrap !important; margin-right: 4px !important;">Auto:</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important; font-weight: bold !important;">${vehicle?.brand || ''}</span>
@@ -270,7 +272,7 @@ export function getSaeHtml(
 
           <div style="display: flex !important; align-items: baseline !important; grid-column: span 2 !important;">
             <strong style="white-space: nowrap !important; margin-right: 4px !important;">No. de Serie:</strong>
-            <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important; font-family: monospace !important; font-size: 10px !important;">${vehicle?.serie || vehicle?.vin || ''}</span>
+            <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important; font-family: monospace !important; font-size: 10.5px !important;">${vehicle?.serie || vehicle?.vin || ''}</span>
           </div>
           <div style="display: flex !important; align-items: baseline !important;">
             <strong style="white-space: nowrap !important; margin-right: 4px !important;">Motor:</strong>
@@ -283,7 +285,7 @@ export function getSaeHtml(
         </div>
 
         <!-- Checklist grid (2 columns matching paper form) -->
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 2px 30px !important; padding: 0 10px !important; margin-bottom: 6px !important; font-size: 10px !important;">
+        <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px 36px !important; padding: 0 10px !important; margin-bottom: 8px !important; font-size: 10.5px !important;">
           <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
             <span>Tapetes</span> ${renderCheck(order.checklist.tapetes)}
           </div>
@@ -336,39 +338,50 @@ export function getSaeHtml(
         </div>
 
         <!-- Underlined inspeccion and objetos de valor -->
-        <div style="display: flex !important; flex-direction: column !important; gap: 4px !important; padding: 0 4px !important; font-size: 10px !important;">
+        <div style="display: flex !important; flex-direction: column !important; gap: 5px !important; padding: 0 4px !important; font-size: 10.5px !important;">
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Inspección Componentes de Motor</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Inspección Componentes de Motor</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${order.checklist.inspeccionMotor || ''}</span>
           </div>
           <div style="display: flex !important; align-items: baseline !important;">
-            <strong style="white-space: nowrap !important; margin-right: 4px !important;">Objetos de Valor</strong>
+            <strong style="white-space: nowrap !important; margin-right: 5px !important;">Objetos de Valor</strong>
             <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; padding-bottom: 1px !important;">${order.checklist.objetosValor || ''}</span>
           </div>
         </div>
       </div>
 
       <!-- Lower Split Grid: 2 Columns Side-by-Side (3. Descripción del servicio vs 4. Condiciones del servicio) -->
-      <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 14px !important; margin-bottom: 8px !important;">
+      <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; margin-bottom: 8px !important; flex: 1 !important;">
         
         <!-- Left Side Column: 3. Descripción del servicio -->
         <div style="display: flex !important; flex-direction: column !important; justify-content: space-between !important;">
           <div>
-            <img src="${barra3Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 26px !important; object-fit: fill !important; display: block !important; margin-bottom: 6px !important;" alt="3. Descripción del servicio" />
+            <img src="${barra3Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 8px !important;" alt="3. Descripción del servicio" />
 
-            <!-- Underlined Service Description rows matching paper form -->
+            <!-- Underlined Service Description rows matching paper form with LARGER TEXT -->
             <div style="margin-bottom: 8px !important;">
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 18px !important; padding-bottom: 1px !important; font-size: 10px !important; font-weight: bold !important; color: #000000 !important;">
-                ${order.reportedFailure}
+              <div style="border-bottom: 1px solid #000000 !important; min-height: 22px !important; padding-bottom: 2px !important; font-size: 13px !important; font-weight: bold !important; color: #000000 !important; line-height: 1.3 !important;">
+                ${order.reportedFailure || 'Servicio General'}
               </div>
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 18px !important; margin-top: 4px !important;"></div>
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 18px !important; margin-top: 4px !important;"></div>
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 18px !important; margin-top: 4px !important;"></div>
-              <div style="border-bottom: 1px solid #000000 !important; min-height: 18px !important; margin-top: 4px !important;"></div>
+              <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 4px !important;"></div>
+              <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 4px !important;"></div>
+              <div style="border-bottom: 1px solid #000000 !important; min-height: 20px !important; margin-top: 4px !important;"></div>
+            </div>
+
+            <!-- FIRMA DEL CLIENTE: Abajo del texto de descripción del servicio -->
+            <div style="text-align: center !important; margin: 8px 0 12px 0 !important;">
+              ${order.clientSignature ? `
+                <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 48px !important; max-width: 160px !important; margin: 0 auto 2px auto !important; display: block !important;" />
+              ` : `
+                <div style="height: 38px !important;"></div>
+              `}
+              <div style="border-top: 1px solid #000000 !important; width: 85% !important; margin: 0 auto 2px auto !important;"></div>
+              <div style="font-weight: bold !important; font-size: 10px !important; text-transform: uppercase !important;">Nombre y Firma del Cliente</div>
+              <div style="font-size: 8px !important; font-style: italic !important; color: #374151 !important;">(Acepto Condiciones y presupuesto)</div>
             </div>
 
             <!-- Fecha, Hora, Técnico -->
-            <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 6px !important; font-size: 10px !important; margin-bottom: 4px !important;">
+            <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; font-size: 10.5px !important; margin-bottom: 6px !important;">
               <div style="display: flex !important; align-items: baseline !important;">
                 <strong style="margin-right: 4px !important;">Fecha:</strong>
                 <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; font-weight: bold !important;">${dateStr}</span>
@@ -378,48 +391,45 @@ export function getSaeHtml(
                 <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important; font-weight: bold !important;">${timeStr}</span>
               </div>
             </div>
-            <div style="display: flex !important; align-items: baseline !important; font-size: 10px !important; margin-bottom: 12px !important;">
+            <div style="display: flex !important; align-items: baseline !important; font-size: 10.5px !important; margin-bottom: 8px !important;">
               <strong style="margin-right: 4px !important;">Técnico:</strong>
               <span style="border-bottom: 1px solid #000000 !important; flex: 1 !important;">${mechanicName}</span>
             </div>
           </div>
 
-          <!-- Signature box at bottom left -->
-          <div style="text-align: center !important; padding-top: 6px !important;">
-            ${order.clientSignature ? `
-              <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 48px !important; max-width: 160px !important; margin: 0 auto 2px auto !important; display: block !important;" />
-            ` : `
-              <div style="height: 38px !important;"></div>
-            `}
+          <!-- FIRMA DEL ASESOR: En donde estaba la firma del cliente (abajo a la izquierda) -->
+          <div style="text-align: center !important; padding-top: 6px !important; margin-top: auto !important;">
+            <div style="height: 38px !important; display: flex !important; align-items: flex-end !important; justify-content: center !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; padding-bottom: 2px !important;">
+              ${advisorName}
+            </div>
             <div style="border-top: 1px solid #000000 !important; width: 85% !important; margin: 0 auto 2px auto !important;"></div>
-            <div style="font-weight: bold !important; font-size: 10px !important; text-transform: uppercase !important;">Nombre y Firma del Cliente</div>
-            <div style="font-size: 8px !important; font-style: italic !important; color: #374151 !important;">(Acepto Condiciones y presupuesto)</div>
+            <div style="font-weight: bold !important; font-size: 10px !important; text-transform: uppercase !important;">Nombre y Firma del Asesor / Recepción</div>
           </div>
         </div>
 
-        <!-- Right Side Column: 4. Condiciones del servicio -->
+        <!-- Right Side Column: 4. Condiciones del servicio (Usando la barra 04) -->
         <div>
-          <img src="${barra4Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 26px !important; object-fit: fill !important; display: block !important; margin-bottom: 6px !important;" onError="this.onerror=null; this.src='${barra3Url}';" alt="4. Condiciones del servicio" />
+          <img src="${barra4Url}" crossorigin="anonymous" style="width: 100% !important; height: auto !important; max-height: 28px !important; object-fit: fill !important; display: block !important; margin-bottom: 8px !important;" alt="4. Condiciones del servicio" />
 
-          <div style="font-size: 7.2px !important; line-height: 1.18 !important; text-align: justify !important; color: #000000 !important;">
-            <p style="margin: 0 0 2px 0 !important;">1. Este documento no tiene validez como comprobante fiscal.</p>
-            <p style="margin: 0 0 2px 0 !important;">2. Presente este comprobante para cualquier aclaración o ajuste posterior.</p>
-            <p style="margin: 0 0 2px 0 !important;">3. La empresa no se hace responsable por objetos de valor olvidados en el vehículo que no sean reportados a la administración.</p>
-            <p style="margin: 0 0 2px 0 !important;">4. Si el automóvil requiere prueba de camino, el costo de la gasolina será cubierto por el cliente.</p>
-            <p style="margin: 0 0 2px 0 !important;">5. En caso de accidente automovilístico y/o siniestro, el cliente autoriza hacer uso de la póliza del seguro del vehículo.</p>
-            <p style="margin: 0 0 2px 0 !important;">6. El costo por revisión y diagnóstico es de $350.00 (trescientos cincuenta pesos 00/100 M.N.) por hora. Para esta revisión se consideran <span style="border-bottom: 1px solid #000 !important; padding: 0 3px !important; font-weight: bold !important;">1.5</span> horas.<br/>El cliente firma de conformidad ___________________________</p>
-            <p style="margin: 0 0 2px 0 !important;">7. En caso de que el presupuesto no sea aceptado, el cliente pagará exclusivamente el costo por revisión y diagnóstico.</p>
-            <p style="margin: 0 0 2px 0 !important;">8. El prestador de servicio se obliga a devolver el automóvil en las condiciones que le fue entregado, exceptuando las consecuencias inevitables del diagnóstico.</p>
-            <p style="margin: 0 0 2px 0 !important;">9. Se cobrarán $300.00 (trescientos pesos 00/100 M.N.) diarios por concepto de pensión si el auto no es recogido después de 24 horas de haber recibido la notificación de terminado el trabajo.</p>
-            <p style="margin: 0 0 2px 0 !important;">10. El cliente renuncia a recoger las partes usadas que fueron retiradas de la unidad, si no son solicitadas al momento de la entrega de su vehículo ________________________</p>
+          <div style="font-size: 8px !important; line-height: 1.25 !important; text-align: justify !important; color: #000000 !important;">
+            <p style="margin: 0 0 3px 0 !important;">1. Este documento no tiene validez como comprobante fiscal.</p>
+            <p style="margin: 0 0 3px 0 !important;">2. Presente este comprobante para cualquier aclaración o ajuste posterior.</p>
+            <p style="margin: 0 0 3px 0 !important;">3. La empresa no se hace responsable por objetos de valor olvidados en el vehículo que no sean reportados a la administración.</p>
+            <p style="margin: 0 0 3px 0 !important;">4. Si el automóvil requiere prueba de camino, el costo de la gasolina será cubierto por el cliente.</p>
+            <p style="margin: 0 0 3px 0 !important;">5. En caso de accidente automovilístico y/o siniestro, el cliente autoriza hacer uso de la póliza del seguro del vehículo.</p>
+            <p style="margin: 0 0 3px 0 !important;">6. El costo por revisión y diagnóstico es de $350.00 (trescientos cincuenta pesos 00/100 M.N.) por hora. Para esta revisión se consideran <span style="border-bottom: 1px solid #000 !important; padding: 0 3px !important; font-weight: bold !important;">1.5</span> horas.<br/>El cliente firma de conformidad ___________________________</p>
+            <p style="margin: 0 0 3px 0 !important;">7. En caso de que el presupuesto no sea aceptado, el cliente pagará exclusivamente el costo por revisión y diagnóstico.</p>
+            <p style="margin: 0 0 3px 0 !important;">8. El prestador de servicio se obliga a devolver el automóvil en las condiciones que le fue entregado, exceptuando las consecuencias inevitables del diagnóstico.</p>
+            <p style="margin: 0 0 3px 0 !important;">9. Se cobrarán $300.00 (trescientos pesos 00/100 M.N.) diarios por concepto de pensión si el auto no es recogido después de 24 horas de haber recibido la notificación de terminado el trabajo.</p>
+            <p style="margin: 0 0 3px 0 !important;">10. El cliente renuncia a recoger las partes usadas que fueron retiradas de la unidad, si no son solicitadas al momento de la entrega de su vehículo ________________________</p>
           </div>
         </div>
       </div>
 
       <!-- Footer Bar -->
-      <div style="border-top: 1px solid #000000 !important; padding-top: 4px !important; margin-top: 4px !important; text-align: center !important; font-size: 8.5px !important; font-weight: bold !important; color: #000000 !important; display: flex !important; flex-direction: column !important; gap: 2px !important;">
+      <div style="border-top: 1px solid #000000 !important; padding-top: 6px !important; margin-top: 8px !important; text-align: center !important; font-size: 9px !important; font-weight: bold !important; color: #000000 !important; display: flex !important; flex-direction: column !important; gap: 3px !important;">
         <div>Mixtecas Mz. 52 Lt. 17 Esq. Rey TepalcatzinAjusco, Coyoacán. C.P. 04300 CDMX</div>
-        <div style="display: flex !important; justify-content: center !important; gap: 15px !important;">
+        <div style="display: flex !important; justify-content: center !important; gap: 18px !important;">
           <span>📞 55 4632 6652</span>
           <span>🟢 55 3917 7754</span>
           <span>✉️ contacto@saecdmx.com</span>
@@ -445,7 +455,7 @@ export async function generateSaePdf(
   container.style.left = '0px';
   container.style.top = '0px';
   container.style.width = '750px';
-  container.style.padding = '20px';
+  container.style.padding = '0px';
   container.style.backgroundColor = '#FFFFFF';
   container.style.color = '#111827';
   container.style.fontFamily = '"Arial", sans-serif';
@@ -475,9 +485,9 @@ export async function generateSaePdf(
       format: 'letter'
     });
 
-    const imgWidth = 216;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    const pdfWidth = 215.9; // Letter width in mm
+    const pdfHeight = 279.4; // Letter height in mm
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
     const filename = `Orden_SAE_Folio_${order.folio || order.id.replace('OS-', '')}.pdf`;
     pdf.save(filename);
@@ -504,7 +514,7 @@ export async function generateSaePdfBlob(
   container.style.left = '0px';
   container.style.top = '0px';
   container.style.width = '750px';
-  container.style.padding = '20px';
+  container.style.padding = '0px';
   container.style.backgroundColor = '#FFFFFF';
   container.style.color = '#111827';
   container.style.fontFamily = '"Arial", sans-serif';
@@ -534,9 +544,9 @@ export async function generateSaePdfBlob(
       format: 'letter'
     });
 
-    const imgWidth = 216;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    const pdfWidth = 215.9; // Letter width in mm
+    const pdfHeight = 279.4; // Letter height in mm
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
     return pdf.output('blob');
   } catch (error) {
