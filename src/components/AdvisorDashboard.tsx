@@ -4980,13 +4980,13 @@ export default function AdvisorDashboard({
 
       {/* Save Success and WhatsApp Delivery Modal Overlay */}
       {showSaveSuccessModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl border border-slate-200 w-full max-w-lg overflow-hidden shadow-2xl flex flex-col transform scale-100 transition-all">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 w-full max-w-lg max-h-[92vh] my-auto overflow-hidden shadow-2xl flex flex-col transform transition-all">
             {/* Header */}
-            <div className="bg-slate-900 px-6 py-5 flex items-center justify-between text-white">
+            <div className="bg-slate-900 px-4 sm:px-6 py-4 flex items-center justify-between text-white shrink-0 sticky top-0 z-10">
               <div className="flex items-center gap-2">
-                <CheckSquare size={20} className="text-emerald-500 animate-bounce" />
-                <h3 className="font-black text-base md:text-lg font-display">¡Orden Registrada Correctamente!</h3>
+                <CheckSquare size={20} className="text-emerald-500 shrink-0" />
+                <h3 className="font-black text-sm sm:text-base md:text-lg font-display">¡Orden Registrada Correctamente!</h3>
               </div>
               <button 
                 type="button" 
@@ -4994,14 +4994,16 @@ export default function AdvisorDashboard({
                   setShowSaveSuccessModal(false);
                   if (setActiveTab) setActiveTab('quotes');
                 }}
-                className="text-slate-400 hover:text-white transition-colors bg-slate-800 p-1.5 rounded-full"
+                className="text-slate-300 hover:text-white transition-colors bg-slate-800 hover:bg-slate-700 p-2 rounded-full shrink-0 flex items-center justify-center cursor-pointer"
+                title="Cerrar ventana"
+                aria-label="Cerrar"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Content Body */}
-            <div className="p-6 space-y-5 text-slate-800 text-left">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 text-slate-800 text-left overflow-y-auto flex-1">
               <div className="text-center space-y-2">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600 mx-auto border border-emerald-500/20">
                   <Check size={36} strokeWidth={3} />
@@ -5316,14 +5318,21 @@ export default function AdvisorDashboard({
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowSaveSuccessModal(false)}
+                className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-all"
+              >
+                Cerrar Ventana
+              </button>
               <button
                 type="button"
                 onClick={() => {
                   setShowSaveSuccessModal(false);
                   if (setActiveTab) setActiveTab('quotes');
                 }}
-                className="px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-2"
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-2"
               >
                 <span>Ir a Cotizador y Presupuesto</span>
                 <ChevronRight size={14} />
