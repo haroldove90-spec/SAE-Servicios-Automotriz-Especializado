@@ -166,13 +166,13 @@ export function getSaeHtml(
   // Checkbox mark helper for background template
   const renderCheckMark = (val: boolean | undefined, topPx: number, isColumn2: boolean = false) => {
     const isYes = val === true;
-    // Column 1: Yes box is left ~366px, No box is left ~402px
-    // Column 2: Yes box is left ~632px, No box is left ~668px
-    const yesLeft = isColumn2 ? 632 : 366;
-    const noLeft = isColumn2 ? 668 : 402;
+    // Column 1: Sí box is left ~184px, No box is left ~247px
+    // Column 2: Sí box is left ~570px, No box is left ~632px
+    const yesLeft = isColumn2 ? 570 : 184;
+    const noLeft = isColumn2 ? 632 : 247;
 
     const targetLeft = isYes ? yesLeft : noLeft;
-    return `<div style="position: absolute !important; top: ${topPx}px !important; left: ${targetLeft}px !important; font-weight: 900 !important; font-size: 11px !important; color: #000000 !important; line-height: 1 !important;">✕</div>`;
+    return `<div style="position: absolute !important; top: ${topPx}px !important; left: ${targetLeft}px !important; font-weight: 900 !important; font-size: 12px !important; color: #000000 !important; line-height: 1 !important; width: 14px !important; text-align: center !important;">✕</div>`;
   };
 
   return `
@@ -184,128 +184,128 @@ export function getSaeHtml(
       <!-- Data Overlay Layer (Dynamic values positioned directly over image fields) -->
       <div style="position: absolute !important; top: 0 !important; left: 0 !important; width: 750px !important; height: 980px !important; z-index: 1 !important; font-size: 11px !important;">
 
-        <!-- Folio Number -->
-        <div style="position: absolute !important; top: 18px !important; right: 28px !important; width: 95px !important; text-align: center !important; font-weight: 900 !important; font-size: 18px !important; color: #D32F2F !important; font-family: 'Courier New', monospace, sans-serif !important; line-height: 1 !important;">
+        <!-- Folio Number (Positioned inside the capsule box at top right) -->
+        <div style="position: absolute !important; top: 50px !important; left: 600px !important; width: 110px !important; text-align: center !important; font-weight: 900 !important; font-size: 16px !important; color: #D32F2F !important; font-family: 'Courier New', monospace, sans-serif !important; line-height: 1 !important;">
           ${order.folio || order.id.replace('OS-', '')}
         </div>
 
         <!-- Section 1: Datos del cliente -->
         <!-- Cliente -->
-        <div style="position: absolute !important; top: 86px !important; left: 88px !important; font-weight: bold !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 120px !important; left: 90px !important; font-weight: bold !important; font-size: 11px !important;">
           ${client?.name || ''}
         </div>
         <!-- E-Mail -->
-        <div style="position: absolute !important; top: 86px !important; left: 435px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 120px !important; left: 435px !important; font-size: 11px !important;">
           ${client?.email || ''}
         </div>
         <!-- Tel. Cel -->
-        <div style="position: absolute !important; top: 109px !important; left: 95px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 143px !important; left: 95px !important; font-size: 11px !important;">
           ${client?.phone || ''}
         </div>
         <!-- Tel -->
-        <div style="position: absolute !important; top: 109px !important; left: 418px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 143px !important; left: 415px !important; font-size: 11px !important;">
           ${client?.telFijo || ''}
         </div>
         <!-- Calle -->
-        <div style="position: absolute !important; top: 132px !important; left: 80px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 166px !important; left: 80px !important; font-size: 11px !important;">
           ${client?.calle || client?.address || ''}
         </div>
         <!-- C.P. -->
-        <div style="position: absolute !important; top: 132px !important; left: 420px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 166px !important; left: 580px !important; font-size: 11px !important;">
           ${client?.cp || ''}
         </div>
         <!-- Colonia -->
-        <div style="position: absolute !important; top: 155px !important; left: 90px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 189px !important; left: 95px !important; font-size: 11px !important;">
           ${client?.colonia || ''}
         </div>
         <!-- Alcaldía -->
-        <div style="position: absolute !important; top: 155px !important; left: 438px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 189px !important; left: 465px !important; font-size: 11px !important;">
           ${client?.alcaldia || ''}
         </div>
 
         <!-- Section 2: Datos del auto -->
         <!-- Auto (Marca) -->
-        <div style="position: absolute !important; top: 212px !important; left: 78px !important; font-weight: bold !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 250px !important; left: 80px !important; font-weight: bold !important; font-size: 11px !important;">
           ${vehicle?.brand || ''}
         </div>
         <!-- Modelo -->
-        <div style="position: absolute !important; top: 212px !important; left: 275px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 250px !important; left: 300px !important; font-size: 11px !important;">
           ${vehicle?.model || ''} ${vehicle?.year ? `(${vehicle.year})` : ''}
         </div>
         <!-- Placas -->
-        <div style="position: absolute !important; top: 212px !important; left: 472px !important; font-weight: bold !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 250px !important; left: 510px !important; font-weight: bold !important; font-size: 11px !important;">
           ${vehicle?.plate || ''}
         </div>
         <!-- Kms -->
-        <div style="position: absolute !important; top: 212px !important; left: 628px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 250px !important; left: 655px !important; font-size: 11px !important;">
           ${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}
         </div>
         <!-- No. de Serie -->
-        <div style="position: absolute !important; top: 235px !important; left: 118px !important; font-size: 10.5px !important; font-family: monospace !important;">
+        <div style="position: absolute !important; top: 273px !important; left: 120px !important; font-size: 10.5px !important; font-family: monospace !important;">
           ${vehicle?.serie || vehicle?.vin || ''}
         </div>
         <!-- Motor -->
-        <div style="position: absolute !important; top: 235px !important; left: 472px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 273px !important; left: 465px !important; font-size: 11px !important;">
           ${vehicle?.motor || ''}
         </div>
         <!-- Color -->
-        <div style="position: absolute !important; top: 235px !important; left: 632px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 273px !important; left: 640px !important; font-size: 11px !important;">
           ${vehicle?.color || ''}
         </div>
 
         <!-- Checklist Marks -->
         <!-- Column 1 -->
-        ${renderCheckMark(order.checklist?.tapetes, 268, false)}
-        ${renderCheckMark(order.checklist?.encendedor, 286, false)}
-        ${renderCheckMark(order.checklist?.estereo, 304, false)}
-        ${renderCheckMark(order.checklist?.tarjetaCirculacion, 322, false)}
-        ${renderCheckMark(order.checklist?.compVerificacion, 340, false)}
-        ${renderCheckMark(order.checklist?.polizaSeguro, 358, false)}
-        ${renderCheckMark(order.checklist?.segurosRuedas, 376, false)}
+        ${renderCheckMark(order.checklist?.tapetes, 301, false)}
+        ${renderCheckMark(order.checklist?.encendedor, 320, false)}
+        ${renderCheckMark(order.checklist?.estereo, 339, false)}
+        ${renderCheckMark(order.checklist?.tarjetaCirculacion, 358, false)}
+        ${renderCheckMark(order.checklist?.compVerificacion, 377, false)}
+        ${renderCheckMark(order.checklist?.polizaSeguro, 396, false)}
+        ${renderCheckMark(order.checklist?.segurosRuedas, 415, false)}
 
         <!-- Column 2 -->
-        ${renderCheckMark(order.checklist?.gato || order.checklist?.jack, 268, true)}
-        ${renderCheckMark(order.checklist?.herramienta || order.checklist?.tools, 286, true)}
-        ${renderCheckMark(order.checklist?.extintor || order.checklist?.extinguisher, 304, true)}
-        ${renderCheckMark(order.checklist?.llantaRefaccion || order.checklist?.spareTire, 322, true)}
-        ${renderCheckMark(order.checklist?.sensoresPresencia, 340, true)}
-        ${renderCheckMark(order.checklist?.camaraReversa, 362, true)}
+        ${renderCheckMark(order.checklist?.gato || order.checklist?.jack, 301, true)}
+        ${renderCheckMark(order.checklist?.herramienta || order.checklist?.tools, 320, true)}
+        ${renderCheckMark(order.checklist?.extintor || order.checklist?.extinguisher, 339, true)}
+        ${renderCheckMark(order.checklist?.llantaRefaccion || order.checklist?.spareTire, 358, true)}
+        ${renderCheckMark(order.checklist?.sensoresPresencia, 377, true)}
+        ${renderCheckMark(order.checklist?.camaraReversa, 396, true)}
 
         <!-- Gasolina Percentage -->
-        <div style="position: absolute !important; top: 376px !important; left: 642px !important; font-weight: bold !important; color: #D32F2F !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 415px !important; left: 620px !important; font-weight: bold !important; color: #D32F2F !important; font-size: 11px !important;">
           ${order.checklist?.fuelLevel !== undefined ? order.checklist.fuelLevel : 50}%
         </div>
 
         <!-- Inspección Componentes de Motor -->
-        <div style="position: absolute !important; top: 400px !important; left: 235px !important; font-size: 10.5px !important;">
+        <div style="position: absolute !important; top: 438px !important; left: 230px !important; font-size: 10.5px !important;">
           ${order.checklist?.inspeccionMotor || ''}
         </div>
 
         <!-- Objetos de Valor -->
-        <div style="position: absolute !important; top: 422px !important; left: 140px !important; font-size: 10.5px !important;">
+        <div style="position: absolute !important; top: 461px !important; left: 140px !important; font-size: 10.5px !important;">
           ${order.checklist?.objetosValor || ''}
         </div>
 
         <!-- Section 3: Descripción del servicio -->
-        <div style="position: absolute !important; top: 490px !important; left: 38px !important; font-weight: bold !important; font-size: 11px !important; max-width: 310px !important; line-height: 1.4 !important;">
+        <div style="position: absolute !important; top: 525px !important; left: 38px !important; font-weight: bold !important; font-size: 11px !important; max-width: 310px !important; line-height: 22px !important;">
           ${order.reportedFailure || 'Servicio General'}
         </div>
 
         <!-- Fecha -->
-        <div style="position: absolute !important; top: 605px !important; left: 80px !important; font-weight: bold !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 648px !important; left: 80px !important; font-weight: bold !important; font-size: 11px !important;">
           ${dateStr}
         </div>
         <!-- Hora -->
-        <div style="position: absolute !important; top: 605px !important; left: 240px !important; font-weight: bold !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 648px !important; left: 235px !important; font-weight: bold !important; font-size: 11px !important;">
           ${timeStr}
         </div>
         <!-- Técnico -->
-        <div style="position: absolute !important; top: 628px !important; left: 90px !important; font-size: 11px !important;">
+        <div style="position: absolute !important; top: 671px !important; left: 90px !important; font-size: 11px !important;">
           ${mechanicName}
         </div>
 
         <!-- Firma del Cliente -->
-        <div style="position: absolute !important; top: 660px !important; left: 75px !important; width: 200px !important; height: 50px !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+        <div style="position: absolute !important; top: 700px !important; left: 70px !important; width: 200px !important; height: 48px !important; display: flex !important; align-items: center !important; justify-content: center !important;">
           ${order.clientSignature ? `
             <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 48px !important; max-width: 190px !important; object-fit: contain !important;" />
           ` : ''}
