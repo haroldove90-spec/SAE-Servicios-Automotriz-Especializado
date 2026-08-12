@@ -225,7 +225,7 @@ export function getSaeHtml(
 
         <!-- Section 2: Datos del auto -->
         <!-- Auto (Marca) -->
-        <div style="position: absolute !important; top: 252px !important; left: 85px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 252px !important; left: 140px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.brand || ''}
         </div>
         <!-- Modelo -->
@@ -241,7 +241,7 @@ export function getSaeHtml(
           ${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}
         </div>
         <!-- No. de Serie -->
-        <div style="position: absolute !important; top: 275px !important; left: 145px !important; font-size: 10.5px !important; font-family: monospace !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 275px !important; left: 165px !important; font-size: 10.5px !important; font-family: monospace !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.serie || vehicle?.vin || ''}
         </div>
         <!-- Motor -->
