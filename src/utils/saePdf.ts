@@ -180,240 +180,140 @@ export function getSaeHtml(
   };
 
   return `
-    <div style="position: relative !important; width: 750px !important; min-height: 980px !important; margin: 0 auto !important; font-family: 'Arial', 'Helvetica', sans-serif !important; color: #000000 !important; line-height: 1.3 !important; font-size: 10.5px !important; background-color: #FFFFFF !important; box-sizing: border-box !important;">
+    <div style="position: relative !important; width: 750px !important; height: 980px !important; margin: 0 auto !important; font-family: 'Arial', 'Helvetica', sans-serif !important; color: #000000 !important; background-color: #FFFFFF !important; box-sizing: border-box !important; overflow: hidden !important;">
       
       <!-- Full Background Form Image -->
-      <img src="${formatoBgUrl}" crossorigin="anonymous" style="position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; object-fit: fill !important; z-index: 0 !important;" alt="Fondo Formato SAE" />
+      <img src="${formatoBgUrl}" crossorigin="anonymous" style="position: absolute !important; top: 0 !important; left: 0 !important; width: 750px !important; height: 980px !important; object-fit: fill !important; z-index: 0 !important;" alt="Fondo Formato SAE" />
 
-      <!-- Data Overlay Layer -->
-      <div style="position: relative !important; z-index: 1 !important; width: 100% !important; height: 100% !important; padding: 12px 18px !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; min-height: 980px !important; box-sizing: border-box !important;">
+      <!-- Data Overlay Layer (Dynamic values positioned directly over image fields) -->
+      <div style="position: absolute !important; top: 0 !important; left: 0 !important; width: 750px !important; height: 980px !important; z-index: 1 !important; font-size: 11px !important;">
 
-        <!-- Top Header Section -->
-        <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important; min-height: 46px !important;">
-          <!-- Left: Reserved area for printed background logo -->
-          <div style="display: flex !important; align-items: center !important;"></div>
-          
-          <!-- Right: Folio Capsule Box -->
-          <div style="display: flex !important; align-items: center !important; gap: 8px !important;">
-            <span style="font-weight: bold !important; font-size: 16px !important; color: #000000 !important;">Folio</span>
-            <div style="display: inline-flex !important; align-items: center !important; justify-content: center !important; border: 2px solid #000000 !important; border-radius: 20px !important; min-width: 95px !important; height: 32px !important; box-sizing: border-box !important; background-color: #FFFFFF !important; padding: 0 12px !important;">
-              <span style="font-weight: 900 !important; font-size: 18px !important; color: #D32F2F !important; font-family: 'Courier New', monospace, sans-serif !important; text-align: center !important; line-height: 1 !important; display: block !important;">
-                ${order.folio || order.id.replace('OS-', '')}
-              </span>
-            </div>
-          </div>
+        <!-- Folio Number -->
+        <div style="position: absolute !important; top: 18px !important; right: 28px !important; width: 95px !important; text-align: center !important; font-weight: 900 !important; font-size: 18px !important; color: #D32F2F !important; font-family: 'Courier New', monospace, sans-serif !important; line-height: 1 !important;">
+          ${order.folio || order.id.replace('OS-', '')}
         </div>
 
         <!-- Section 1: Datos del cliente -->
-        <div style="margin-bottom: 8px !important; margin-top: 20px !important;">
-          <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 6px 22px !important; font-size: 11px !important; padding: 0 4px !important;">
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Cliente:</strong>
-              <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${client?.name || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">E-Mail:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${client?.email || ''}</span>
-            </div>
-
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Tel. Cel:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${client?.phone || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Tel:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${client?.telFijo || ''}</span>
-            </div>
-
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Calle:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${client?.calle || client?.address || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">C.P.:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${client?.cp || ''}</span>
-            </div>
-
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Colonia:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${client?.colonia || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Alcaldía:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${client?.alcaldia || ''}</span>
-            </div>
-          </div>
+        <!-- Cliente -->
+        <div style="position: absolute !important; top: 86px !important; left: 88px !important; font-weight: bold !important; font-size: 11px !important;">
+          ${client?.name || ''}
+        </div>
+        <!-- E-Mail -->
+        <div style="position: absolute !important; top: 86px !important; left: 435px !important; font-size: 11px !important;">
+          ${client?.email || ''}
+        </div>
+        <!-- Tel. Cel -->
+        <div style="position: absolute !important; top: 109px !important; left: 95px !important; font-size: 11px !important;">
+          ${client?.phone || ''}
+        </div>
+        <!-- Tel -->
+        <div style="position: absolute !important; top: 109px !important; left: 418px !important; font-size: 11px !important;">
+          ${client?.telFijo || ''}
+        </div>
+        <!-- Calle -->
+        <div style="position: absolute !important; top: 132px !important; left: 80px !important; font-size: 11px !important;">
+          ${client?.calle || client?.address || ''}
+        </div>
+        <!-- C.P. -->
+        <div style="position: absolute !important; top: 132px !important; left: 420px !important; font-size: 11px !important;">
+          ${client?.cp || ''}
+        </div>
+        <!-- Colonia -->
+        <div style="position: absolute !important; top: 155px !important; left: 90px !important; font-size: 11px !important;">
+          ${client?.colonia || ''}
+        </div>
+        <!-- Alcaldía -->
+        <div style="position: absolute !important; top: 155px !important; left: 438px !important; font-size: 11px !important;">
+          ${client?.alcaldia || ''}
         </div>
 
         <!-- Section 2: Datos del auto -->
-        <div style="margin-bottom: 8px !important; margin-top: 15px !important;">
-          <!-- Auto fields row 1 & 2 -->
-          <div style="display: grid !important; grid-template-columns: 1.2fr 1fr 1fr 0.8fr !important; gap: 6px 12px !important; font-size: 11px !important; padding: 0 4px !important; margin-bottom: 8px !important;">
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Auto:</strong>
-              <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${vehicle?.brand || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Modelo:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.model || ''} (${vehicle?.year || ''})</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Placas:</strong>
-              <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${vehicle?.plate || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Kms:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}</span>
-            </div>
-
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important; grid-column: span 2 !important;">
-              <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">No. de Serie:</strong>
-              <span style="flex: 1 !important; font-family: monospace !important; font-size: 10.5px !important; line-height: 1 !important;">${vehicle?.serie || vehicle?.vin || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Motor:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.motor || ''}</span>
-            </div>
-            <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-              <strong style="white-space: nowrap !important; margin-right: 4px !important; line-height: 1 !important;">Color:</strong>
-              <span style="flex: 1 !important; line-height: 1 !important;">${vehicle?.color || ''}</span>
-            </div>
-          </div>
-
-          <!-- Checklist grid (2 columns matching paper form) -->
-          <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px 36px !important; padding: 0 10px !important; margin-bottom: 8px !important; font-size: 10.5px !important;">
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Tapetes</span> ${renderCheck(order.checklist.tapetes)}
-            </div>
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Gato</span> ${renderCheck(order.checklist.gato || order.checklist.jack)}
-            </div>
-
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Encendedor</span> ${renderCheck(order.checklist.encendedor)}
-            </div>
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Herramienta</span> ${renderCheck(order.checklist.herramienta || order.checklist.tools)}
-            </div>
-
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Estéreo</span> ${renderCheck(order.checklist.estereo)}
-            </div>
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Extintor</span> ${renderCheck(order.checklist.extintor || order.checklist.extinguisher)}
-            </div>
-
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Tarjeta de Circulación</span> ${renderCheck(order.checklist.tarjetaCirculacion)}
-            </div>
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Llanta de refacción</span> ${renderCheck(order.checklist.llantaRefaccion || order.checklist.spareTire)}
-            </div>
-
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Comp. de Verificación</span> ${renderCheck(order.checklist.compVerificacion)}
-            </div>
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Sensores de presencia</span> ${renderCheck(order.checklist.sensoresPresencia)}
-            </div>
-
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Póliza de seguro</span> ${renderCheck(order.checklist.polizaSeguro)}
-            </div>
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Cámara de Reversa</span> ${renderCheck(order.checklist.camaraReversa)}
-            </div>
-
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span>Seguros de Ruedas</span> ${renderCheck(order.checklist.segurosRuedas)}
-            </div>
-            <div style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
-              <span style="font-weight: bold !important; color: #D32F2F !important;">Gasolina:</span>
-              <span style="font-weight: bold !important; color: #D32F2F !important;">${order.checklist.fuelLevel}%</span>
-            </div>
-          </div>
+        <!-- Auto (Marca) -->
+        <div style="position: absolute !important; top: 212px !important; left: 78px !important; font-weight: bold !important; font-size: 11px !important;">
+          ${vehicle?.brand || ''}
+        </div>
+        <!-- Modelo -->
+        <div style="position: absolute !important; top: 212px !important; left: 275px !important; font-size: 11px !important;">
+          ${vehicle?.model || ''} ${vehicle?.year ? `(${vehicle.year})` : ''}
+        </div>
+        <!-- Placas -->
+        <div style="position: absolute !important; top: 212px !important; left: 472px !important; font-weight: bold !important; font-size: 11px !important;">
+          ${vehicle?.plate || ''}
+        </div>
+        <!-- Kms -->
+        <div style="position: absolute !important; top: 212px !important; left: 628px !important; font-size: 11px !important;">
+          ${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}
+        </div>
+        <!-- No. de Serie -->
+        <div style="position: absolute !important; top: 235px !important; left: 118px !important; font-size: 10.5px !important; font-family: monospace !important;">
+          ${vehicle?.serie || vehicle?.vin || ''}
+        </div>
+        <!-- Motor -->
+        <div style="position: absolute !important; top: 235px !important; left: 472px !important; font-size: 11px !important;">
+          ${vehicle?.motor || ''}
+        </div>
+        <!-- Color -->
+        <div style="position: absolute !important; top: 235px !important; left: 632px !important; font-size: 11px !important;">
+          ${vehicle?.color || ''}
         </div>
 
-        <!-- Lower Split Grid: Side-by-Side 2 Columns (Left: Inspección + Descripción del servicio + Firma vs Right: Condiciones del servicio) -->
-        <div style="display: grid !important; grid-template-columns: 1fr 1.05fr !important; gap: 14px !important; margin-bottom: 6px !important; flex: 1 !important;">
-          
-          <!-- Left Column -->
-          <div style="display: flex !important; flex-direction: column !important; justify-content: space-between !important;">
-            <div>
-              <!-- Inspección Componentes de Motor & Objetos de Valor -->
-              <div style="display: flex !important; flex-direction: column !important; gap: 5px !important; padding: 0 2px !important; font-size: 10.5px !important; margin-bottom: 12px !important;">
-                <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-                  <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Inspección Componentes de Motor</strong>
-                  <span style="flex: 1 !important; line-height: 1 !important;">${order.checklist.inspeccionMotor || ''}</span>
-                </div>
-                <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-                  <strong style="white-space: nowrap !important; margin-right: 5px !important; line-height: 1 !important;">Objetos de Valor</strong>
-                  <span style="flex: 1 !important; line-height: 1 !important;">${order.checklist.objetosValor || ''}</span>
-                </div>
-              </div>
+        <!-- Checklist Marks -->
+        <!-- Column 1 -->
+        ${renderCheckMark(order.checklist?.tapetes, 268, false)}
+        ${renderCheckMark(order.checklist?.encendedor, 286, false)}
+        ${renderCheckMark(order.checklist?.estereo, 304, false)}
+        ${renderCheckMark(order.checklist?.tarjetaCirculacion, 322, false)}
+        ${renderCheckMark(order.checklist?.compVerificacion, 340, false)}
+        ${renderCheckMark(order.checklist?.polizaSeguro, 358, false)}
+        ${renderCheckMark(order.checklist?.segurosRuedas, 376, false)}
 
-              <!-- Underlined Service Description rows matching paper form -->
-              <div style="margin-bottom: 8px !important; margin-top: 22px !important;">
-                <div style="border-bottom: 1.2px solid #000000 !important; min-height: 22px !important; padding-bottom: 5px !important; font-size: 11px !important; font-weight: bold !important; color: #000000 !important; line-height: 1 !important; display: flex !important; align-items: flex-end !important;">
-                  <span>${order.reportedFailure || 'Servicio General'}</span>
-                </div>
-                <div style="border-bottom: 1.2px solid #000000 !important; height: 20px !important; margin-top: 5px !important;"></div>
-                <div style="border-bottom: 1.2px solid #000000 !important; height: 20px !important; margin-top: 5px !important;"></div>
-                <div style="border-bottom: 1.2px solid #000000 !important; height: 20px !important; margin-top: 5px !important;"></div>
-                <div style="border-bottom: 1.2px solid #000000 !important; height: 20px !important; margin-top: 5px !important;"></div>
-              </div>
+        <!-- Column 2 -->
+        ${renderCheckMark(order.checklist?.gato || order.checklist?.jack, 268, true)}
+        ${renderCheckMark(order.checklist?.herramienta || order.checklist?.tools, 286, true)}
+        ${renderCheckMark(order.checklist?.extintor || order.checklist?.extinguisher, 304, true)}
+        ${renderCheckMark(order.checklist?.llantaRefaccion || order.checklist?.spareTire, 322, true)}
+        ${renderCheckMark(order.checklist?.sensoresPresencia, 340, true)}
+        ${renderCheckMark(order.checklist?.camaraReversa, 362, true)}
 
-              <!-- Fecha, Hora, Técnico -->
-              <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; font-size: 10.5px !important; margin-bottom: 6px !important;">
-                <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-                  <strong style="margin-right: 4px !important; line-height: 1 !important;">Fecha:</strong>
-                  <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${dateStr}</span>
-                </div>
-                <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important;">
-                  <strong style="margin-right: 4px !important; line-height: 1 !important;">Hora:</strong>
-                  <span style="flex: 1 !important; font-weight: bold !important; line-height: 1 !important;">${timeStr}</span>
-                </div>
-              </div>
-              <div style="display: flex !important; align-items: flex-end !important; border-bottom: 1.2px solid #000000 !important; padding-bottom: 5px !important; min-height: 22px !important; font-size: 10.5px !important; margin-bottom: 10px !important;">
-                <strong style="margin-right: 4px !important; line-height: 1 !important;">Técnico:</strong>
-                <span style="flex: 1 !important; line-height: 1 !important;">${mechanicName}</span>
-              </div>
-            </div>
-
-            <!-- Firma del Cliente (SOLO CLIENTE, Asesor eliminado segun instruccion) -->
-            <div style="text-align: center !important; margin-top: auto !important; margin-bottom: 4px !important;">
-              <div style="height: 38px !important; display: flex !important; align-items: flex-end !important; justify-content: center !important;">
-                ${order.clientSignature ? `
-                  <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 38px !important; max-width: 180px !important; margin: 0 auto !important; display: block !important;" />
-                ` : `
-                  <div style="height: 34px !important;"></div>
-                `}
-              </div>
-              <div style="border-top: 1.2px solid #000000 !important; width: 90% !important; margin: 2px auto 3px auto !important;"></div>
-              <div style="font-weight: bold !important; font-size: 11px !important; text-transform: uppercase !important; color: #000000 !important;">Nombre y Firma del Cliente</div>
-              <div style="font-size: 9px !important; font-weight: bold !important; font-style: italic !important; color: #111827 !important;">(Acepto Condiciones y presupuesto)</div>
-            </div>
-          </div>
-
-          <!-- Right Column: Section 4 Conditions 1-10 -->
-          <div style="display: flex !important; flex-direction: column !important; margin-top: 20px !important;">
-            <div style="font-size: 8.8px !important; line-height: 1.3 !important; text-align: justify !important; color: #000000 !important;">
-              <p style="margin: 0 0 3px 0 !important;">1. Este documento no tiene validez como comprobante fiscal.</p>
-              <p style="margin: 0 0 3px 0 !important;">2. Presente este comprobante para cualquier aclaración o ajuste posterior.</p>
-              <p style="margin: 0 0 3px 0 !important;">3. La empresa no se hace responsable por objetos de valor olvidados en el vehículo que no sean reportados a la administración.</p>
-              <p style="margin: 0 0 3px 0 !important;">4. Si el automóvil requiere prueba de camino, el costo de la gasolina será cubierto por el cliente.</p>
-              <p style="margin: 0 0 3px 0 !important;">5. En caso de accidente automovilístico y/o siniestro, el cliente autoriza hacer uso de la póliza del seguro del vehículo.</p>
-              <p style="margin: 0 0 3px 0 !important;">6. El costo por revisión y diagnóstico es de $350.00 (trescientos cincuenta pesos 00/100 M.N.) por hora. Para esta revisión se consideran <span style="display: inline-block !important; border-bottom: 1.2px solid #000000 !important; padding: 0 5px 2px 5px !important; font-weight: bold !important; line-height: 1 !important;">1.5</span> horas.<br/>El cliente firma de conformidad <span style="display: inline-block !important; width: 130px !important; border-bottom: 1.2px solid #000000 !important; height: 10px !important; vertical-align: bottom !important; margin-left: 3px !important;"></span></p>
-              <p style="margin: 0 0 3px 0 !important;">7. En caso de que el presupuesto no sea aceptado, el cliente pagará exclusivamente el costo por revisión y diagnóstico.</p>
-              <p style="margin: 0 0 3px 0 !important;">8. El prestador de servicio se obliga a devolver el automóvil en las condiciones que le fue entregado, exceptuando las consecuencias inevitables del diagnóstico.</p>
-              <p style="margin: 0 0 3px 0 !important;">9. Se cobrarán $300.00 (trescientos pesos 00/100 M.N.) diarios por concepto de pensión si el auto no es recogido después de 24 horas de haber recibido la notificación de terminado el trabajo.</p>
-              <p style="margin: 0 0 3px 0 !important;">10. El cliente renuncia a recoger las partes usadas que fueron retiradas de la unidad, si no son solicitadas al momento de la entrega de su vehículo <span style="display: inline-block !important; width: 110px !important; border-bottom: 1.2px solid #000000 !important; height: 10px !important; vertical-align: bottom !important; margin-left: 3px !important;"></span></p>
-            </div>
-          </div>
+        <!-- Gasolina Percentage -->
+        <div style="position: absolute !important; top: 376px !important; left: 642px !important; font-weight: bold !important; color: #D32F2F !important; font-size: 11px !important;">
+          ${order.checklist?.fuelLevel !== undefined ? order.checklist.fuelLevel : 50}%
         </div>
 
-        <!-- Footer Spacer reserved for printed background -->
-        <div style="min-height: 25px !important;"></div>
+        <!-- Inspección Componentes de Motor -->
+        <div style="position: absolute !important; top: 400px !important; left: 235px !important; font-size: 10.5px !important;">
+          ${order.checklist?.inspeccionMotor || ''}
+        </div>
+
+        <!-- Objetos de Valor -->
+        <div style="position: absolute !important; top: 422px !important; left: 140px !important; font-size: 10.5px !important;">
+          ${order.checklist?.objetosValor || ''}
+        </div>
+
+        <!-- Section 3: Descripción del servicio -->
+        <div style="position: absolute !important; top: 490px !important; left: 38px !important; font-weight: bold !important; font-size: 11px !important; max-width: 310px !important; line-height: 1.4 !important;">
+          ${order.reportedFailure || 'Servicio General'}
+        </div>
+
+        <!-- Fecha -->
+        <div style="position: absolute !important; top: 605px !important; left: 80px !important; font-weight: bold !important; font-size: 11px !important;">
+          ${dateStr}
+        </div>
+        <!-- Hora -->
+        <div style="position: absolute !important; top: 605px !important; left: 240px !important; font-weight: bold !important; font-size: 11px !important;">
+          ${timeStr}
+        </div>
+        <!-- Técnico -->
+        <div style="position: absolute !important; top: 628px !important; left: 90px !important; font-size: 11px !important;">
+          ${mechanicName}
+        </div>
+
+        <!-- Firma del Cliente -->
+        <div style="position: absolute !important; top: 660px !important; left: 75px !important; width: 200px !important; height: 50px !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+          ${order.clientSignature ? `
+            <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 48px !important; max-width: 190px !important; object-fit: contain !important;" />
+          ` : ''}
+        </div>
 
       </div>
     </div>
