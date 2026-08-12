@@ -317,17 +317,26 @@ export function useWorkshopState() {
   useEffect(() => {
     if (!loaded) return;
     localStorage.setItem('wt_presupuestos', JSON.stringify(presupuestos));
-  }, [presupuestos, loaded]);
+    if (supabaseConnected && !isSyncing) {
+      safeUpsert('presupuestos', presupuestos);
+    }
+  }, [presupuestos, loaded, supabaseConnected]);
 
   useEffect(() => {
     if (!loaded) return;
     localStorage.setItem('wt_ordenes_reparacion', JSON.stringify(ordenesReparacion));
-  }, [ordenesReparacion, loaded]);
+    if (supabaseConnected && !isSyncing) {
+      safeUpsert('ordenes_reparacion', ordenesReparacion);
+    }
+  }, [ordenesReparacion, loaded, supabaseConnected]);
 
   useEffect(() => {
     if (!loaded) return;
     localStorage.setItem('wt_notas_salida', JSON.stringify(notasSalida));
-  }, [notasSalida, loaded]);
+    if (supabaseConnected && !isSyncing) {
+      safeUpsert('notas_salida', notasSalida);
+    }
+  }, [notasSalida, loaded, supabaseConnected]);
 
   useEffect(() => {
     if (!loaded) return;
