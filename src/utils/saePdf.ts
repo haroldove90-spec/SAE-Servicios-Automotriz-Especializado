@@ -225,31 +225,31 @@ export function getSaeHtml(
 
         <!-- Section 2: Datos del auto -->
         <!-- Auto (Marca) -->
-        <div style="position: absolute !important; top: 252px !important; left: 120px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 252px !important; left: 85px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.brand || ''}
         </div>
         <!-- Modelo -->
-        <div style="position: absolute !important; top: 252px !important; left: 315px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 252px !important; left: 325px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.model || ''} ${vehicle?.year ? `(${vehicle.year})` : ''}
         </div>
         <!-- Placas -->
-        <div style="position: absolute !important; top: 252px !important; left: 425px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 252px !important; left: 490px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.plate || ''}
         </div>
         <!-- Kms -->
-        <div style="position: absolute !important; top: 252px !important; left: 545px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 252px !important; left: 660px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}
         </div>
         <!-- No. de Serie -->
-        <div style="position: absolute !important; top: 275px !important; left: 175px !important; font-size: 10.5px !important; font-family: monospace !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 275px !important; left: 145px !important; font-size: 10.5px !important; font-family: monospace !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.serie || vehicle?.vin || ''}
         </div>
         <!-- Motor -->
-        <div style="position: absolute !important; top: 275px !important; left: 475px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 275px !important; left: 470px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.motor || ''}
         </div>
         <!-- Color -->
-        <div style="position: absolute !important; top: 275px !important; left: 635px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="position: absolute !important; top: 275px !important; left: 600px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
           ${vehicle?.color || ''}
         </div>
 
