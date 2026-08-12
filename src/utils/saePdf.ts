@@ -163,20 +163,16 @@ export function getSaeHtml(
   // Supabase asset background URL provided by client
   const formatoBgUrl = "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato1.png";
 
-  // Checkbox helpers matching paper document [Sí] [No]
-  const renderCheck = (val: boolean | undefined) => {
+  // Checkbox mark helper for background template
+  const renderCheckMark = (val: boolean | undefined, topPx: number, isColumn2: boolean = false) => {
     const isYes = val === true;
-    const isNo = val === false;
-    return `
-      <span style="display: inline-flex !important; align-items: center !important; gap: 4px !important; font-size: 10px !important;">
-        <span style="display: inline-flex !important; align-items: center !important; gap: 2px !important;">
-          Sí <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 14px !important; height: 14px !important; border: 1.5px solid #000000 !important; font-weight: 900 !important; font-size: 10px !important; line-height: 1 !important; color: #000000 !important; background-color: #FFFFFF !important; box-sizing: border-box !important; text-align: center !important;">${isYes ? 'X' : ''}</span>
-        </span>
-        <span style="display: inline-flex !important; align-items: center !important; gap: 2px !important;">
-          <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 14px !important; height: 14px !important; border: 1.5px solid #000000 !important; font-weight: 900 !important; font-size: 10px !important; line-height: 1 !important; color: #000000 !important; background-color: #FFFFFF !important; box-sizing: border-box !important; text-align: center !important;">${isNo ? 'X' : (!val ? 'X' : '')}</span> No
-        </span>
-      </span>
-    `;
+    // Column 1: Yes box is left ~366px, No box is left ~402px
+    // Column 2: Yes box is left ~632px, No box is left ~668px
+    const yesLeft = isColumn2 ? 632 : 366;
+    const noLeft = isColumn2 ? 668 : 402;
+
+    const targetLeft = isYes ? yesLeft : noLeft;
+    return `<div style="position: absolute !important; top: ${topPx}px !important; left: ${targetLeft}px !important; font-weight: 900 !important; font-size: 11px !important; color: #000000 !important; line-height: 1 !important;">✕</div>`;
   };
 
   return `
@@ -413,6 +409,7 @@ export async function generateSaePdfBlob(
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
+      allowTaint: true,
       backgroundColor: '#FFFFFF',
       logging: false
     });
@@ -452,7 +449,7 @@ export async function generateSaeImageBlob(
   container.style.left = '0px';
   container.style.top = '0px';
   container.style.width = '750px';
-  container.style.padding = '20px';
+  container.style.padding = '0px';
   container.style.backgroundColor = '#FFFFFF';
   container.style.color = '#111827';
   container.style.fontFamily = '"Arial", sans-serif';
@@ -471,6 +468,7 @@ export async function generateSaeImageBlob(
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
+      allowTaint: true,
       backgroundColor: '#FFFFFF',
       logging: false
     });
