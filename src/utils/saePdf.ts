@@ -188,13 +188,9 @@ export function getSaeHtml(
       
       <!-- Top Header Section -->
       <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important;">
-        <!-- Left: Logo + Text -->
-        <div style="display: flex !important; align-items: center !important; gap: 10px !important;">
-          <img src="${logoUrl}" crossorigin="anonymous" style="height: 40px !important; width: auto !important; object-fit: contain !important;" alt="SAE Logo" />
-          <div style="display: flex !important; flex-direction: column !important; justify-content: center !important;">
-            <span style="font-weight: 900 !important; font-size: 10px !important; color: #D32F2F !important; letter-spacing: 0.2px !important; text-transform: uppercase !important; line-height: 1.1 !important;">SERVICIO AUTOMOTRIZ ESPECIALIZADO</span>
-            <span style="font-weight: bold !important; font-style: italic !important; font-size: 9px !important; color: #00A8E8 !important; line-height: 1.1 !important;">¡La escudería que te lleva seguro a tu destino!</span>
-          </div>
+        <!-- Left: Logo -->
+        <div style="display: flex !important; align-items: center !important;">
+          <img src="${logoUrl}" crossorigin="anonymous" style="height: 46px !important; width: auto !important; max-width: 480px !important; object-fit: contain !important;" alt="SAE Logo" />
         </div>
         
         <!-- Right: Folio Capsule Box -->
