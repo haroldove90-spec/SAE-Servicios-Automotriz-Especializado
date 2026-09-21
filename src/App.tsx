@@ -100,7 +100,7 @@ export default function App() {
   const [adminTab, setAdminTab] = useState<'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador'>(() => {
     return (localStorage.getItem('sae_admin_tab') as any) || 'metrics';
   });
-  const [advisorTab, setAdvisorTab] = useState<'reception' | 'quotes' | 'ordenes_reparacion' | 'salidas' | 'agenda' | 'crm'>(() => {
+  const [advisorTab, setAdvisorTab] = useState<'reception' | 'quotes' | 'ordenes_reparacion' | 'salidas' | 'agenda' | 'crm' | 'calibrador'>(() => {
     const saved = localStorage.getItem('sae_advisor_tab');
     if (saved === 'agenda' || saved === 'crm') return 'reception';
     return (saved as any) || 'reception';
@@ -161,6 +161,7 @@ export default function App() {
           { id: 'quotes', label: 'Presupuestos', icon: FileText },
           { id: 'ordenes_reparacion', label: 'Órdenes de Reparación', icon: ClipboardList },
           { id: 'salidas', label: 'Salidas', icon: LogOut },
+          { id: 'calibrador', label: 'Calibrador PDF', icon: Sliders },
         ];
       case 'mechanic':
         return [

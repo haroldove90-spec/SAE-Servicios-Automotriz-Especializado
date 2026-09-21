@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   FileText, Save, RotateCcw, Download, ZoomIn, ZoomOut, Move, 
   Database, Copy, Check, Crosshair, Search, ChevronRight, Sliders,
-  Eye, AlertCircle, Info, Sparkles, CheckCircle2, ChevronDown
+  Eye, AlertCircle, Info, Sparkles, CheckCircle2, ChevronDown, X
 } from 'lucide-react';
 import { 
   PdfTemplateConfig, 
@@ -23,16 +23,20 @@ interface PdfCalibratorProps {
   clients?: Client[];
   vehicles?: Vehicle[];
   employees?: Employee[];
+  initialFormat?: string;
+  onClose?: () => void;
 }
 
 export default function PdfCalibrator({
   orders = [],
   clients = [],
   vehicles = [],
-  employees = []
+  employees = [],
+  initialFormat = 'formato1',
+  onClose
 }: PdfCalibratorProps) {
   // Format selector
-  const [selectedFormatId, setSelectedFormatId] = useState<string>('formato1');
+  const [selectedFormatId, setSelectedFormatId] = useState<string>(initialFormat);
   const [config, setConfig] = useState<PdfTemplateConfig>(() => getTemplateConfig('formato1'));
   
   // Selected field for fine adjustment
@@ -331,6 +335,18 @@ export default function PdfCalibrator({
               <Save size={15} />
               <span>Guardar Calibración</span>
             </button>
+
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow transition-colors cursor-pointer border border-slate-700"
+                title="Cerrar Calibrador y volver a Recepción"
+              >
+                <X size={15} />
+                <span>Cerrar</span>
+              </button>
+            )}
           </div>
         </div>
 
