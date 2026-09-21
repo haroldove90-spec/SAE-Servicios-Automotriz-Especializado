@@ -716,137 +716,170 @@ export async function shareSaePresupuestoMobile(presupuesto: Presupuesto): Promi
 }
 
 /**
- * Returns the raw HTML string representing the official SAE Orden de Reparación form,
- * matching the paper document.
+ * Returns the raw HTML string representing the official SAE Orden de Reparación form (Formato 3),
+ * styled and positioned directly on top of the physical background format using calibrated coordinates.
  */
 export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
-  const crimson = '#A21C26';
+  // Load calibrated template configuration for Formato 3
+  const template = getTemplateConfig('formato3');
+  const formatoBgUrl = template.bgUrl || "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203.png";
+
+  const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; width?: number }) => {
+    const f = template.fields.find(item => item.id === fieldId);
+    const x = f ? f.x : fallback.x;
+    const y = f ? f.y : fallback.y;
+    const fontSize = f?.fontSize ?? fallback.fontSize ?? 10.5;
+    const fontWeight = f?.fontWeight ?? fallback.fontWeight ?? 'normal';
+    const color = f?.color ?? fallback.color ?? '#000000';
+    const align = f?.align ?? fallback.align ?? 'left';
+    const width = f?.width ?? fallback.width;
+
+    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: 1.1 !important; white-space: nowrap !important; z-index: 10 !important;`;
+  };
+
+  // Get table column coordinates from template fields or fallbacks
+  const colMarca = template.fields.find(f => f.id === 'tabla_r1_marca') || { x: 82, align: 'center', fontSize: 9.5 };
+  const colDesc = template.fields.find(f => f.id === 'tabla_r1_descripcion') || { x: 128, align: 'left', fontSize: 9.5 };
+  const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 664, align: 'center', fontSize: 9.5 };
+
+  // Calculate table rows (starting at y ~ 320, spacing ~ 24px, up to 24 rows)
+  const items = orden.items || [];
+  const rowsHtml = items.slice(0, 24).map((item, idx) => {
+    const yPos = 320 + (idx * 24);
+    return `
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colMarca.x}px !important; font-size: ${colMarca.fontSize || 9.5}px !important; font-weight: bold !important; text-align: ${colMarca.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+        ${item.marca || item.codigo || ''}
+      </div>
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 510px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 9.5}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
+        ${item.descripcion || ''}
+      </div>
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 9.5}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+        ${item.cantidad || 1}
+      </div>
+    `;
+  }).join('');
+
+  const rotacionPresionAire = orden.rotacionPresionAire || orden.rotacionAireLlantas || '';
+  const revLimpiaparabrisas = orden.revLimpiaparabrisas || orden.revLimpiaParabrisas || '';
+  const revLuces = orden.revLuces || orden.revLucesNivelesEngral || '';
+  const revNivelesGeneral = orden.revNivelesGeneral || orden.revLucesNivelesEngral || '';
+  const matriculaPlacas = orden.matriculaPlacas || orden.matriculaVin || '';
+  const tecnicoResponsable = orden.tecnicoResponsable || orden.tecnico || '';
 
   return `
-    <!-- Top Bar with Notice and Title -->
-    <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 12px !important; border-bottom: 2px solid ${crimson} !important; padding-bottom: 10px !important; background-color: transparent !important;">
+    <div style="position: relative !important; width: 750px !important; height: 980px !important; margin: 0 auto !important; font-family: 'Arial', 'Helvetica', sans-serif !important; color: #000000 !important; background-color: #FFFFFF !important; box-sizing: border-box !important; overflow: hidden !important;">
       
-      <!-- Red Notice Box matching paper document -->
-      <div style="border: 2px solid ${crimson} !important; background-color: #FFF5F5 !important; padding: 8px 12px !important; border-radius: 6px !important; max-width: 360px !important; font-size: 8.5px !important; font-weight: 800 !important; color: ${crimson} !important; line-height: 1.3 !important; text-transform: uppercase !important;">
-        RECUERDA QUE LAS REFACCIONES QUE SE UTILICEN DEBEN SER ANOTADAS AL REVERZO DE LA HOJA, LAS QUE SE COMPRARON Y LAS QUE SE EXTRAJERON DEL ALMACEN.
-      </div>
+      <!-- Fondo Oficial Formato 3 (Orden de Reparación SAE) -->
+      <img src="${formatoBgUrl}" crossorigin="anonymous" style="position: absolute !important; top: 0 !important; left: 0 !important; width: 750px !important; height: 980px !important; object-fit: fill !important; z-index: 0 !important;" alt="Fondo Formato 3 Orden de Reparación SAE" />
 
-      <!-- Workshop Info & Title -->
-      <div style="text-align: right !important; font-size: 9.5px !important; color: #1F2937 !important; line-height: 1.3 !important;">
-        <div style="font-weight: 900 !important; font-size: 22px !important; color: ${crimson} !important; letter-spacing: 0.5px !important;">
-          ORDEN DE REPARACIÓN
+      <!-- Capa de Datos Calibrada -->
+      <div style="position: absolute !important; top: 0 !important; left: 0 !important; width: 750px !important; height: 980px !important; z-index: 10 !important;">
+        
+        <!-- Fecha -->
+        <div style="${getStyle('fecha', { x: 454, y: 138, fontSize: 11, fontWeight: 'bold', align: 'left' })}">
+          ${orden.fecha}
         </div>
-        <div style="font-weight: 800 !important; font-size: 13px !important; color: #111827 !important; margin-top: 2px !important;">
-          Número: <span style="color: ${crimson} !important;">${orden.numero}</span> &nbsp;&nbsp;|&nbsp;&nbsp; Fecha: <span>${orden.fecha}</span>
+
+        <!-- Número de Orden -->
+        <div style="${getStyle('numero_orden', { x: 635, y: 138, fontSize: 15, fontWeight: '900', color: '#D32F2F', align: 'left' })}">
+          ${orden.numero}
         </div>
-        <div style="font-weight: 600 !important; margin-top: 2px !important;">Mixtecas Mz.52 Lt.17 Esquina Rey Tepalcatzin</div>
-        <div>Col. Ajusco Alcaldía Coyoacán C.P. 04300 C.D.M.X.</div>
-        <div style="font-weight: 700 !important; color: #111827 !important;">Tel: 55 4632 6652 y 55 3917 7754 Cel: 55 1384 6680</div>
-        <div style="font-weight: 700 !important; color: ${crimson} !important; margin-top: 2px !important;">Atención Personal: ${orden.asesor || 'Alberto Flores Hdz.'}</div>
-      </div>
-    </div>
 
-    <!-- Vehicle & Client Main Header Card -->
-    <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; margin-bottom: 12px !important; border: 1.5px solid #D1D5DB !important; border-radius: 8px !important; padding: 10px 12px !important; background-color: #FAFAFA !important; font-size: 11px !important; color: #111827 !important;">
-      <!-- Column 1: Client Info -->
-      <div style="display: flex !important; flex-direction: column !important; gap: 4px !important;">
-        <div><strong style="color: #111827 !important;">CLIENTE:</strong> <span style="font-weight: 700 !important; color: #111827 !important;">${orden.clienteNombre}</span></div>
-        <div><strong>Calle:</strong> ${orden.clienteCalle || ''}</div>
-        <div><strong>C.P./Colonia:</strong> ${orden.clienteCpColonia || ''}</div>
-        <div><strong>Alcaldía:</strong> ${orden.clienteAlcaldia || ''}</div>
-        <div><strong>Teléfono:</strong> ${orden.clienteTelefono || ''}</div>
-      </div>
+        <!-- Revisiones Rápidas -->
+        ${rotacionPresionAire ? `
+          <div style="${getStyle('rotacion_presion_aire', { x: 330, y: 191, fontSize: 11, fontWeight: 'bold', align: 'center' })}">
+            ${rotacionPresionAire}
+          </div>
+        ` : ''}
 
-      <!-- Column 2: Vehicle Info -->
-      <div style="display: flex !important; flex-direction: column !important; gap: 4px !important;">
-        <div><strong>Matrícula / VIN:</strong> <strong style="color: ${crimson} !important;">${orden.matriculaVin}</strong></div>
-        <div><strong>Marca/Motor:</strong> ${orden.marcaMotor}</div>
-        <div><strong>Modelo/Color:</strong> ${orden.modeloColor}</div>
-        <div><strong>Kilómetros:</strong> ${orden.kilometros ? orden.kilometros.toLocaleString() : ''} Kms.</div>
-      </div>
-    </div>
+        ${revLimpiaparabrisas ? `
+          <div style="${getStyle('rev_limpiaparabrisas', { x: 334, y: 227, fontSize: 11, fontWeight: 'bold', align: 'center' })}">
+            ${revLimpiaparabrisas}
+          </div>
+        ` : ''}
 
-    <!-- Quality Check & Revisions Section -->
-    <div style="margin-bottom: 12px !important; border: 1px solid #CBD5E1 !important; border-radius: 6px !important; padding: 8px 12px !important; background-color: #F8FAFC !important; font-size: 9.5px !important; font-weight: 700 !important; color: #334155 !important; display: flex !important; flex-direction: column !important; gap: 6px !important;">
-      <div style="display: flex !important; justify-content: space-between !important; border-bottom: 1px dashed #CBD5E1 !important; padding-bottom: 4px !important;">
-        <span>ROTACIÓN Y PRESIÓN DE AIRE A LLANTAS:</span>
-        <span style="color: #0F172A !important; font-weight: 800 !important;">${orden.rotacionAireLlantas || '_____________________________________'}</span>
-      </div>
-      <div style="display: flex !important; justify-content: space-between !important; border-bottom: 1px dashed #CBD5E1 !important; padding-bottom: 4px !important;">
-        <span>REV. LIMPIA PARABRISAS Y CHISGUETEROS:</span>
-        <span style="color: #0F172A !important; font-weight: 800 !important;">${orden.revLimpiaParabrisas || '_____________________________________'}</span>
-      </div>
-      <div style="display: flex !important; justify-content: space-between !important;">
-        <span>REV. DE LUCES Y NIVELES EN GENERAL:</span>
-        <span style="color: #0F172A !important; font-weight: 800 !important;">${orden.revLucesNivelesEngral || '_____________________________________'}</span>
-      </div>
-    </div>
+        ${revLuces ? `
+          <div style="${getStyle('rev_luces', { x: 160, y: 261, fontSize: 11, fontWeight: 'bold', align: 'center' })}">
+            ${revLuces}
+          </div>
+        ` : ''}
 
-    <!-- Items Table -->
-    <div style="margin-bottom: 15px !important; border: 1.5px solid #1E293B !important; border-radius: 6px !important; overflow: hidden !important;">
-      <table style="width: 100% !important; border-collapse: collapse !important; font-size: 10px !important;">
-        <thead>
-          <tr style="background-color: #1E293B !important; color: #FFFFFF !important; font-weight: 800 !important; text-transform: uppercase !important;">
-            <th style="padding: 6px 8px !important; text-align: left !important; width: 80px !important; border-right: 1px solid #334155 !important;">Marca</th>
-            <th style="padding: 6px 8px !important; text-align: left !important; border-right: 1px solid #334155 !important;">Repuestos / Trabajos</th>
-            <th style="padding: 6px 8px !important; text-align: center !important; width: 60px !important;">Cant.</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${orden.items.map((item, idx) => `
-            <tr style="border-bottom: 1px solid #E2E8F0 !important; background-color: ${idx % 2 === 0 ? '#FFFFFF' : '#F8FAFC'} !important; color: #0F172A !important;">
-              <td style="padding: 5px 8px !important; font-weight: 700 !important; font-family: monospace !important; border-right: 1px solid #E2E8F0 !important;">${item.codigo || ''}</td>
-              <td style="padding: 5px 8px !important; border-right: 1px solid #E2E8F0 !important;">${item.descripcion}</td>
-              <td style="padding: 5px 8px !important; text-align: center !important; font-weight: 800 !important;">${item.cantidad}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
+        ${revNivelesGeneral ? `
+          <div style="${getStyle('rev_niveles_general', { x: 323, y: 261, fontSize: 11, fontWeight: 'bold', align: 'center' })}">
+            ${revNivelesGeneral}
+          </div>
+        ` : ''}
 
-    <!-- Footer Signatures -->
-    <div style="margin-top: 25px !important; display: flex !important; justify-content: space-between !important; align-items: flex-end !important; font-size: 11px !important; font-weight: 800 !important; color: #0F172A !important; padding-top: 15px !important;">
-      <div>
-        <span>TECNICO: </span>
-        <span style="border-bottom: 1.5px solid #0F172A !important; padding-bottom: 2px !important; display: inline-block !important; width: 280px !important;">
-          ${orden.tecnico || ''}
-        </span>
-      </div>
-      <div>
-        <span>ASESOR / RECEPCIÓN: </span>
-        <span style="border-bottom: 1.5px solid #0F172A !important; padding-bottom: 2px !important; display: inline-block !important; width: 200px !important; text-align: center !important;">
-          ${orden.asesor || 'Alberto Flores Hdz.'}
-        </span>
+        <!-- Datos del Vehículo -->
+        <div style="${getStyle('matricula_placas', { x: 480, y: 188, fontSize: 11, fontWeight: 'bold', align: 'left' })}">
+          ${matriculaPlacas}
+        </div>
+
+        <div style="${getStyle('marca_motor', { x: 495, y: 212, fontSize: 10.5, fontWeight: 'normal', align: 'left' })}">
+          ${orden.marcaMotor}
+        </div>
+
+        <div style="${getStyle('modelo_color', { x: 500, y: 237, fontSize: 10.5, fontWeight: 'normal', align: 'left' })}">
+          ${orden.modeloColor}
+        </div>
+
+        <div style="${getStyle('kilometraje', { x: 450, y: 259, fontSize: 10.5, fontWeight: 'normal', align: 'left' })}">
+          ${orden.kilometros ? `${orden.kilometros.toLocaleString('es-MX')} km` : ''}
+        </div>
+
+        <!-- Tabla de Repuestos Dinámica -->
+        ${rowsHtml}
+
+        <!-- Técnico Responsable -->
+        ${tecnicoResponsable ? `
+          <div style="${getStyle('tecnico_responsable', { x: 115, y: 934, fontSize: 10.5, fontWeight: 'bold', align: 'left' })}">
+            ${tecnicoResponsable}
+          </div>
+        ` : ''}
+
       </div>
     </div>
   `;
 }
 
+// Alias for backwards compatibility
+export const getSaeOrdenReparacionHtml = getSaeOrdenDeReparacionHtml;
+
 export async function generateSaeOrdenDeReparacionPdfBlob(orden: OrdenReparacion): Promise<Blob | null> {
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
-  container.style.width = '210mm';
-  container.style.padding = '12mm';
+  container.id = 'sae-pdf-render-root-orden-reparacion';
+  container.style.position = 'fixed';
+  container.style.left = '0px';
+  container.style.top = '0px';
+  container.style.width = '750px';
+  container.style.padding = '0px';
   container.style.backgroundColor = '#FFFFFF';
-  container.style.fontFamily = "'Arial', sans-serif";
-  container.innerHTML = getSaeOrdenDeReparacionHtml(orden);
+  container.style.color = '#111827';
+  container.style.fontFamily = '"Arial", sans-serif';
+  container.style.fontSize = '11px';
+  container.style.lineHeight = '1.4';
+  container.style.zIndex = '-9999';
+  container.style.opacity = '0.99';
+  container.style.pointerEvents = 'none';
 
+  container.innerHTML = getSaeOrdenDeReparacionHtml(orden);
   document.body.appendChild(container);
 
   try {
+    await waitForImages(container);
+
     const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
+      backgroundColor: '#FFFFFF',
       logging: false
     });
 
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a4'
+      format: 'letter'
     });
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -855,9 +888,9 @@ export async function generateSaeOrdenDeReparacionPdfBlob(orden: OrdenReparacion
     const imgHeight = canvas.height;
     const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
     const imgX = (pdfWidth - imgWidth * ratio) / 2;
-    const imgY = 10;
+    const imgY = 5;
 
-    pdf.addImage(imgData, 'JPEG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
     return pdf.output('blob');
   } catch (error) {
     console.error('Error generating Orden de Reparación PDF blob:', error);
@@ -866,6 +899,9 @@ export async function generateSaeOrdenDeReparacionPdfBlob(orden: OrdenReparacion
     document.body.removeChild(container);
   }
 }
+
+// Alias for backwards compatibility
+export const generateSaeOrdenReparacionPdfBlob = generateSaeOrdenDeReparacionPdfBlob;
 
 export async function downloadSaeOrdenDeReparacionPdf(orden: OrdenReparacion): Promise<void> {
   const pdfBlob = await generateSaeOrdenDeReparacionPdfBlob(orden);
@@ -903,6 +939,10 @@ export async function shareSaeOrdenDeReparacionMobile(orden: OrdenReparacion): P
     return false;
   }
 }
+
+// Aliases for backwards compatibility
+export const downloadSaeOrdenReparacionPdf = downloadSaeOrdenDeReparacionPdf;
+export const shareSaeOrdenReparacionMobile = shareSaeOrdenDeReparacionMobile;
 
 /**
  * Returns raw HTML string representing the official SAE Nota de Salida form,

@@ -11,14 +11,15 @@ import {
   TemplateSection,
   DEFAULT_FORMATO_1,
   DEFAULT_FORMATO_2,
+  DEFAULT_FORMATO_3,
   INITIAL_TEMPLATES_MAP,
   getTemplateConfig, 
   saveTemplateConfig, 
   resetTemplateConfig,
   SUPABASE_SQL_SCRIPT
 } from '../utils/pdfTemplateStorage';
-import { generateSaePdf, downloadSaePresupuestoPdf } from '../utils/saePdf';
-import { ServiceOrder, Client, Vehicle, Employee, Presupuesto } from '../types';
+import { generateSaePdf, downloadSaePresupuestoPdf, downloadSaeOrdenDeReparacionPdf } from '../utils/saePdf';
+import { ServiceOrder, Client, Vehicle, Employee, Presupuesto, OrdenReparacion } from '../types';
 
 interface PdfCalibratorProps {
   orders?: ServiceOrder[];
@@ -234,7 +235,41 @@ export default function PdfCalibrator({
         plateEnding: '8'
       };
 
-      if (selectedFormatId === 'formato2') {
+      if (selectedFormatId === 'formato3') {
+        const sampleOrden: OrdenReparacion = {
+          id: 'sample-ord-180',
+          numero: '180',
+          fecha: '07/07/2026',
+          asesor: 'Alberto Flores Hdz.',
+          tecnico: 'Martín Domínguez (Mecánico en Jefe)',
+          tecnicoResponsable: 'Martín Domínguez (Mecánico en Jefe)',
+          rotacionAireLlantas: 'OK',
+          rotacionPresionAire: 'OK',
+          revLimpiaParabrisas: 'OK',
+          revLimpiaparabrisas: 'OK',
+          revLucesNivelesEngral: 'OK',
+          revLuces: 'OK',
+          revNivelesGeneral: 'OK',
+          clienteNombre: sampleClient.name || 'CONGREGACIÓN DE LA MISIÓN',
+          clienteCalle: sampleClient.calle || 'Av. San Fernando #154',
+          clienteCpColonia: '14000 Tlalpan Centro',
+          clienteAlcaldia: 'Tlalpan, CDMX',
+          clienteTelefono: sampleClient.phone || '73 5266 8332',
+          marcaMotor: `${sampleVehicle.brand || 'FORD'}-${sampleVehicle.model || 'RANGER'} / ${sampleVehicle.motor || '2.3L'}`,
+          modeloColor: `${sampleVehicle.year || '2012'} / ${sampleVehicle.color || 'BLANCO'}`,
+          matriculaVin: sampleVehicle.plate || '865-XXJ',
+          matriculaPlacas: sampleVehicle.plate || '865-XXJ',
+          kilometros: sampleVehicle.mileage || 161282,
+          items: [
+            { id: '1', marca: 'BREMBO', codigo: '0266', descripcion: 'Juego de balatas cerámicas delanteras', cantidad: 1 },
+            { id: '2', marca: 'MOTORCRAFT', codigo: '0242', descripcion: 'Rectificado de discos delanteros', cantidad: 2 },
+            { id: '3', marca: 'SAE-MO', codigo: '0105', descripcion: 'Mano de obra especializada e instalación', cantidad: 1 }
+          ],
+          status: 'En Proceso',
+          createdAt: new Date().toISOString()
+        };
+        await downloadSaeOrdenDeReparacionPdf(sampleOrden);
+      } else if (selectedFormatId === 'formato2') {
         const samplePresupuesto: Presupuesto = {
           id: 'pres-sample-1',
           numero: '202',
@@ -267,8 +302,15 @@ export default function PdfCalibrator({
         await generateSaePdf(sampleOrder, sampleClient, sampleVehicle, employees);
       }
 
+      const formatNames: Record<string, string> = {
+        formato1: 'Orden de Recepción',
+        formato2: 'Presupuesto',
+        formato3: 'Orden de Reparación',
+        formato4: 'Nota de Salida'
+      };
+
       setSaveStatus({
-        message: `¡PDF de prueba (${selectedFormatId === 'formato2' ? 'Presupuesto' : 'Orden de Recepción'}) generado y descargado!`,
+        message: `¡PDF de prueba (${formatNames[selectedFormatId] || selectedFormatId}) generado y descargado con coordenadas oficiales!`,
         type: 'success'
       });
       setTimeout(() => setSaveStatus(null), 4000);
@@ -426,7 +468,7 @@ export default function PdfCalibrator({
             {[
               { id: 'formato1', label: '1. Orden de Recepción SAE', active: true, badge: 'Calibrado' },
               { id: 'formato2', label: '2. Presupuestos (Formato 2)', active: true, badge: 'Activo' },
-              { id: 'formato3', label: '3. Orden de Reparación', active: false, badge: 'Próximamente' },
+              { id: 'formato3', label: '3. Orden de Reparación', active: true, badge: 'Activo' },
               { id: 'formato4', label: '4. Nota de Salida', active: false, badge: 'Próximamente' }
             ].map(f => (
               <button

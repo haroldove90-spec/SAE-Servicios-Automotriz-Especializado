@@ -3,7 +3,7 @@ import {
   Plus, Search, UserPlus, Car, CheckSquare, Calendar, History, Send, 
   Trash, Check, X, FileText, ChevronRight, AlertCircle, MapPin, Sparkles, UserCheck, User,
   Camera, Upload, Trash2, AlertTriangle, Download, Sparkle, Copy, Image, Share2, Mail,
-  HelpCircle, Printer, RefreshCw, Edit2, Eye, DollarSign, ClipboardList, LogOut, Sliders
+  HelpCircle, Printer, RefreshCw, Edit2, Eye, DollarSign, ClipboardList, LogOut, Sliders, Wrench
 } from 'lucide-react';
 import { Client, Vehicle, Employee, InventoryItem, ServiceOrder, BudgetLineItem, OrderStatus, Checklist, Presupuesto, PresupuestoItem, OrdenReparacion, OrdenReparacionItem, NotaSalida, NotaSalidaItem } from '../types';
 import PdfCalibrator from './PdfCalibrator';
@@ -517,7 +517,7 @@ export default function AdvisorDashboard({
   };
 
   // State for Orden de Reparación
-  const [ordenSubTab, setOrdenSubTab] = useState<'formulario' | 'historial'>('formulario');
+  const [ordenSubTab, setOrdenSubTab] = useState<'formulario' | 'historial' | 'bahias'>('formulario');
   const [editingOrdenId, setEditingOrdenId] = useState<string | null>(null);
 
   const [ordNumero, setOrdNumero] = useState(() => (180 + (ordenesReparacion?.length || 0) + 1).toString());
@@ -1401,13 +1401,13 @@ export default function AdvisorDashboard({
           <label htmlFor="advisor-mobile-tab-select" className="block text-xs font-bold text-slate-500 mb-1">Módulo de Asesor / Recepción</label>
           <select
             id="advisor-mobile-tab-select"
-            value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value as 'reception' | 'quotes' | 'agenda' | 'crm' | 'calibrador')}
+            value={(activeTab === 'agenda') ? 'ordenes_reparacion' : activeTab}
+            onChange={(e) => setActiveTab(e.target.value as any)}
             className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#8D6A28]"
           >
             <option value="reception">🚗 Recepción y Órdenes</option>
             <option value="quotes">💵 Presupuestos</option>
-            <option value="agenda">📅 Agenda y Bahías</option>
+            <option value="ordenes_reparacion">🔧 Orden de reparación</option>
             <option value="crm">🕒 CRM Clínico del Auto</option>
             <option value="calibrador">📐 Calibrador PDF</option>
           </select>
@@ -1440,16 +1440,16 @@ export default function AdvisorDashboard({
             <span>Presupuestos</span>
           </button>
           <button
-            id="advisor-tab-agenda"
-            onClick={() => setActiveTab('agenda')}
+            id="advisor-tab-ordenes-reparacion"
+            onClick={() => setActiveTab('ordenes_reparacion')}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
-              activeTab === 'agenda'
+              activeTab === 'ordenes_reparacion' || (activeTab as string) === 'agenda'
                 ? 'bg-[#8D6A28] text-white shadow-md'
                 : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
           >
-            <Calendar size={16} />
-            <span>Agenda y Bahías</span>
+            <Wrench size={16} />
+            <span>Orden de reparación</span>
           </button>
           <button
             id="advisor-tab-crm"
@@ -3364,11 +3364,11 @@ export default function AdvisorDashboard({
       )}
 
       {/* ÓRDENES DE REPARACIÓN TAB */}
-      {activeTab === 'ordenes_reparacion' && (
+      {(activeTab === 'ordenes_reparacion' || (activeTab as string) === 'agenda') && (
         <div className="space-y-6">
           {/* SUB-NAVIGATION BAR */}
           <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => setOrdenSubTab('formulario')}
@@ -3393,6 +3393,33 @@ export default function AdvisorDashboard({
               >
                 <History size={15} />
                 <span>Historial de Órdenes ({ordenesReparacion.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrdenSubTab('bahias')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                  ordenSubTab === 'bahias'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <Calendar size={15} />
+                <span>Agenda y Bahías ({agenda.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCalibratorFormat('formato3');
+                  setPreviousTab('ordenes_reparacion');
+                  setActiveTab('calibrador');
+                }}
+                className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Abrir Calibrador visual de coordenadas para el Formato 3 Orden de Reparación"
+              >
+                <Sliders size={14} className="text-amber-400" />
+                <span>Calibrar PDF Formato 3</span>
               </button>
             </div>
 
@@ -3803,6 +3830,20 @@ export default function AdvisorDashboard({
                 {/* BOTONES DE ACCIÓN */}
                 <div className="flex flex-wrap items-center gap-3 justify-end border-t border-slate-200 pt-6">
                   <button
+                    type="button"
+                    onClick={() => {
+                      setCalibratorFormat('formato3');
+                      setPreviousTab('ordenes_reparacion');
+                      setActiveTab('calibrador');
+                    }}
+                    className="bg-slate-800 hover:bg-slate-900 text-amber-400 hover:text-amber-300 font-bold px-3.5 py-2.5 rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-amber-500/30"
+                    title="Alinear y calibrar campos visuales sobre el formato físico oficial"
+                  >
+                    <Sliders size={15} />
+                    <span>Calibrar Formato 3</span>
+                  </button>
+
+                  <button
                     type="submit"
                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md shadow-emerald-600/20 flex items-center gap-2 transition-all cursor-pointer"
                   >
@@ -3991,6 +4032,108 @@ export default function AdvisorDashboard({
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {/* SUB-TAB 3: AGENDA Y BAHÍAS DEL TALLER */}
+          {ordenSubTab === 'bahias' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Scheduling form */}
+              <form onSubmit={handleAddBooking} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h4 className="font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-1.5 font-display">
+                  <Calendar size={18} className="text-amber-600" />
+                  Agendar Cita / Bahía
+                </h4>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="block text-slate-500 font-medium mb-1">Fecha</label>
+                    <input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-slate-500 font-medium mb-1">Hora</label>
+                    <input type="time" value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-slate-500 font-medium mb-1">Placas del Auto</label>
+                    <input type="text" required value={bookingPlate} onChange={(e) => setBookingPlate(e.target.value.toUpperCase())} className="w-full p-2 border border-slate-200 rounded-lg font-mono uppercase" placeholder="Ej. 931-WYZ" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-slate-500 font-medium mb-1">Asignar Bahía de Trabajo</label>
+                    <select value={bookingBay} onChange={(e) => setBookingBay(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-700">
+                      <option value="Bahía 1 - Rampa">Bahía 1 - Rampa Elevadora 1</option>
+                      <option value="Bahía 2 - Eléctrico">Bahía 2 - Escaneo y Eléctrico</option>
+                      <option value="Bahía 3 - Suspensión">Bahía 3 - Suspensión y Frenos</option>
+                      <option value="Bahía 4 - Detallado">Bahía 4 - Estética y Lavado</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-slate-500 font-medium mb-1">Mecánico Responsable</label>
+                    <select value={bookingMech} onChange={(e) => setBookingMech(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-700">
+                      {employees.filter(e => e.role === 'Mecanico').map(mech => (
+                        <option key={mech.id} value={mech.id}>{mech.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-slate-500 font-medium mb-1">Servicio Solicitado</label>
+                    <input type="text" required value={bookingPurpose} onChange={(e) => setBookingPurpose(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg" placeholder="Ej. Afinación Mayor..." />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 text-xs rounded-lg shadow-sm transition-all cursor-pointer"
+                >
+                  Agendar Cita
+                </button>
+              </form>
+
+              {/* Interactive timeline map */}
+              <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <h4 className="font-bold text-slate-800">Calendario de Bahías y Citas ({bookingDate})</h4>
+                  <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">4 Bahías de Trabajo</span>
+                </div>
+
+                <div className="space-y-4">
+                  {['Bahía 1 - Rampa', 'Bahía 2 - Eléctrico', 'Bahía 3 - Suspensión', 'Bahía 4 - Detallado'].map((bay) => {
+                    const bayBookings = agenda.filter(b => b.bay === bay);
+                    return (
+                      <div key={bay} className="border border-slate-100 rounded-xl p-3 bg-slate-50/50">
+                        <h5 className="font-bold text-xs text-slate-700 mb-2 flex items-center gap-1.5">
+                          <MapPin size={12} className="text-amber-500" />
+                          {bay}
+                        </h5>
+                        
+                        {bayBookings.length === 0 ? (
+                          <p className="text-[11px] text-slate-400 italic">No hay servicios programados en esta bahía.</p>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {bayBookings.map((bk) => {
+                              const mech = employees.find(e => e.id === bk.mechanicId);
+                              return (
+                                <div key={bk.id} className="bg-white p-2.5 border border-slate-200 rounded-lg text-[11px] shadow-sm flex flex-col justify-between">
+                                  <div>
+                                    <div className="flex justify-between items-center mb-1">
+                                      <span className="font-bold text-amber-600 font-mono">{bk.time} Hrs</span>
+                                      <span className="bg-slate-100 text-slate-600 font-mono px-1.5 py-0.2 rounded font-semibold">{bk.vehiclePlate}</span>
+                                    </div>
+                                    <p className="font-semibold text-slate-800">{bk.purpose}</p>
+                                  </div>
+                                  <p className="text-[10px] text-slate-400 mt-1.5 border-t border-slate-50 pt-1">
+                                    Mecánico: <strong>{mech?.name || 'Asignando'}</strong>
+                                  </p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
@@ -4736,108 +4879,6 @@ export default function AdvisorDashboard({
               </div>
             </div>
           )}
-        </div>
-      )}
-
-      {/* AGENDA & WORKSHOP BAYS TAB */}
-      {activeTab === 'agenda' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Scheduling form */}
-          <form onSubmit={handleAddBooking} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <h4 className="font-bold text-slate-800 border-b border-slate-100 pb-2 flex items-center gap-1.5 font-display">
-              <Calendar size={18} className="text-amber-600" />
-              Agendar Cita / Bahía
-            </h4>
-
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <label className="block text-slate-500 font-medium mb-1">Fecha</label>
-                <input type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-slate-500 font-medium mb-1">Hora</label>
-                <input type="time" value={bookingTime} onChange={(e) => setBookingTime(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg" />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-slate-500 font-medium mb-1">Placas del Auto</label>
-                <input type="text" required value={bookingPlate} onChange={(e) => setBookingPlate(e.target.value.toUpperCase())} className="w-full p-2 border border-slate-200 rounded-lg font-mono uppercase" placeholder="Ej. 931-WYZ" />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-slate-500 font-medium mb-1">Asignar Bahía de Trabajo</label>
-                <select value={bookingBay} onChange={(e) => setBookingBay(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-700">
-                  <option value="Bahía 1 - Rampa">Bahía 1 - Rampa Elevadora 1</option>
-                  <option value="Bahía 2 - Eléctrico">Bahía 2 - Escaneo y Eléctrico</option>
-                  <option value="Bahía 3 - Suspensión">Bahía 3 - Suspensión y Frenos</option>
-                  <option value="Bahía 4 - Detallado">Bahía 4 - Estética y Lavado</option>
-                </select>
-              </div>
-              <div className="col-span-2">
-                <label className="block text-slate-500 font-medium mb-1">Mecánico Responsable</label>
-                <select value={bookingMech} onChange={(e) => setBookingMech(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-700">
-                  {employees.filter(e => e.role === 'Mecanico').map(mech => (
-                    <option key={mech.id} value={mech.id}>{mech.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-span-2">
-                <label className="block text-slate-500 font-medium mb-1">Servicio Solicitado</label>
-                <input type="text" required value={bookingPurpose} onChange={(e) => setBookingPurpose(e.target.value)} className="w-full p-2 border border-slate-200 rounded-lg" placeholder="Ej. Afinación Mayor..." />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 text-xs rounded-lg shadow-sm transition-all"
-            >
-              Agendar Cita
-            </button>
-          </form>
-
-          {/* Interactive timeline map */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h4 className="font-bold text-slate-800">Calendario de Bahías y Citas ({bookingDate})</h4>
-              <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-bold">4 Bahías de Trabajo</span>
-            </div>
-
-            <div className="space-y-4">
-              {['Bahía 1 - Rampa', 'Bahía 2 - Eléctrico', 'Bahía 3 - Suspensión', 'Bahía 4 - Detallado'].map((bay) => {
-                const bayBookings = agenda.filter(b => b.bay === bay);
-                return (
-                  <div key={bay} className="border border-slate-100 rounded-xl p-3 bg-slate-50/50">
-                    <h5 className="font-bold text-xs text-slate-700 mb-2 flex items-center gap-1.5">
-                      <MapPin size={12} className="text-amber-500" />
-                      {bay}
-                    </h5>
-                    
-                    {bayBookings.length === 0 ? (
-                      <p className="text-[11px] text-slate-400 italic">No hay servicios programados en esta bahía.</p>
-                    ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {bayBookings.map((bk) => {
-                          const mech = employees.find(e => e.id === bk.mechanicId);
-                          return (
-                            <div key={bk.id} className="bg-white p-2.5 border border-slate-200 rounded-lg text-[11px] shadow-sm flex flex-col justify-between">
-                              <div>
-                                <div className="flex justify-between items-center mb-1">
-                                  <span className="font-bold text-amber-600 font-mono">{bk.time} Hrs</span>
-                                  <span className="bg-slate-100 text-slate-600 font-mono px-1.5 py-0.2 rounded font-semibold">{bk.vehiclePlate}</span>
-                                </div>
-                                <p className="font-semibold text-slate-800">{bk.purpose}</p>
-                              </div>
-                              <p className="text-[10px] text-slate-400 mt-1.5 border-t border-slate-50 pt-1">
-                                Mecánico: <strong>{mech?.name || 'Asignando'}</strong>
-                              </p>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
       )}
 

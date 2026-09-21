@@ -102,7 +102,8 @@ export default function App() {
   });
   const [advisorTab, setAdvisorTab] = useState<'reception' | 'quotes' | 'ordenes_reparacion' | 'salidas' | 'agenda' | 'crm' | 'calibrador'>(() => {
     const saved = localStorage.getItem('sae_advisor_tab');
-    if (saved === 'agenda' || saved === 'crm') return 'reception';
+    if (saved === 'agenda') return 'ordenes_reparacion';
+    if (saved === 'crm') return 'reception';
     return (saved as any) || 'reception';
   });
   const [mechanicTab, setMechanicTab] = useState<'tasks' | 'diagnostics' | 'parts'>(() => {

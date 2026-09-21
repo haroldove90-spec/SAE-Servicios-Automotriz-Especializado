@@ -179,6 +179,7 @@ export interface Presupuesto {
 
 export interface OrdenReparacionItem {
   id: string;
+  marca?: string; // Columna 'Marca' del formato 3
   codigo?: string;
   descripcion: string;
   cantidad: number;
@@ -188,35 +189,41 @@ export interface OrdenReparacion {
   id: string;
   numero: string; // e.g. "180"
   fecha: string; // e.g. "07/07/2026"
-  asesor: string; // e.g. "Alberto Flores Hdz."
+  asesor?: string; // e.g. "Alberto Flores Hdz."
+  tecnico?: string; // Alias de tecnicoResponsable
+  tecnicoResponsable?: string;
   
-  // Quality and revision checks matching paper
-  rotacionAireLlantas?: string;
-  revLimpiaParabrisas?: string;
-  revLucesNivelesEngral?: string;
-  tecnico?: string;
-
-  // Datos del Cliente
-  clienteNombre: string;
-  clienteCalle: string;
-  clienteCpColonia: string;
-  clienteAlcaldia: string;
-  clienteTelefono: string;
+  // Revisiones rápidas (Formato 3)
+  rotacionPresionAire?: string; // "OK", "✓", "SI", etc.
+  rotacionAireLlantas?: string; // Alias
+  revLimpiaparabrisas?: string;
+  revLimpiaParabrisas?: string; // Alias
+  revLuces?: string;
+  revLucesNivelesEngral?: string; // Alias
+  revNivelesGeneral?: string;
   
   // Datos del Vehículo
+  matriculaPlacas?: string; // e.g. "865-XXJ"
+  matriculaVin?: string; // Alias
   marcaMotor: string; // e.g. "FORD-RANGER / 2.3L"
   modeloColor: string; // e.g. "2012 / BLANCO"
-  matriculaVin: string; // e.g. "865-XXJ / 8AFER5AD8C6453240"
   kilometros: number;
   
-  // Items / Desglose
+  // Items / Desglose de Repuestos
   items: OrdenReparacionItem[];
   
+  // Datos opcionales / cliente
+  clienteNombre?: string;
+  clienteCalle?: string;
+  clienteCpColonia?: string;
+  clienteAlcaldia?: string;
+  clienteTelefono?: string;
   notas?: string;
   
   clientId?: string;
   vehicleId?: string;
   serviceOrderId?: string;
+  ordenServicioNumero?: string;
   
   createdAt: string;
   status: 'En Proceso' | 'Completada' | 'Entregada' | 'Cancelada';

@@ -14,7 +14,8 @@ export type TemplateSection =
   | 'servicio'
   | 'firmas'
   | 'tabla'
-  | 'pie_pagina';
+  | 'pie_pagina'
+  | 'revisiones';
 
 export interface PdfTemplateField {
   id: string;
@@ -1087,10 +1088,265 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
 export const DEFAULT_FORMATO_3: PdfTemplateConfig = {
   id: 'formato3',
   nombre: 'Formato 3: Orden de Reparación SAE',
-  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato3.png',
+  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203.png',
   width: 750,
   height: 980,
-  fields: []
+  fields: [
+    // Encabezado / Control
+    {
+      id: 'fecha',
+      label: 'Fecha (Línea a la derecha de Fecha:)',
+      section: 'encabezado',
+      x: 454,
+      y: 138,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '07/07/2026'
+    },
+    {
+      id: 'numero_orden',
+      label: 'Número de Orden (Línea derecha de Número:)',
+      section: 'encabezado',
+      x: 635,
+      y: 138,
+      fontSize: 15,
+      fontWeight: '900',
+      color: '#D32F2F',
+      align: 'left',
+      sampleValue: '180'
+    },
+
+    // Revisiones Rápidas
+    {
+      id: 'rotacion_presion_aire',
+      label: 'Rotación y Presión de Aire a Llantas',
+      section: 'revisiones',
+      x: 330,
+      y: 191,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'OK'
+    },
+    {
+      id: 'rev_limpiaparabrisas',
+      label: 'Rev. Limpia Parabrisas y Chisgueteros',
+      section: 'revisiones',
+      x: 334,
+      y: 227,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'OK'
+    },
+    {
+      id: 'rev_luces',
+      label: 'Rev. de Luces',
+      section: 'revisiones',
+      x: 160,
+      y: 261,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'OK'
+    },
+    {
+      id: 'rev_niveles_general',
+      label: 'Y Niveles en General',
+      section: 'revisiones',
+      x: 323,
+      y: 261,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'OK'
+    },
+
+    // Datos del Vehículo
+    {
+      id: 'matricula_placas',
+      label: 'Matrícula / Placas (Línea derecha de Matrícula:)',
+      section: 'auto',
+      x: 480,
+      y: 188,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '865-XXJ'
+    },
+    {
+      id: 'marca_motor',
+      label: 'Marca / Motor (Línea derecha de Marca/Motor:)',
+      section: 'auto',
+      x: 495,
+      y: 212,
+      fontSize: 10.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'FORD-RANGER / 2.3L'
+    },
+    {
+      id: 'modelo_color',
+      label: 'Modelo / Color (Línea derecha de Modelo/Color:)',
+      section: 'auto',
+      x: 500,
+      y: 237,
+      fontSize: 10.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '2012 / BLANCO'
+    },
+    {
+      id: 'kilometraje',
+      label: 'Kms. (Línea derecha de Kms.:)',
+      section: 'auto',
+      x: 450,
+      y: 259,
+      fontSize: 10.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '161,282 km'
+    },
+
+    // Tabla de Repuestos - Renglones de muestra
+    // Renglón 1
+    {
+      id: 'tabla_r1_marca',
+      label: 'R1: Marca',
+      section: 'tabla',
+      x: 82,
+      y: 320,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'BREMBO'
+    },
+    {
+      id: 'tabla_r1_descripcion',
+      label: 'R1: Descripción Repuesto / Trabajo',
+      section: 'tabla',
+      x: 128,
+      y: 320,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Juego de balatas cerámicas delanteras'
+    },
+    {
+      id: 'tabla_r1_cantidad',
+      label: 'R1: Cantidad',
+      section: 'tabla',
+      x: 664,
+      y: 320,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: '1'
+    },
+
+    // Renglón 2
+    {
+      id: 'tabla_r2_marca',
+      label: 'R2: Marca',
+      section: 'tabla',
+      x: 82,
+      y: 344,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'MOTORCRAFT'
+    },
+    {
+      id: 'tabla_r2_descripcion',
+      label: 'R2: Descripción Repuesto / Trabajo',
+      section: 'tabla',
+      x: 128,
+      y: 344,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Rectificado de discos delanteros'
+    },
+    {
+      id: 'tabla_r2_cantidad',
+      label: 'R2: Cantidad',
+      section: 'tabla',
+      x: 664,
+      y: 344,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: '2'
+    },
+
+    // Renglón 3
+    {
+      id: 'tabla_r3_marca',
+      label: 'R3: Marca',
+      section: 'tabla',
+      x: 82,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'SAE-MO'
+    },
+    {
+      id: 'tabla_r3_descripcion',
+      label: 'R3: Descripción Repuesto / Trabajo',
+      section: 'tabla',
+      x: 128,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Mano de obra especializada e instalación'
+    },
+    {
+      id: 'tabla_r3_cantidad',
+      label: 'R3: Cantidad',
+      section: 'tabla',
+      x: 664,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: '1'
+    },
+
+    // Pie de Formulario
+    {
+      id: 'tecnico_responsable',
+      label: 'Técnico Responsable (Línea al lado de TECNICO)',
+      section: 'pie_pagina',
+      x: 115,
+      y: 934,
+      fontSize: 10.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Martín Domínguez (Mecánico en Jefe)'
+    }
+  ]
 };
 
 export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
@@ -1251,6 +1507,24 @@ VALUES (
   750,
   980,
   '${JSON.stringify(DEFAULT_FORMATO_2.fields).replace(/'/g, "''")}'::jsonb
+)
+ON CONFLICT (id) DO UPDATE SET
+  nombre = EXCLUDED.nombre,
+  bg_url = EXCLUDED.bg_url,
+  canvas_width = EXCLUDED.canvas_width,
+  canvas_height = EXCLUDED.canvas_height,
+  fields = EXCLUDED.fields,
+  updated_at = now();
+
+-- SEED: Formato 3 (Orden de Reparación SAE)
+INSERT INTO sae_pdf_templates (id, nombre, bg_url, canvas_width, canvas_height, fields)
+VALUES (
+  'formato3',
+  'Formato 3: Orden de Reparación SAE',
+  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203.png',
+  750,
+  980,
+  '${JSON.stringify(DEFAULT_FORMATO_3.fields).replace(/'/g, "''")}'::jsonb
 )
 ON CONFLICT (id) DO UPDATE SET
   nombre = EXCLUDED.nombre,
