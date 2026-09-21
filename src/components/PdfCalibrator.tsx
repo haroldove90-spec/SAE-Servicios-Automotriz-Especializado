@@ -12,14 +12,15 @@ import {
   DEFAULT_FORMATO_1,
   DEFAULT_FORMATO_2,
   DEFAULT_FORMATO_3,
+  DEFAULT_FORMATO_4,
   INITIAL_TEMPLATES_MAP,
   getTemplateConfig, 
   saveTemplateConfig, 
   resetTemplateConfig,
   SUPABASE_SQL_SCRIPT
 } from '../utils/pdfTemplateStorage';
-import { generateSaePdf, downloadSaePresupuestoPdf, downloadSaeOrdenDeReparacionPdf } from '../utils/saePdf';
-import { ServiceOrder, Client, Vehicle, Employee, Presupuesto, OrdenReparacion } from '../types';
+import { generateSaePdf, downloadSaePresupuestoPdf, downloadSaeOrdenDeReparacionPdf, downloadSaeNotaSalidaPdf } from '../utils/saePdf';
+import { ServiceOrder, Client, Vehicle, Employee, Presupuesto, OrdenReparacion, NotaSalida } from '../types';
 
 interface PdfCalibratorProps {
   orders?: ServiceOrder[];
@@ -298,6 +299,34 @@ export default function PdfCalibrator({
           status: 'Enviado'
         };
         await downloadSaePresupuestoPdf(samplePresupuesto);
+      } else if (selectedFormatId === 'formato4') {
+        const sampleNotaSalida: NotaSalida = {
+          id: 'salida-sample-187',
+          numero: '187',
+          fecha: new Date().toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          asesor: 'Alberto Flores Hdz.',
+          clienteNombre: sampleClient.name || 'CONGREGACIÓN DE LA MISIÓN',
+          clienteCalle: sampleClient.calle || 'Av. San Fernando #154',
+          clienteCpColonia: `${sampleClient.cp || '14000'} / ${sampleClient.colonia || 'Tlalpan Centro'}`,
+          clienteAlcaldia: sampleClient.alcaldia || 'Tlalpan, CDMX',
+          clienteTelefono: sampleClient.phone || '55 4632 6652',
+          marcaMotor: `${sampleVehicle.brand || 'FORD'}-${sampleVehicle.model || 'RANGER'} / ${sampleVehicle.motor || '2.3L'}`,
+          modeloColor: `${sampleVehicle.year || '2012'} / ${sampleVehicle.color || 'BLANCO'}`,
+          matriculaVin: sampleVehicle.plate || '865-XXJ',
+          kilometros: sampleVehicle.mileage || 161282,
+          formaPago: 'CONTADO',
+          garantia: '30 DIAS Ó 2,000 KMS. LO QUE OCURRA PRIMERO',
+          ordenServicioNumero: sampleOrder.folio || '378A',
+          items: [
+            { id: '1', codigo: 'KIT-01', descripcion: 'Juego de balatas cerámicas delanteras', cantidad: 1, importeUnitario: 1450, total: 1450 },
+            { id: '2', codigo: 'SRV-02', descripcion: 'Rectificado de discos de freno delanteros', cantidad: 2, importeUnitario: 350, total: 700 },
+            { id: '3', codigo: 'MO-01', descripcion: 'Mano de obra especializada y purga de sistema', cantidad: 1, importeUnitario: 850, total: 850 }
+          ],
+          total: 3000,
+          createdAt: new Date().toISOString(),
+          status: 'Emitida'
+        };
+        await downloadSaeNotaSalidaPdf(sampleNotaSalida);
       } else {
         await generateSaePdf(sampleOrder, sampleClient, sampleVehicle, employees);
       }
@@ -469,7 +498,7 @@ export default function PdfCalibrator({
               { id: 'formato1', label: '1. Orden de Recepción SAE', active: true, badge: 'Calibrado' },
               { id: 'formato2', label: '2. Presupuestos (Formato 2)', active: true, badge: 'Activo' },
               { id: 'formato3', label: '3. Orden de Reparación', active: true, badge: 'Activo' },
-              { id: 'formato4', label: '4. Nota de Salida', active: false, badge: 'Próximamente' }
+              { id: 'formato4', label: '4. Salida', active: true, badge: 'Activo' }
             ].map(f => (
               <button
                 key={f.id}

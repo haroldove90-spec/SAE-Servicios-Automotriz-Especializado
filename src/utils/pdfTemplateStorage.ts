@@ -15,7 +15,13 @@ export type TemplateSection =
   | 'firmas'
   | 'tabla'
   | 'pie_pagina'
-  | 'revisiones';
+  | 'revisiones'
+  | 'encabezado_control'
+  | 'datos_cliente'
+  | 'datos_vehiculo'
+  | 'tabla_repuestos'
+  | 'tabla_servicios'
+  | 'totales';
 
 export interface PdfTemplateField {
   id: string;
@@ -25,6 +31,7 @@ export interface PdfTemplateField {
   y: number; // in pixels (based on 980px height canvas)
   fontSize?: number;
   fontWeight?: 'normal' | 'bold' | '900';
+  fontFamily?: string;
   color?: string;
   align?: 'left' | 'center' | 'right';
   width?: number;
@@ -1351,11 +1358,206 @@ export const DEFAULT_FORMATO_3: PdfTemplateConfig = {
 
 export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
   id: 'formato4',
-  nombre: 'Formato 4: Nota de Salida SAE',
-  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato4.png',
+  nombre: 'Formato 4: Salida SAE',
+  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204.png',
   width: 750,
   height: 980,
-  fields: []
+  fields: [
+    // Encabezado y Control
+    {
+      id: 'numero_salida',
+      label: 'Número de Salida',
+      section: 'encabezado_control',
+      x: 488,
+      y: 206,
+      fontSize: 14,
+      fontFamily: 'monospace',
+      fontWeight: '900',
+      color: '#DC2626',
+      align: 'left'
+    },
+    // Datos del Cliente
+    {
+      id: 'cliente_nombre',
+      label: 'Cliente (Nombre)',
+      section: 'datos_cliente',
+      x: 140,
+      y: 214,
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'cliente_calle',
+      label: 'Calle y Número',
+      section: 'datos_cliente',
+      x: 134,
+      y: 239,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'cliente_cp_colonia',
+      label: 'C.P. y Colonia',
+      section: 'datos_cliente',
+      x: 139,
+      y: 258,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'cliente_alcaldia',
+      label: 'Alcaldía / Municipio',
+      section: 'datos_cliente',
+      x: 137,
+      y: 276,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'cliente_telefono',
+      label: 'Teléfono',
+      section: 'datos_cliente',
+      x: 134,
+      y: 293,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    // Datos del Vehículo
+    {
+      id: 'vehiculo_marca_motor',
+      label: 'Marca / Motor',
+      section: 'datos_vehiculo',
+      x: 516,
+      y: 240,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'vehiculo_modelo_color',
+      label: 'Modelo / Color',
+      section: 'datos_vehiculo',
+      x: 520,
+      y: 259,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'vehiculo_matricula',
+      label: 'Matrícula (Placas)',
+      section: 'datos_vehiculo',
+      x: 495,
+      y: 277,
+      fontSize: 10,
+      fontWeight: '900',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'vehiculo_kilometros',
+      label: 'Kilómetros',
+      section: 'datos_vehiculo',
+      x: 504,
+      y: 295,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    // Columnas de la Tabla de Repuestos
+    {
+      id: 'tabla_r1_codigo',
+      label: 'Columna Código',
+      section: 'tabla_repuestos',
+      x: 73,
+      y: 334,
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center'
+    },
+    {
+      id: 'tabla_r1_descripcion',
+      label: 'Columna Repuestos (Descripción)',
+      section: 'tabla_repuestos',
+      x: 107,
+      y: 334,
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'tabla_r1_cantidad',
+      label: 'Columna Cantidad',
+      section: 'tabla_repuestos',
+      x: 536,
+      y: 334,
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center'
+    },
+    {
+      id: 'tabla_r1_importe',
+      label: 'Columna Importe Unitario',
+      section: 'tabla_repuestos',
+      x: 611,
+      y: 334,
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'right'
+    },
+    {
+      id: 'tabla_r1_total',
+      label: 'Columna Total Partida',
+      section: 'tabla_repuestos',
+      x: 681,
+      y: 334,
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'right'
+    },
+    // Pie de Página
+    {
+      id: 'orden_de_servicio_numero',
+      label: 'Ord. de Serv. #',
+      section: 'pie_pagina',
+      x: 504,
+      y: 929,
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
+    {
+      id: 'total_general',
+      label: 'Total General',
+      section: 'pie_pagina',
+      x: 686,
+      y: 933,
+      fontSize: 13,
+      fontFamily: 'monospace',
+      fontWeight: '900',
+      color: '#000000',
+      align: 'right'
+    }
+  ]
 };
 
 export const INITIAL_TEMPLATES_MAP: Record<string, PdfTemplateConfig> = {
@@ -1525,6 +1727,24 @@ VALUES (
   750,
   980,
   '${JSON.stringify(DEFAULT_FORMATO_3.fields).replace(/'/g, "''")}'::jsonb
+)
+ON CONFLICT (id) DO UPDATE SET
+  nombre = EXCLUDED.nombre,
+  bg_url = EXCLUDED.bg_url,
+  canvas_width = EXCLUDED.canvas_width,
+  canvas_height = EXCLUDED.canvas_height,
+  fields = EXCLUDED.fields,
+  updated_at = now();
+
+-- SEED: Formato 4 (Salida SAE)
+INSERT INTO sae_pdf_templates (id, nombre, bg_url, canvas_width, canvas_height, fields)
+VALUES (
+  'formato4',
+  'Formato 4: Salida SAE',
+  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204.png',
+  750,
+  980,
+  '${JSON.stringify(DEFAULT_FORMATO_4.fields).replace(/'/g, "''")}'::jsonb
 )
 ON CONFLICT (id) DO UPDATE SET
   nombre = EXCLUDED.nombre,

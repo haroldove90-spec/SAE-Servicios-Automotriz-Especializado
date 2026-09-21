@@ -752,7 +752,7 @@ export default function AdvisorDashboard({
   };
 
   // State for Salidas Module
-  const [salidaSubTab, setSalidaSubTab] = useState<'formulario' | 'historial' | 'presupuestos'>('formulario');
+  const [salidaSubTab, setSalidaSubTab] = useState<'formulario' | 'historial' | 'presupuestos' | 'crm'>('formulario');
   const [editingSalidaId, setEditingSalidaId] = useState<string | null>(null);
 
   const [salNumero, setSalNumero] = useState(() => (187 + (notasSalida?.length || 0)).toString());
@@ -1401,14 +1401,14 @@ export default function AdvisorDashboard({
           <label htmlFor="advisor-mobile-tab-select" className="block text-xs font-bold text-slate-500 mb-1">Módulo de Asesor / Recepción</label>
           <select
             id="advisor-mobile-tab-select"
-            value={(activeTab === 'agenda') ? 'ordenes_reparacion' : activeTab}
+            value={(activeTab === 'agenda') ? 'ordenes_reparacion' : (activeTab === 'crm' ? 'salidas' : activeTab)}
             onChange={(e) => setActiveTab(e.target.value as any)}
             className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#8D6A28]"
           >
             <option value="reception">🚗 Recepción y Órdenes</option>
             <option value="quotes">💵 Presupuestos</option>
             <option value="ordenes_reparacion">🔧 Orden de reparación</option>
-            <option value="crm">🕒 CRM Clínico del Auto</option>
+            <option value="salidas">📄 Salida</option>
             <option value="calibrador">📐 Calibrador PDF</option>
           </select>
         </div>
@@ -1452,16 +1452,16 @@ export default function AdvisorDashboard({
             <span>Orden de reparación</span>
           </button>
           <button
-            id="advisor-tab-crm"
-            onClick={() => setActiveTab('crm')}
+            id="advisor-tab-salidas"
+            onClick={() => setActiveTab('salidas')}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
-              activeTab === 'crm'
+              activeTab === 'salidas' || (activeTab as string) === 'crm'
                 ? 'bg-[#8D6A28] text-white shadow-md'
                 : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
           >
-            <History size={16} />
-            <span>CRM Clínico del Auto</span>
+            <LogOut size={16} />
+            <span>Salida</span>
           </button>
           <button
             id="advisor-tab-calibrador"
@@ -4141,7 +4141,7 @@ export default function AdvisorDashboard({
       )}
 
       {/* MÓDULO OFICIAL SALIDAS / PRESUPUESTOS Y NOTAS DE LIQUIDACIÓN SAE */}
-      {activeTab === 'salidas' && (
+      {(activeTab === 'salidas' || (activeTab as string) === 'crm') && (
         <div className="space-y-6">
           {/* BARRA DE NAVEGACIÓN SECUNDARIA / SUB-TABS */}
           <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
@@ -4184,10 +4184,37 @@ export default function AdvisorDashboard({
                 <FileText size={15} />
                 <span>Historial de Presupuestos ({presupuestos.length})</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setSalidaSubTab('crm')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                  salidaSubTab === 'crm'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <Search size={15} />
+                <span>Historial Clínico ({vehicles.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCalibratorFormat('formato4');
+                  setPreviousTab('salidas');
+                  setActiveTab('calibrador');
+                }}
+                className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Abrir Calibrador visual de coordenadas para el Formato 4 Salida"
+              >
+                <Sliders size={14} className="text-amber-400" />
+                <span>Calibrar Formato 4</span>
+              </button>
             </div>
 
             <div className="text-xs text-slate-500 font-medium hidden sm:block">
-              Módulo Oficial de Salidas y Liquidación SAE • Hoja de Salida
+              Módulo Oficial de Salidas y Liquidación SAE • Hoja de Salida (Formato 4)
             </div>
           </div>
 
@@ -4879,126 +4906,126 @@ export default function AdvisorDashboard({
               </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* CRM HISTORY TAB */}
-      {activeTab === 'crm' && (
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
-            <div>
-              <h4 className="font-bold text-slate-800 font-display">Historial Clínico del Auto (CRM)</h4>
-              <p className="text-xs text-slate-500">Expediente médico completo de reparaciones, notas de diagnóstico y piezas surtidas</p>
-            </div>
-            
-            <div className="relative w-full sm:w-80">
-              <input
-                type="text"
-                value={crmSearch}
-                onChange={(e) => setCrmSearch(e.target.value)}
-                placeholder="Buscar por placa o marca..."
-                className="w-full pl-8 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-amber-500"
-              />
-              <Search size={14} className="absolute left-2.5 top-3 text-slate-400" />
-            </div>
-          </div>
+          {/* SUB-TAB 4: HISTORIAL CLÍNICO DEL AUTO (CRM) */}
+          {salidaSubTab === 'crm' && (
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-md space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+                <div>
+                  <h4 className="font-bold text-slate-800 font-display">Historial Clínico del Auto (CRM)</h4>
+                  <p className="text-xs text-slate-500">Expediente médico completo de reparaciones, notas de diagnóstico y piezas surtidas</p>
+                </div>
+                
+                <div className="relative w-full sm:w-80">
+                  <input
+                    type="text"
+                    value={crmSearch}
+                    onChange={(e) => setCrmSearch(e.target.value)}
+                    placeholder="Buscar por placa o marca..."
+                    className="w-full pl-8 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-amber-500"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-3 text-slate-400" />
+                </div>
+              </div>
 
-          <div className="space-y-6">
-            {vehicles
-              .filter(v => 
-                v.plate.toLowerCase().includes(crmSearch.toLowerCase()) || 
-                v.brand.toLowerCase().includes(crmSearch.toLowerCase()) ||
-                v.model.toLowerCase().includes(crmSearch.toLowerCase())
-              )
-              .map((v) => {
-                const owner = clients.find(c => c.id === v.ownerId);
-                const vehicleHistory = orders.filter(o => o.vehicleId === v.id);
+              <div className="space-y-6">
+                {vehicles
+                  .filter(v => 
+                    v.plate.toLowerCase().includes(crmSearch.toLowerCase()) || 
+                    v.brand.toLowerCase().includes(crmSearch.toLowerCase()) ||
+                    v.model.toLowerCase().includes(crmSearch.toLowerCase())
+                  )
+                  .map((v) => {
+                    const owner = clients.find(c => c.id === v.ownerId);
+                    const vehicleHistory = orders.filter(o => o.vehicleId === v.id);
 
-                return (
-                  <div key={v.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-sm transition-all space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                      <div>
-                        <h5 className="font-bold text-sm text-slate-800">
-                          {v.brand} {v.model} ({v.year}) - <span className="font-mono text-amber-600">{v.plate}</span>
-                        </h5>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          Propietario: <strong>{owner?.name}</strong> • Cel: {owner?.phone} • Email: {owner?.email}
-                        </p>
-                      </div>
-                      <div className="text-right text-xs">
-                        <p className="text-slate-500">Km Actual: <strong>{v.mileage.toLocaleString()} KM</strong></p>
-                        <p className="text-slate-500">Engomado: <span className={`inline-block w-2.5 h-2.5 rounded-sm bg-${v.engomadoColor}-400 mr-1`}></span>{v.engomadoColor.toUpperCase()} (Dígito: {v.plateEnding})</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-xs font-bold text-slate-700">Historial Clínico ({vehicleHistory.length} Órdenes de Servicio)</p>
-                      {vehicleHistory.length === 0 ? (
-                        <p className="text-xs text-slate-400 italic">No hay expedientes registrados previos.</p>
-                      ) : (
-                        <div className="space-y-3 pl-3 border-l-2 border-slate-200">
-                          {vehicleHistory.map((o) => (
-                            <div key={o.id} className="relative text-xs space-y-1">
-                              {/* circular node */}
-                              <div className="absolute -left-[17px] top-1.5 w-2.5 h-2.5 rounded-full bg-slate-300 border-2 border-white"></div>
-                              <div className="flex flex-wrap justify-between items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-1.5 mb-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-mono text-amber-600 bg-amber-50 px-1.5 rounded">{o.id}</span>
-                                  {o.folio && <span className="text-[10px] text-slate-500 font-sans">Folio: <strong>{o.folio}</strong></span>}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-slate-400 font-normal mr-2">{o.dateOpened.split(' ')[0]}</span>
-                                  
-                                  {/* Download PDF button */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const clientObj = clients.find(c => c.id === o.clientId);
-                                      const vehObj = vehicles.find(v => v.id === o.vehicleId);
-                                      generateSaePdf(o, clientObj, vehObj, employees);
-                                    }}
-                                    className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded border border-amber-200 flex items-center gap-1 text-[10px] transition-colors"
-                                    title="Descargar Orden de Entrada en PDF"
-                                  >
-                                    <Download size={10} />
-                                    <span>Descargar PDF</span>
-                                  </button>
-
-                                  {/* WhatsApp button */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const clientObj = clients.find(c => c.id === o.clientId);
-                                      if (clientObj?.hasWhatsapp === false) {
-                                        alert('Aviso: El cliente no cuenta con WhatsApp activo de acuerdo a su perfil registrado.');
-                                      } else {
-                                        const phone = clientObj?.phone || '';
-                                        const msg = `Hola, te compartimos tu Orden de Entrada de SAE con el Folio: ${o.folio || o.id}. Estatus actual: En Diagnóstico. ¡La escudería que te lleva seguro a tu destino! 🚗🏁`;
-                                        window.open(`https://api.whatsapp.com/send?phone=52${phone}&text=${encodeURIComponent(msg)}`, '_blank');
-                                      }
-                                    }}
-                                    className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded border border-emerald-200 flex items-center gap-1 text-[10px] transition-colors"
-                                    title="Enviar por WhatsApp"
-                                  >
-                                    <Send size={10} />
-                                    <span>Enviar WhatsApp</span>
-                                  </button>
-                                </div>
-                              </div>
-                              <p className="text-slate-700"><strong>Falla reportada:</strong> {o.reportedFailure}</p>
-                              {o.diagnostics && <p className="text-slate-600 bg-slate-50/50 p-1.5 rounded border border-slate-100"><strong>Diagnóstico:</strong> {o.diagnostics}</p>}
-                              <p className="text-[11px] text-slate-500">
-                                Reparación: {o.items.filter(item => item.approved).map(item => item.description).join(', ') || 'Sin partidas aprobadas.'}
-                              </p>
-                            </div>
-                          ))}
+                    return (
+                      <div key={v.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-sm transition-all space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                          <div>
+                            <h5 className="font-bold text-sm text-slate-800">
+                              {v.brand} {v.model} ({v.year}) - <span className="font-mono text-amber-600">{v.plate}</span>
+                            </h5>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              Propietario: <strong>{owner?.name}</strong> • Cel: {owner?.phone} • Email: {owner?.email}
+                            </p>
+                          </div>
+                          <div className="text-right text-xs">
+                            <p className="text-slate-500">Km Actual: <strong>{v.mileage.toLocaleString()} KM</strong></p>
+                            <p className="text-slate-500">Engomado: <span className={`inline-block w-2.5 h-2.5 rounded-sm bg-${v.engomadoColor}-400 mr-1`}></span>{v.engomadoColor.toUpperCase()} (Dígito: {v.plateEnding})</p>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
+
+                        <div className="space-y-3">
+                          <p className="text-xs font-bold text-slate-700">Historial Clínico ({vehicleHistory.length} Órdenes de Servicio)</p>
+                          {vehicleHistory.length === 0 ? (
+                            <p className="text-xs text-slate-400 italic">No hay expedientes registrados previos.</p>
+                          ) : (
+                            <div className="space-y-3 pl-3 border-l-2 border-slate-200">
+                              {vehicleHistory.map((o) => (
+                                <div key={o.id} className="relative text-xs space-y-1">
+                                  {/* circular node */}
+                                  <div className="absolute -left-[17px] top-1.5 w-2.5 h-2.5 rounded-full bg-slate-300 border-2 border-white"></div>
+                                  <div className="flex flex-wrap justify-between items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-1.5 mb-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-mono text-amber-600 bg-amber-50 px-1.5 rounded">{o.id}</span>
+                                      {o.folio && <span className="text-[10px] text-slate-500 font-sans">Folio: <strong>{o.folio}</strong></span>}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-slate-400 font-normal mr-2">{o.dateOpened.split(' ')[0]}</span>
+                                      
+                                      {/* Download PDF button */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const clientObj = clients.find(c => c.id === o.clientId);
+                                          const vehObj = vehicles.find(v => v.id === o.vehicleId);
+                                          generateSaePdf(o, clientObj, vehObj, employees);
+                                        }}
+                                        className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded border border-amber-200 flex items-center gap-1 text-[10px] transition-colors"
+                                        title="Descargar Orden de Entrada en PDF"
+                                      >
+                                        <Download size={10} />
+                                        <span>Descargar PDF</span>
+                                      </button>
+
+                                      {/* WhatsApp button */}
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const clientObj = clients.find(c => c.id === o.clientId);
+                                          if (clientObj?.hasWhatsapp === false) {
+                                            alert('Aviso: El cliente no cuenta con WhatsApp activo de acuerdo a su perfil registrado.');
+                                          } else {
+                                            const phone = clientObj?.phone || '';
+                                            const msg = `Hola, te compartimos tu Orden de Entrada de SAE con el Folio: ${o.folio || o.id}. Estatus actual: En Diagnóstico. ¡La escudería que te lleva seguro a tu destino! 🚗🏁`;
+                                            window.open(`https://api.whatsapp.com/send?phone=52${phone}&text=${encodeURIComponent(msg)}`, '_blank');
+                                          }
+                                        }}
+                                        className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded border border-emerald-200 flex items-center gap-1 text-[10px] transition-colors"
+                                        title="Enviar por WhatsApp"
+                                      >
+                                        <Send size={10} />
+                                        <span>Enviar WhatsApp</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <p className="text-slate-700"><strong>Falla reportada:</strong> {o.reportedFailure}</p>
+                                  {o.diagnostics && <p className="text-slate-600 bg-slate-50/50 p-1.5 rounded border border-slate-100"><strong>Diagnóstico:</strong> {o.diagnostics}</p>}
+                                  <p className="text-[11px] text-slate-500">
+                                    Reparación: {o.items.filter(item => item.approved).map(item => item.description).join(', ') || 'Sin partidas aprobadas.'}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
