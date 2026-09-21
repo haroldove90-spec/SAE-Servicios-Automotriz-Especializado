@@ -2,21 +2,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   FileText, Save, RotateCcw, Download, ZoomIn, ZoomOut, Move, 
   Database, Copy, Check, Crosshair, Search, ChevronRight, Sliders,
-  Eye, AlertCircle, Info, Sparkles, CheckCircle2, ChevronDown, X
+  Eye, AlertCircle, Info, Sparkles, CheckCircle2, ChevronDown, X,
+  ArrowLeft
 } from 'lucide-react';
 import { 
   PdfTemplateConfig, 
   PdfTemplateField, 
   TemplateSection,
   DEFAULT_FORMATO_1,
+  DEFAULT_FORMATO_2,
   INITIAL_TEMPLATES_MAP,
   getTemplateConfig, 
   saveTemplateConfig, 
   resetTemplateConfig,
   SUPABASE_SQL_SCRIPT
 } from '../utils/pdfTemplateStorage';
-import { generateSaePdf } from '../utils/saePdf';
-import { ServiceOrder, Client, Vehicle, Employee } from '../types';
+import { generateSaePdf, downloadSaePresupuestoPdf } from '../utils/saePdf';
+import { ServiceOrder, Client, Vehicle, Employee, Presupuesto } from '../types';
 
 interface PdfCalibratorProps {
   orders?: ServiceOrder[];
@@ -25,6 +27,7 @@ interface PdfCalibratorProps {
   employees?: Employee[];
   initialFormat?: string;
   onClose?: () => void;
+  returnTabName?: string;
 }
 
 export default function PdfCalibrator({
@@ -33,11 +36,12 @@ export default function PdfCalibrator({
   vehicles = [],
   employees = [],
   initialFormat = 'formato1',
-  onClose
+  onClose,
+  returnTabName
 }: PdfCalibratorProps) {
   // Format selector
   const [selectedFormatId, setSelectedFormatId] = useState<string>(initialFormat);
-  const [config, setConfig] = useState<PdfTemplateConfig>(() => getTemplateConfig('formato1'));
+  const [config, setConfig] = useState<PdfTemplateConfig>(() => getTemplateConfig(initialFormat));
   
   // Selected field for fine adjustment
   const [selectedFieldId, setSelectedFieldId] = useState<string>('folio');
@@ -59,10 +63,18 @@ export default function PdfCalibrator({
   const [copiedSql, setCopiedSql] = useState<boolean>(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
 
+  // Sync format with initialFormat if it changes externally
+  useEffect(() => {
+    if (initialFormat && initialFormat !== selectedFormatId) {
+      setSelectedFormatId(initialFormat);
+    }
+  }, [initialFormat]);
+
   // Load config when format changes
   useEffect(() => {
     const loaded = getTemplateConfig(selectedFormatId);
     setConfig(loaded);
+    setActiveSection('todos');
     if (loaded.fields.length > 0) {
       setSelectedFieldId(loaded.fields[0].id);
     }
@@ -222,9 +234,41 @@ export default function PdfCalibrator({
         plateEnding: '8'
       };
 
-      await generateSaePdf(sampleOrder, sampleClient, sampleVehicle, employees);
+      if (selectedFormatId === 'formato2') {
+        const samplePresupuesto: Presupuesto = {
+          id: 'pres-sample-1',
+          numero: '202',
+          fecha: new Date().toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          asesor: 'Alberto Flores Hdz.',
+          clienteNombre: sampleClient.name || 'CONGREGACIÓN DE LA MISIÓN',
+          clienteCalle: sampleClient.calle || 'Av. San Fernando #154',
+          clienteCpColonia: `${sampleClient.cp || '14000'} / ${sampleClient.colonia || 'Tlalpan Centro'}`,
+          clienteAlcaldia: sampleClient.alcaldia || 'Tlalpan, CDMX',
+          clienteTelefono: sampleClient.phone || '55 4632 6652',
+          marcaMotor: `${sampleVehicle.brand || 'FORD'}-${sampleVehicle.model || 'RANGER'} / ${sampleVehicle.motor || '2.3L'}`,
+          modeloColor: `${sampleVehicle.year || '2012'} / ${sampleVehicle.color || 'BLANCO'}`,
+          matriculaVin: sampleVehicle.plate || '865-XXJ',
+          kilometros: sampleVehicle.mileage || 161282,
+          items: [
+            { id: '1', codigo: 'KIT-01', descripcion: 'Juego de balatas de freno delanteras cerámicas', cantidad: 1, importeUnitario: 1450, total: 1450 },
+            { id: '2', codigo: 'SRV-02', descripcion: 'Rectificado de discos de freno delanteros', cantidad: 2, importeUnitario: 350, total: 700 },
+            { id: '3', codigo: 'MO-01', descripcion: 'Mano de obra especializada y purga de frenos', cantidad: 1, importeUnitario: 850, total: 850 }
+          ],
+          ordenServicioNumero: sampleOrder.id || 'OS-409A',
+          total: 3000,
+          formaPago: 'CONTADO',
+          validezDias: 12,
+          diasEntrega: 3,
+          createdAt: new Date().toISOString(),
+          status: 'Enviado'
+        };
+        await downloadSaePresupuestoPdf(samplePresupuesto);
+      } else {
+        await generateSaePdf(sampleOrder, sampleClient, sampleVehicle, employees);
+      }
+
       setSaveStatus({
-        message: '¡PDF de prueba generado y descargado con tus coordenadas exactas!',
+        message: `¡PDF de prueba (${selectedFormatId === 'formato2' ? 'Presupuesto' : 'Orden de Recepción'}) generado y descargado!`,
         type: 'success'
       });
       setTimeout(() => setSaveStatus(null), 4000);
@@ -301,6 +345,18 @@ export default function PdfCalibrator({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer border border-amber-400"
+                title={`Regresar a ${returnTabName || 'Recepción y Órdenes'}`}
+              >
+                <ArrowLeft size={15} />
+                <span>Volver a {returnTabName || 'Recepción'}</span>
+              </button>
+            )}
+
             <button
               onClick={() => setShowSqlModal(true)}
               className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-300"
@@ -340,11 +396,10 @@ export default function PdfCalibrator({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow transition-colors cursor-pointer border border-slate-700"
-                title="Cerrar Calibrador y volver a Recepción"
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow transition-colors cursor-pointer border border-slate-700"
+                title="Cerrar Calibrador"
               >
                 <X size={15} />
-                <span>Cerrar</span>
               </button>
             )}
           </div>
@@ -369,8 +424,8 @@ export default function PdfCalibrator({
               Formato:
             </span>
             {[
-              { id: 'formato1', label: '1. Orden de Recepción SAE', active: true, badge: 'Calibrando' },
-              { id: 'formato2', label: '2. Presupuesto', active: false, badge: 'Próximamente' },
+              { id: 'formato1', label: '1. Orden de Recepción SAE', active: true, badge: 'Calibrado' },
+              { id: 'formato2', label: '2. Presupuestos (Formato 2)', active: true, badge: 'Activo' },
               { id: 'formato3', label: '3. Orden de Reparación', active: false, badge: 'Próximamente' },
               { id: 'formato4', label: '4. Nota de Salida', active: false, badge: 'Próximamente' }
             ].map(f => (
@@ -543,9 +598,16 @@ export default function PdfCalibrator({
                 </div>
               </div>
 
-              <div className="text-[11px] text-slate-400 bg-amber-50/50 p-2 rounded-lg border border-amber-200/50 flex items-center gap-1.5">
-                <Info size={14} className="text-amber-600 shrink-0" />
-                <span>Tip: Puedes usar las <strong>flechas del teclado</strong> (← ↑ ↓ →) para mover el elemento seleccionado con precisión milimétrica (con Shift mueves 5px).</span>
+              <div className="calibrator-tip-box text-xs text-amber-950 font-medium bg-amber-50 p-3 rounded-xl border border-amber-300/80 shadow-xs flex items-start gap-2.5">
+                <div className="p-1 bg-amber-500 text-white rounded-lg shrink-0 mt-0.5">
+                  <Info size={14} />
+                </div>
+                <div className="leading-snug">
+                  <span className="font-bold text-amber-900 block mb-0.5">💡 Tip de Calibración Rápida:</span>
+                  <span className="text-amber-950">
+                    Puedes usar las <strong className="bg-white px-1.5 py-0.5 rounded border border-amber-300 font-mono text-[11px] text-slate-900 font-bold">flechas del teclado (← ↑ ↓ →)</strong> para mover el elemento seleccionado con precisión milimétrica (mantén <strong className="bg-white px-1.5 py-0.5 rounded border border-amber-300 font-mono text-[11px] text-slate-900 font-bold">Shift</strong> para mover 5px).
+                  </span>
+                </div>
               </div>
             </div>
           ) : (
@@ -576,7 +638,14 @@ export default function PdfCalibrator({
 
             {/* Section Filter Pills */}
             <div className="flex flex-wrap gap-1">
-              {[
+              {(selectedFormatId === 'formato2' ? [
+                { id: 'todos', label: 'Todos' },
+                { id: 'encabezado', label: 'Folio y Fecha' },
+                { id: 'cliente', label: 'Cliente' },
+                { id: 'auto', label: 'Vehículo' },
+                { id: 'tabla', label: 'Tabla Repuestos' },
+                { id: 'pie_pagina', label: 'Pie y Totales' }
+              ] : [
                 { id: 'todos', label: 'Todos' },
                 { id: 'encabezado', label: 'Folio' },
                 { id: 'cliente', label: 'Cliente' },
@@ -586,14 +655,14 @@ export default function PdfCalibrator({
                 { id: 'observaciones', label: 'Observaciones' },
                 { id: 'servicio', label: 'Servicio' },
                 { id: 'firmas', label: 'Firmas' }
-              ].map(sec => (
+              ]).map(sec => (
                 <button
                   key={sec.id}
                   onClick={() => setActiveSection(sec.id)}
-                  className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
                     activeSection === sec.id
-                      ? 'bg-[#8D6A28] text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-[#8D6A28] text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   {sec.label}

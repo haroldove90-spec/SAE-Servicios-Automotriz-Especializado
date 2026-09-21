@@ -12,7 +12,9 @@ export type TemplateSection =
   | 'checklist_col2'
   | 'observaciones'
   | 'servicio'
-  | 'firmas';
+  | 'firmas'
+  | 'tabla'
+  | 'pie_pagina';
 
 export interface PdfTemplateField {
   id: string;
@@ -713,10 +715,373 @@ export const DEFAULT_FORMATO_1: PdfTemplateConfig = {
 export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
   id: 'formato2',
   nombre: 'Formato 2: Presupuesto SAE',
-  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato2.png',
+  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202.png',
   width: 750,
   height: 980,
-  fields: []
+  fields: [
+    // Encabezado / Control
+    {
+      id: 'numero_salida',
+      label: 'Número de Folio / Presupuesto',
+      section: 'encabezado',
+      x: 490,
+      y: 206,
+      fontSize: 14,
+      fontWeight: '900',
+      color: '#D32F2F',
+      align: 'left',
+      sampleValue: '202'
+    },
+    {
+      id: 'fecha',
+      label: 'Fecha del Presupuesto',
+      section: 'encabezado',
+      x: 620,
+      y: 206,
+      fontSize: 10.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '21/09/2026'
+    },
+
+    // Datos del Cliente
+    {
+      id: 'cliente_nombre',
+      label: 'CLIENTE (Nombre / Razón Social)',
+      section: 'cliente',
+      x: 140,
+      y: 214,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Congregación de la Misión'
+    },
+    {
+      id: 'cliente_calle',
+      label: 'Calle y Número',
+      section: 'cliente',
+      x: 134,
+      y: 239,
+      fontSize: 10,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Av. San Fernando #154'
+    },
+    {
+      id: 'cliente_cp_colonia',
+      label: 'C.P. / Colonia',
+      section: 'cliente',
+      x: 139,
+      y: 258,
+      fontSize: 10,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '14000 Tlalpan Centro'
+    },
+    {
+      id: 'cliente_alcaldia',
+      label: 'Alcaldía / Municipio',
+      section: 'cliente',
+      x: 137,
+      y: 276,
+      fontSize: 10,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Tlalpan'
+    },
+    {
+      id: 'cliente_telefono',
+      label: 'Teléfono',
+      section: 'cliente',
+      x: 134,
+      y: 293,
+      fontSize: 10,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '73 5266 8332'
+    },
+
+    // Datos del Vehículo
+    {
+      id: 'vehiculo_marca_motor',
+      label: 'Marca / Motor',
+      section: 'auto',
+      x: 516,
+      y: 240,
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'FORD-RANGER / 2.3L'
+    },
+    {
+      id: 'vehiculo_modelo_color',
+      label: 'Modelo / Color',
+      section: 'auto',
+      x: 520,
+      y: 259,
+      fontSize: 10,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '2012 / BLANCO'
+    },
+    {
+      id: 'vehiculo_matricula',
+      label: 'Matrícula / Placas',
+      section: 'auto',
+      x: 495,
+      y: 277,
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '865-XXJ'
+    },
+    {
+      id: 'vehiculo_kilometros',
+      label: 'Kilómetros',
+      section: 'auto',
+      x: 504,
+      y: 295,
+      fontSize: 10,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: '161,282 km'
+    },
+
+    // Tabla de Repuestos / Partidas (Muestra de renglones calibrados)
+    // Renglón 1
+    {
+      id: 'tabla_r1_codigo',
+      label: 'R1: Código',
+      section: 'tabla',
+      x: 73,
+      y: 345,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'KIT-01'
+    },
+    {
+      id: 'tabla_r1_descripcion',
+      label: 'R1: Descripción Repuesto / Servicio',
+      section: 'tabla',
+      x: 107,
+      y: 345,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Cambio de balatas delanteras cerámicas'
+    },
+    {
+      id: 'tabla_r1_cantidad',
+      label: 'R1: Cantidad',
+      section: 'tabla',
+      x: 536,
+      y: 345,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: '1'
+    },
+    {
+      id: 'tabla_r1_unitario',
+      label: 'R1: Importe Unitario',
+      section: 'tabla',
+      x: 611,
+      y: 345,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'right',
+      sampleValue: '1,450.00'
+    },
+    {
+      id: 'tabla_r1_total',
+      label: 'R1: Total Partida',
+      section: 'tabla',
+      x: 681,
+      y: 345,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'right',
+      sampleValue: '1,450.00'
+    },
+
+    // Renglón 2
+    {
+      id: 'tabla_r2_codigo',
+      label: 'R2: Código',
+      section: 'tabla',
+      x: 73,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'MNT-04'
+    },
+    {
+      id: 'tabla_r2_descripcion',
+      label: 'R2: Descripción Repuesto / Servicio',
+      section: 'tabla',
+      x: 107,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Rectificado de discos de freno delanteros'
+    },
+    {
+      id: 'tabla_r2_cantidad',
+      label: 'R2: Cantidad',
+      section: 'tabla',
+      x: 536,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: '2'
+    },
+    {
+      id: 'tabla_r2_unitario',
+      label: 'R2: Importe Unitario',
+      section: 'tabla',
+      x: 611,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'right',
+      sampleValue: '350.00'
+    },
+    {
+      id: 'tabla_r2_total',
+      label: 'R2: Total Partida',
+      section: 'tabla',
+      x: 681,
+      y: 368,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'right',
+      sampleValue: '700.00'
+    },
+
+    // Renglón 3
+    {
+      id: 'tabla_r3_codigo',
+      label: 'R3: Código',
+      section: 'tabla',
+      x: 73,
+      y: 391,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: 'MO-02'
+    },
+    {
+      id: 'tabla_r3_descripcion',
+      label: 'R3: Descripción Repuesto / Servicio',
+      section: 'tabla',
+      x: 107,
+      y: 391,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'Mano de obra y purga de sistema de frenos'
+    },
+    {
+      id: 'tabla_r3_cantidad',
+      label: 'R3: Cantidad',
+      section: 'tabla',
+      x: 536,
+      y: 391,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'center',
+      sampleValue: '1'
+    },
+    {
+      id: 'tabla_r3_unitario',
+      label: 'R3: Importe Unitario',
+      section: 'tabla',
+      x: 611,
+      y: 391,
+      fontSize: 9.5,
+      fontWeight: 'normal',
+      color: '#000000',
+      align: 'right',
+      sampleValue: '850.00'
+    },
+    {
+      id: 'tabla_r3_total',
+      label: 'R3: Total Partida',
+      section: 'tabla',
+      x: 681,
+      y: 391,
+      fontSize: 9.5,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'right',
+      sampleValue: '850.00'
+    },
+
+    // Pie de Página
+    {
+      id: 'orden_de_servicio_numero',
+      label: "Ord. de Servicio # (Espacio derecha de 'ORD. DE SERV. #')",
+      section: 'pie_pagina',
+      x: 504,
+      y: 929,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'OS-409A'
+    },
+    {
+      id: 'total_general',
+      label: "Total General (Casilla blanca debajo de 'Total')",
+      section: 'pie_pagina',
+      x: 681,
+      y: 933,
+      fontSize: 12.5,
+      fontWeight: '900',
+      color: '#000000',
+      align: 'right',
+      sampleValue: '$3,000.00'
+    },
+    {
+      id: 'forma_pago',
+      label: 'Forma de Pago',
+      section: 'pie_pagina',
+      x: 140,
+      y: 929,
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left',
+      sampleValue: 'CONTADO'
+    }
+  ]
 };
 
 export const DEFAULT_FORMATO_3: PdfTemplateConfig = {
@@ -857,5 +1222,41 @@ DROP POLICY IF EXISTS "Permitir modificacion de plantillas" ON sae_pdf_templates
 CREATE POLICY "Permitir modificacion de plantillas" 
 ON sae_pdf_templates FOR ALL USING (true);
 
-COMMENT ON TABLE sae_pdf_templates IS 'Guarda las posiciones de calibración milimétrica para los 4 formatos de PDF del taller SAE.';
+COMMENT ON TABLE sae_pdf_templates IS 'Guarda las posiciones de calibración milimétrica para los formatos de PDF del taller SAE.';
+
+-- SEED: Formato 1 (Orden de Recepción SAE)
+INSERT INTO sae_pdf_templates (id, nombre, bg_url, canvas_width, canvas_height, fields)
+VALUES (
+  'formato1',
+  'Formato 1: Orden de Recepción SAE',
+  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato1.png',
+  750,
+  980,
+  '${JSON.stringify(DEFAULT_FORMATO_1.fields).replace(/'/g, "''")}'::jsonb
+)
+ON CONFLICT (id) DO UPDATE SET
+  nombre = EXCLUDED.nombre,
+  bg_url = EXCLUDED.bg_url,
+  canvas_width = EXCLUDED.canvas_width,
+  canvas_height = EXCLUDED.canvas_height,
+  fields = EXCLUDED.fields,
+  updated_at = now();
+
+-- SEED: Formato 2 (Presupuestos SAE)
+INSERT INTO sae_pdf_templates (id, nombre, bg_url, canvas_width, canvas_height, fields)
+VALUES (
+  'formato2',
+  'Formato 2: Presupuesto SAE',
+  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202.png',
+  750,
+  980,
+  '${JSON.stringify(DEFAULT_FORMATO_2.fields).replace(/'/g, "''")}'::jsonb
+)
+ON CONFLICT (id) DO UPDATE SET
+  nombre = EXCLUDED.nombre,
+  bg_url = EXCLUDED.bg_url,
+  canvas_width = EXCLUDED.canvas_width,
+  canvas_height = EXCLUDED.canvas_height,
+  fields = EXCLUDED.fields,
+  updated_at = now();
 `;

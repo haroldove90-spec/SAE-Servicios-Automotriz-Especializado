@@ -171,6 +171,7 @@ export interface Presupuesto {
   clientId?: string;
   vehicleId?: string;
   serviceOrderId?: string;
+  ordenServicioNumero?: string;
   
   createdAt: string;
   status: 'Borrador' | 'Enviado' | 'Aprobado' | 'Rechazado' | 'Convertido';

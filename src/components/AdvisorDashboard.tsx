@@ -183,6 +183,8 @@ export default function AdvisorDashboard({
   // Save Success Modal states
   const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
   const [showCalibratorModal, setShowCalibratorModal] = useState(false);
+  const [calibratorFormat, setCalibratorFormat] = useState<string>('formato1');
+  const [previousTab, setPreviousTab] = useState<'reception' | 'quotes' | 'ordenes_reparacion' | 'salidas' | 'agenda' | 'crm'>('reception');
   const [successOrderId, setSuccessOrderId] = useState('');
   const [successOrderFolio, setSuccessOrderFolio] = useState('');
   const [successClientPhone, setSuccessClientPhone] = useState('');
@@ -1404,7 +1406,7 @@ export default function AdvisorDashboard({
             className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#8D6A28]"
           >
             <option value="reception">🚗 Recepción y Órdenes</option>
-            <option value="quotes">💵 Cotizaciones y Cobros</option>
+            <option value="quotes">💵 Presupuestos</option>
             <option value="agenda">📅 Agenda y Bahías</option>
             <option value="crm">🕒 CRM Clínico del Auto</option>
             <option value="calibrador">📐 Calibrador PDF</option>
@@ -1416,62 +1418,66 @@ export default function AdvisorDashboard({
           <button
             id="advisor-tab-reception"
             onClick={() => setActiveTab('reception')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
               activeTab === 'reception'
                 ? 'bg-[#8D6A28] text-white shadow-md'
-                : 'text-slate-600 hover:bg-slate-100'
+                : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
           >
             <Car size={16} />
-            Recepción y Órdenes
+            <span>Recepción y Órdenes</span>
           </button>
           <button
             id="advisor-tab-quotes"
             onClick={() => setActiveTab('quotes')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
               activeTab === 'quotes'
                 ? 'bg-[#8D6A28] text-white shadow-md'
-                : 'text-slate-600 hover:bg-slate-100'
+                : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
           >
             <FileText size={16} />
-            Cotizaciones y Cobros
+            <span>Presupuestos</span>
           </button>
           <button
             id="advisor-tab-agenda"
             onClick={() => setActiveTab('agenda')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
               activeTab === 'agenda'
                 ? 'bg-[#8D6A28] text-white shadow-md'
-                : 'text-slate-600 hover:bg-slate-100'
+                : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
           >
             <Calendar size={16} />
-            Agenda y Bahías
+            <span>Agenda y Bahías</span>
           </button>
           <button
             id="advisor-tab-crm"
             onClick={() => setActiveTab('crm')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
               activeTab === 'crm'
                 ? 'bg-[#8D6A28] text-white shadow-md'
-                : 'text-slate-600 hover:bg-slate-100'
+                : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
           >
             <History size={16} />
-            CRM Clínico del Auto
+            <span>CRM Clínico del Auto</span>
           </button>
           <button
             id="advisor-tab-calibrador"
-            onClick={() => setActiveTab('calibrador')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+            onClick={() => {
+              setCalibratorFormat('formato1');
+              setPreviousTab('reception');
+              setActiveTab('calibrador');
+            }}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
               activeTab === 'calibrador'
                 ? 'bg-[#8D6A28] text-white shadow-md'
-                : 'text-slate-600 hover:bg-slate-100'
+                : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
           >
             <Sliders size={16} />
-            Calibrador PDF
+            <span>Calibrador PDF</span>
           </button>
         </div>
       </div>
@@ -2162,12 +2168,16 @@ export default function AdvisorDashboard({
                   <div className="pt-1">
                     <button
                       type="button"
-                      onClick={() => setShowCalibratorModal(true)}
+                      onClick={() => {
+                        setCalibratorFormat('formato1');
+                        setPreviousTab('reception');
+                        setActiveTab('calibrador');
+                      }}
                       className="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 font-bold py-3.5 px-6 rounded-xl border border-amber-500/40 hover:border-amber-400 transition-all flex items-center justify-center gap-2.5 text-sm shadow-md hover:shadow-lg cursor-pointer"
                       title="Abrir Calibrador visual de coordenadas para la Orden de Recepción PDF Formato 1"
                     >
                       <Sliders size={18} className="text-amber-500" />
-                      <span>Calibrador PDF (Ajustar Coordenadas de Impresión)</span>
+                      <span>Calibrador PDF (Ajustar Coordenadas de Impresión Formato 1)</span>
                     </button>
                   </div>
                 </div>
@@ -2347,8 +2357,24 @@ export default function AdvisorDashboard({
               </button>
             </div>
 
-            <div className="text-xs text-slate-500 font-medium hidden sm:block">
-              Módulo Oficial Presupuestos SAE • Hoja de Cotizaciones
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setCalibratorFormat('formato2');
+                  setPreviousTab('quotes');
+                  setActiveTab('calibrador');
+                }}
+                className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 font-bold rounded-xl text-xs border border-amber-500/30 shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Abrir Calibrador visual de coordenadas para el Formato 2 Presupuestos"
+              >
+                <Sliders size={14} className="text-amber-500" />
+                <span>Calibrar Formato 2 PDF</span>
+              </button>
+
+              <div className="text-xs text-slate-500 font-medium hidden sm:block">
+                Módulo Oficial Presupuestos SAE • Hoja de Cotizaciones
+              </div>
             </div>
           </div>
 
@@ -4943,7 +4969,9 @@ export default function AdvisorDashboard({
             clients={clients}
             vehicles={vehicles}
             employees={employees}
-            initialFormat="formato1"
+            initialFormat={calibratorFormat}
+            onClose={() => setActiveTab(previousTab || 'reception')}
+            returnTabName={previousTab === 'quotes' ? 'Presupuestos' : 'Recepción y Órdenes'}
           />
         </div>
       )}
@@ -5381,53 +5409,6 @@ export default function AdvisorDashboard({
                 <span>Ir a Cotizador y Presupuesto</span>
                 <ChevronRight size={14} />
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* FULLSCREEN CALIBRADOR PDF MODAL */}
-      {showCalibratorModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm overflow-y-auto flex items-start justify-center p-2 sm:p-4 md:p-6">
-          <div className="bg-slate-950 border border-slate-800 rounded-3xl w-full max-w-7xl max-h-[96vh] flex flex-col shadow-2xl overflow-hidden my-auto">
-            {/* Modal Top Bar */}
-            <div className="bg-slate-900 px-6 py-4 border-b border-slate-800 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                  <Sliders size={20} />
-                </div>
-                <div>
-                  <h3 className="text-white font-bold text-base flex items-center gap-2">
-                    <span>Calibrador de Formatos y Plantillas PDF</span>
-                    <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">
-                      Módulo de Recepción SAE
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Ajusta coordenadas X, Y milimétricas para que la impresión coincida exactamente con las casillas de tu hoja membretada
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowCalibratorModal(false)}
-                className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                title="Cerrar Calibrador"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Modal Scrollable Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto flex-1 bg-slate-900/50">
-              <PdfCalibrator
-                orders={orders}
-                clients={clients}
-                vehicles={vehicles}
-                employees={employees}
-                initialFormat="formato1"
-                onClose={() => setShowCalibratorModal(false)}
-              />
             </div>
           </div>
         </div>
