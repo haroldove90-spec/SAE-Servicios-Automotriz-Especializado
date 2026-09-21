@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { 
   TrendingUp, DollarSign, Briefcase, FileText, Settings, Users, AlertTriangle, 
-  Plus, Search, Download, Trash, Check, X, Shield, RefreshCw, Layers, Award
+  Plus, Search, Download, Trash, Check, X, Shield, RefreshCw, Layers, Award, Sliders
 } from 'lucide-react';
 import { Client, Vehicle, Employee, InventoryItem, Supplier, ServiceOrder, Transaction, WorkshopSettings, PurchaseOrder } from '../types';
+import PdfCalibrator from './PdfCalibrator';
 
 interface AdminDashboardProps {
   clients: Client[];
@@ -21,8 +22,8 @@ interface AdminDashboardProps {
   addTransaction: (t: Omit<Transaction, 'id' | 'date'>) => void;
   handleClientCreditPayment: (clientId: string, amount: number, method: 'Efectivo' | 'Tarjeta' | 'Transferencia') => void;
   resetDatabase: () => void;
-  activeTab?: 'metrics' | 'finances' | 'personnel' | 'config';
-  setActiveTab?: (tab: 'metrics' | 'finances' | 'personnel' | 'config') => void;
+  activeTab?: 'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador';
+  setActiveTab?: (tab: 'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador') => void;
   isSyncing?: boolean;
   supabaseConnected?: boolean | null;
   syncError?: string | null;
@@ -52,7 +53,7 @@ export default function AdminDashboard({
   syncError = null,
   uploadToSupabase = async () => {}
 }: AdminDashboardProps) {
-  const [localActiveTab, setLocalActiveTab] = useState<'metrics' | 'finances' | 'personnel' | 'config'>('metrics');
+  const [localActiveTab, setLocalActiveTab] = useState<'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador'>('metrics');
   const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : localActiveTab;
   const setActiveTab = controlledSetActiveTab !== undefined ? controlledSetActiveTab : setLocalActiveTab;
   
@@ -222,13 +223,14 @@ export default function AdminDashboard({
           <select
             id="admin-mobile-tab-select"
             value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value as 'metrics' | 'finances' | 'personnel' | 'config')}
+            onChange={(e) => setActiveTab(e.target.value as 'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador')}
             className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#8D6A28]"
           >
             <option value="metrics">📈 Métricas de Negocio</option>
             <option value="finances">💵 Finanzas y Contabilidad</option>
             <option value="personnel">👥 Personal y Comisiones</option>
             <option value="config">⚙️ Configuración Maestra</option>
+            <option value="calibrador">🎯 Calibrador Formatos PDF</option>
           </select>
         </div>
 
@@ -281,6 +283,18 @@ export default function AdminDashboard({
           >
             <Settings size={16} />
             Configuración Maestra
+          </button>
+          <button
+            id="tab-calibrador"
+            onClick={() => setActiveTab('calibrador')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+              activeTab === 'calibrador'
+                ? 'bg-[#8D6A28] text-white shadow-md'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <Sliders size={16} />
+            Calibrador PDF
           </button>
         </div>
         
@@ -1099,6 +1113,16 @@ export default function AdminDashboard({
             </div>
           </div>
         </div>
+      )}
+
+      {/* CALIBRADOR DE FORMATOS Y PLANTILLAS PDF */}
+      {activeTab === 'calibrador' && (
+        <PdfCalibrator
+          orders={orders}
+          clients={clients}
+          vehicles={vehicles}
+          employees={employees}
+        />
       )}
     </div>
   );

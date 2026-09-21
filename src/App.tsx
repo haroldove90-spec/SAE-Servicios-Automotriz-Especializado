@@ -9,7 +9,7 @@ import {
   Shield, User, Wrench, Package, Car, Laptop, Clock, 
   Settings, CheckCircle2, ChevronRight, Menu, HelpCircle, AlertTriangle,
   Smartphone, Download, X, Home, LogOut, TrendingUp, DollarSign, Users,
-  FileText, Calendar, History, ListFilter, BellRing, Database, Cloud, RefreshCw, ClipboardList
+  FileText, Calendar, History, ListFilter, BellRing, Database, Cloud, RefreshCw, ClipboardList, Sliders
 } from 'lucide-react';
 import { useWorkshopState } from './useWorkshopState';
 import { UserRole } from './types';
@@ -97,7 +97,7 @@ export default function App() {
   });
 
   // Persistent active tabs for each role, allowing persistent selection between role switches!
-  const [adminTab, setAdminTab] = useState<'metrics' | 'finances' | 'personnel' | 'config'>(() => {
+  const [adminTab, setAdminTab] = useState<'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador'>(() => {
     return (localStorage.getItem('sae_admin_tab') as any) || 'metrics';
   });
   const [advisorTab, setAdvisorTab] = useState<'reception' | 'quotes' | 'ordenes_reparacion' | 'salidas' | 'agenda' | 'crm'>(() => {
@@ -153,6 +153,7 @@ export default function App() {
           { id: 'finances', label: 'Finanzas', icon: DollarSign },
           { id: 'personnel', label: 'Personal', icon: Users },
           { id: 'config', label: 'Config', icon: Settings },
+          { id: 'calibrador', label: 'Calibrador PDF', icon: Sliders },
         ];
       case 'advisor':
         return [
@@ -697,7 +698,7 @@ export default function App() {
       {!showLanding && (
         <div className="fixed bottom-0 left-0 right-0 bg-[#010101]/95 backdrop-blur-md border-t-2 border-[#8D6A28]/50 py-1.5 px-2 sm:px-4 shadow-2xl z-40 block">
           <div className="max-w-7xl mx-auto">
-            <div className={`grid ${getRoleTabs().length === 4 ? 'grid-cols-4' : 'grid-cols-3'} gap-1 w-full text-center`}>
+            <div className={`grid ${getRoleTabs().length === 5 ? 'grid-cols-5' : getRoleTabs().length === 4 ? 'grid-cols-4' : 'grid-cols-3'} gap-1 w-full text-center`}>
               
               {/* Module Buttons for current role */}
               {getRoleTabs().map((item) => {

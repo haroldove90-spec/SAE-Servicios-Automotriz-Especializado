@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { ServiceOrder, Client, Vehicle, Employee, Presupuesto, OrdenReparacion, NotaSalida } from '../types';
+import { getTemplateConfig } from './pdfTemplateStorage';
 
 /**
  * Returns the raw HTML string representing the official SAE Presupuesto form,
@@ -160,19 +161,38 @@ export function getSaeHtml(
   const dateStr = order.fecha || (order.dateOpened ? order.dateOpened.split(' ')[0] : new Date().toISOString().split('T')[0]);
   const timeStr = order.hora || (order.dateOpened && order.dateOpened.split(' ').length > 1 ? order.dateOpened.split(' ')[1].substring(0, 5) : '10:00');
 
-  // Supabase asset background URL provided by client
-  const formatoBgUrl = "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato1.png";
+  // Load calibrated template configuration
+  const template = getTemplateConfig('formato1');
+  const formatoBgUrl = template.bgUrl || "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato1.png";
 
-  // Checkbox mark helper for background template
-  const renderCheckMark = (val: boolean | undefined, topPx: number, isColumn2: boolean = false) => {
-    const isYes = val === true;
-    // Column 1: Sí box is left ~212px, No box is left ~287px
-    // Column 2: Sí box is left ~552px, No box is left ~627px
-    const yesLeft = isColumn2 ? 552 : 212;
-    const noLeft = isColumn2 ? 627 : 287;
+  // Helper to get CSS style for any calibrated field
+  const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; width?: number }) => {
+    const f = template.fields.find(item => item.id === fieldId);
+    const x = f ? f.x : fallback.x;
+    const y = f ? f.y : fallback.y;
+    const fontSize = f?.fontSize ?? fallback.fontSize ?? 11;
+    const fontWeight = f?.fontWeight ?? fallback.fontWeight ?? 'normal';
+    const color = f?.color ?? fallback.color ?? '#000000';
+    const align = f?.align ?? fallback.align ?? 'left';
+    const width = f?.width ?? fallback.width;
 
-    const targetLeft = isYes ? yesLeft : noLeft;
-    return `<div style="position: absolute !important; top: ${topPx}px !important; left: ${targetLeft}px !important; font-weight: 900 !important; font-size: 13px !important; color: #000000 !important; line-height: 1 !important; width: 16px !important; text-align: center !important; z-index: 10 !important;">✕</div>`;
+    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: 1.1 !important; white-space: nowrap !important; z-index: 10 !important;`;
+  };
+
+  // Helper for checklist mark ('X')
+  const renderCheckMark = (val: boolean | undefined, fieldIdSi: string, fieldIdNo: string, fallbackSi: { x: number; y: number }, fallbackNo: { x: number; y: number }) => {
+    const targetId = val === true ? fieldIdSi : fieldIdNo;
+    const fallback = val === true ? fallbackSi : fallbackNo;
+    const f = template.fields.find(item => item.id === targetId);
+    const x = f ? f.x : fallback.x;
+    const y = f ? f.y : fallback.y;
+    const fontSize = f?.fontSize ?? 13;
+    const fontWeight = f?.fontWeight ?? '900';
+    const color = f?.color ?? '#000000';
+    const width = f?.width ?? 16;
+    const align = f?.align ?? 'center';
+
+    return `<div style="position: absolute !important; top: ${y}px !important; left: ${x}px !important; font-weight: ${fontWeight} !important; font-size: ${fontSize}px !important; color: ${color} !important; line-height: 1 !important; width: ${width}px !important; text-align: ${align} !important; z-index: 10 !important;">✕</div>`;
   };
 
   return `
@@ -185,127 +205,127 @@ export function getSaeHtml(
       <div style="position: absolute !important; top: 0 !important; left: 0 !important; width: 750px !important; height: 980px !important; z-index: 10 !important; font-size: 11px !important;">
 
         <!-- Folio Number (Positioned inside the capsule box at top right) -->
-        <div style="position: absolute !important; top: 22px !important; left: 600px !important; width: 110px !important; text-align: center !important; font-weight: 900 !important; font-size: 18px !important; color: #D32F2F !important; font-family: 'Courier New', monospace, sans-serif !important; line-height: 1 !important;">
+        <div style="${getStyle('folio', { x: 655, y: 41, fontSize: 18, fontWeight: '900', color: '#D32F2F', align: 'center', width: 100 })} font-family: 'Courier New', monospace, sans-serif !important;">
           ${order.folio || order.id.replace('OS-', '')}
         </div>
 
         <!-- Section 1: Datos del cliente -->
         <!-- Cliente -->
-        <div style="position: absolute !important; top: 122px !important; left: 145px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_nombre', { x: 145, y: 137, fontSize: 11, fontWeight: 'bold' })}">
           ${client?.name || ''}
         </div>
         <!-- E-Mail -->
-        <div style="position: absolute !important; top: 122px !important; left: 515px !important; font-size: 10.5px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_email', { x: 515, y: 136, fontSize: 10.5 })}">
           ${client?.email || ''}
         </div>
         <!-- Tel. Cel -->
-        <div style="position: absolute !important; top: 146px !important; left: 135px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_telefono_cel', { x: 135, y: 161, fontSize: 11 })}">
           ${client?.phone || ''}
         </div>
         <!-- Tel -->
-        <div style="position: absolute !important; top: 146px !important; left: 490px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_telefono_fijo', { x: 490, y: 161, fontSize: 11 })}">
           ${client?.telFijo || ''}
         </div>
         <!-- Calle -->
-        <div style="position: absolute !important; top: 170px !important; left: 120px !important; font-size: 10.5px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_direccion_calle', { x: 120, y: 184, fontSize: 10.5 })}">
           ${client?.calle || client?.address || ''}
         </div>
         <!-- C.P. -->
-        <div style="position: absolute !important; top: 170px !important; left: 685px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_cp', { x: 685, y: 184, fontSize: 11 })}">
           ${client?.cp || ''}
         </div>
         <!-- Colonia -->
-        <div style="position: absolute !important; top: 194px !important; left: 140px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_colonia', { x: 140, y: 208, fontSize: 11 })}">
           ${client?.colonia || ''}
         </div>
         <!-- Alcaldía -->
-        <div style="position: absolute !important; top: 194px !important; left: 575px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('cliente_alcaldia', { x: 575, y: 208, fontSize: 11 })}">
           ${client?.alcaldia || ''}
         </div>
 
         <!-- Section 2: Datos del auto -->
         <!-- Auto (Marca) -->
-        <div style="position: absolute !important; top: 252px !important; left: 140px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('auto_marca', { x: 140, y: 268, fontSize: 11, fontWeight: 'bold' })}">
           ${vehicle?.brand || ''}
         </div>
         <!-- Modelo -->
-        <div style="position: absolute !important; top: 252px !important; left: 325px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('auto_modelo_anio', { x: 354, y: 268, fontSize: 11 })}">
           ${vehicle?.model || ''} ${vehicle?.year ? `(${vehicle.year})` : ''}
         </div>
         <!-- Placas -->
-        <div style="position: absolute !important; top: 252px !important; left: 490px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('auto_placas', { x: 512, y: 268, fontSize: 11, fontWeight: 'bold', align: 'center' })}">
           ${vehicle?.plate || ''}
         </div>
         <!-- Kms -->
-        <div style="position: absolute !important; top: 252px !important; left: 660px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('auto_kilometraje', { x: 676, y: 268, fontSize: 11, align: 'center' })}">
           ${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}
         </div>
         <!-- No. de Serie -->
-        <div style="position: absolute !important; top: 275px !important; left: 165px !important; font-size: 10.5px !important; font-family: monospace !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('auto_serie_vin', { x: 175, y: 288, fontSize: 10.5 })} font-family: monospace !important;">
           ${vehicle?.serie || vehicle?.vin || ''}
         </div>
         <!-- Motor -->
-        <div style="position: absolute !important; top: 275px !important; left: 470px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('auto_motor', { x: 470, y: 288, fontSize: 11 })}">
           ${vehicle?.motor || ''}
         </div>
         <!-- Color -->
-        <div style="position: absolute !important; top: 275px !important; left: 600px !important; font-size: 11px !important; color: #000000 !important; white-space: nowrap !important;">
+        <div style="${getStyle('auto_color', { x: 636, y: 288, fontSize: 11 })}">
           ${vehicle?.color || ''}
         </div>
 
         <!-- Checklist Marks -->
         <!-- Column 1 -->
-        ${renderCheckMark(order.checklist?.tapetes, 300, false)}
-        ${renderCheckMark(order.checklist?.encendedor, 319, false)}
-        ${renderCheckMark(order.checklist?.estereo, 338, false)}
-        ${renderCheckMark(order.checklist?.tarjetaCirculacion, 357, false)}
-        ${renderCheckMark(order.checklist?.compVerificacion, 376, false)}
-        ${renderCheckMark(order.checklist?.polizaSeguro, 395, false)}
-        ${renderCheckMark(order.checklist?.segurosRuedas, 414, false)}
+        ${renderCheckMark(order.checklist?.tapetes, 'check_tapetes_si', 'check_tapetes_no', { x: 219, y: 320 }, { x: 294, y: 320 })}
+        ${renderCheckMark(order.checklist?.encendedor, 'check_encendedor_si', 'check_encendedor_no', { x: 218, y: 343 }, { x: 294, y: 343 })}
+        ${renderCheckMark(order.checklist?.estereo, 'check_estereo_si', 'check_estereo_no', { x: 218, y: 368 }, { x: 294, y: 368 })}
+        ${renderCheckMark(order.checklist?.tarjetaCirculacion, 'check_tarjeta_circulacion_si', 'check_tarjeta_circulacion_no', { x: 218, y: 388 }, { x: 294, y: 388 })}
+        ${renderCheckMark(order.checklist?.compVerificacion, 'check_verificacion_si', 'check_verificacion_no', { x: 218, y: 411 }, { x: 294, y: 411 })}
+        ${renderCheckMark(order.checklist?.polizaSeguro, 'check_poliza_seguro_si', 'check_poliza_seguro_no', { x: 218, y: 434 }, { x: 294, y: 434 })}
+        ${renderCheckMark(order.checklist?.segurosRuedas, 'check_seguros_ruedas_si', 'check_seguros_ruedas_no', { x: 218, y: 457 }, { x: 294, y: 457 })}
 
         <!-- Column 2 -->
-        ${renderCheckMark(order.checklist?.gato || order.checklist?.jack, 300, true)}
-        ${renderCheckMark(order.checklist?.herramienta || order.checklist?.tools, 319, true)}
-        ${renderCheckMark(order.checklist?.extintor || order.checklist?.extinguisher, 338, true)}
-        ${renderCheckMark(order.checklist?.llantaRefaccion || order.checklist?.spareTire, 357, true)}
-        ${renderCheckMark(order.checklist?.sensoresPresencia, 376, true)}
-        ${renderCheckMark(order.checklist?.camaraReversa, 395, true)}
+        ${renderCheckMark(order.checklist?.gato || order.checklist?.jack, 'check_gato_si', 'check_gato_no', { x: 560, y: 320 }, { x: 634, y: 320 })}
+        ${renderCheckMark(order.checklist?.herramienta || order.checklist?.tools, 'check_herramienta_si', 'check_herramienta_no', { x: 560, y: 352 }, { x: 634, y: 352 })}
+        ${renderCheckMark(order.checklist?.extintor || order.checklist?.extinguisher, 'check_extintor_si', 'check_extintor_no', { x: 559, y: 371 }, { x: 634, y: 371 })}
+        ${renderCheckMark(order.checklist?.llantaRefaccion || order.checklist?.spareTire, 'check_llanta_refaccion_si', 'check_llanta_refaccion_no', { x: 559, y: 394 }, { x: 634, y: 394 })}
+        ${renderCheckMark(order.checklist?.sensoresPresencia, 'check_sensores_si', 'check_sensores_no', { x: 559, y: 415 }, { x: 635, y: 415 })}
+        ${renderCheckMark(order.checklist?.camaraReversa, 'check_camara_reversa_si', 'check_camara_reversa_no', { x: 559, y: 440 }, { x: 635, y: 440 })}
 
         <!-- Gasolina Percentage -->
-        <div style="position: absolute !important; top: 414px !important; left: 620px !important; font-weight: bold !important; color: #D32F2F !important; font-size: 11px !important; z-index: 10 !important;">
+        <div style="${getStyle('gasolina_nivel', { x: 628, y: 440, fontSize: 11, fontWeight: 'bold', color: '#D32F2F', align: 'center' })}">
           ${order.checklist?.fuelLevel !== undefined ? order.checklist.fuelLevel : 50}%
         </div>
 
         <!-- Inspección Componentes de Motor -->
-        <div style="position: absolute !important; top: 438px !important; left: 230px !important; font-size: 10.5px !important; color: #000000 !important;">
-          ${order.checklist?.inspeccionMotor || ''}
+        <div style="${getStyle('inspeccion_componentes_motor', { x: 158, y: 482, fontSize: 10.5 })}">
+          ${order.checklist?.inspeccionMotor || 'Ninguno'}
         </div>
 
         <!-- Objetos de Valor -->
-        <div style="position: absolute !important; top: 461px !important; left: 140px !important; font-size: 10.5px !important; color: #000000 !important;">
-          ${order.checklist?.objetosValor || ''}
+        <div style="${getStyle('objetos_de_valor', { x: 55, y: 552, fontSize: 10.5 })}">
+          ${order.checklist?.objetosValor || 'Ninguno'}
         </div>
 
         <!-- Section 3: Descripción del servicio -->
-        <div style="position: absolute !important; top: 525px !important; left: 38px !important; font-weight: bold !important; font-size: 11px !important; max-width: 310px !important; line-height: 22px !important; color: #000000 !important;">
+        <div style="${getStyle('servicio_descripcion', { x: 38, y: 660, fontSize: 11, fontWeight: 'bold', width: 320 })}">
           ${order.reportedFailure || 'Servicio General'}
         </div>
 
         <!-- Fecha -->
-        <div style="position: absolute !important; top: 648px !important; left: 80px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important;">
+        <div style="${getStyle('servicio_fecha', { x: 80, y: 755, fontSize: 11, fontWeight: 'bold' })}">
           ${dateStr}
         </div>
         <!-- Hora -->
-        <div style="position: absolute !important; top: 648px !important; left: 235px !important; font-weight: bold !important; font-size: 11px !important; color: #000000 !important;">
+        <div style="${getStyle('servicio_hora', { x: 235, y: 755, fontSize: 11, fontWeight: 'bold' })}">
           ${timeStr}
         </div>
         <!-- Técnico -->
-        <div style="position: absolute !important; top: 671px !important; left: 90px !important; font-size: 11px !important; color: #000000 !important;">
+        <div style="${getStyle('servicio_tecnico', { x: 90, y: 778, fontSize: 11 })}">
           ${mechanicName}
         </div>
 
         <!-- Firma del Cliente -->
-        <div style="position: absolute !important; top: 700px !important; left: 70px !important; width: 200px !important; height: 48px !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 10 !important;">
+        <div style="${getStyle('firma_cliente_grafico', { x: 120, y: 810, width: 190, align: 'center' })} height: 48px !important; display: flex !important; align-items: center !important; justify-content: center !important;">
           ${order.clientSignature ? `
             <img src="${order.clientSignature}" crossorigin="anonymous" style="max-height: 48px !important; max-width: 190px !important; object-fit: contain !important;" />
           ` : ''}
