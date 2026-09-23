@@ -2048,10 +2048,11 @@ export default function AdvisorDashboard({
 
                   </div>
 
-                  {/* Gas & Body Layout Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                  {/* Gas & Body Layout Grid (Indicador de gasolina desactivado temporalmente) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                     
-                    {/* Fuel Level */}
+                    {/* Fuel Level - DESACTIVADO TEMPORALMENTE */}
+                    {/*
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3 md:col-span-1">
                       <div className="flex justify-between items-center">
                         <div>
@@ -2085,6 +2086,7 @@ export default function AdvisorDashboard({
                         </div>
                       </div>
                     </div>
+                    */}
 
                     {/* Damage Body toggles */}
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3 md:col-span-1">

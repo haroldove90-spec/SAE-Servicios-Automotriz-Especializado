@@ -341,10 +341,12 @@ export function getSaeHtml(
         ${renderCheckMark(order.checklist?.sensoresPresencia, 'check_sensores_si', 'check_sensores_no', { x: 559, y: 415 }, { x: 635, y: 415 })}
         ${renderCheckMark(order.checklist?.camaraReversa, 'check_camara_reversa_si', 'check_camara_reversa_no', { x: 559, y: 440 }, { x: 635, y: 440 })}
 
-        <!-- Gasolina Percentage -->
+        <!-- Gasolina Percentage (Desactivado temporalmente) -->
+        <!--
         <div style="${getStyle('gasolina_nivel', { x: 628, y: 440, fontSize: 11, fontWeight: 'bold', color: '#D32F2F', align: 'center' })}">
-          ${order.checklist?.fuelLevel !== undefined ? order.checklist.fuelLevel : 50}%
+          \${order.checklist?.fuelLevel !== undefined ? order.checklist.fuelLevel : 50}%
         </div>
+        -->
 
         <!-- Inspección Componentes de Motor -->
         <div style="${(() => {
