@@ -2000,9 +2000,15 @@ export default function AdvisorDashboard({
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-500 font-bold text-[10px] uppercase mb-1">Objetos de Valor Declarados en Cabina</label>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="block text-slate-500 font-bold text-[10px] uppercase">Objetos de Valor Declarados en Cabina</label>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {(checklist.objetosValor || '').length}/120 car. (máx. 2 líneas en PDF)
+                        </span>
+                      </div>
                       <input
                         type="text"
+                        maxLength={120}
                         value={checklist.objetosValor || ''}
                         onChange={(e) => setChecklist(prev => ({ ...prev, objetosValor: e.target.value }))}
                         className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500"
@@ -2014,10 +2020,15 @@ export default function AdvisorDashboard({
 
                 {/* 4. FALLA REPORTADA */}
                 <div className="space-y-4">
-                  <h4 className="text-xs font-black text-slate-900 border-b border-slate-200 pb-1 uppercase tracking-wider flex items-center gap-1.5">
-                    <span className="w-1.5 h-3 bg-amber-500 rounded"></span>
-                    IV. Falla Reportada por el Cliente / Diagnóstico Solicitado
-                  </h4>
+                  <div className="flex justify-between items-center border-b border-slate-200 pb-1">
+                    <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-3 bg-amber-500 rounded"></span>
+                      IV. Falla Reportada por el Cliente / Diagnóstico Solicitado
+                    </h4>
+                    <span className={`text-[10px] font-mono ${(reportedFailure || '').length > 250 ? 'text-amber-600 font-bold' : 'text-slate-400'}`}>
+                      {(reportedFailure || '').length} car. • 5 renglones en formato SAE
+                    </span>
+                  </div>
                   
                   <div>
                     <textarea
@@ -2027,6 +2038,9 @@ export default function AdvisorDashboard({
                       placeholder="Favor de detallar con precisión los síntomas, ruidos o trabajos específicos que el cliente solicita realizar. Esta información se imprimirá formalmente..."
                       className="w-full p-3 border border-slate-200 rounded-xl text-xs h-28 focus:outline-none focus:ring-1 focus:ring-amber-500"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      El generador de PDF ajusta automáticamente el tamaño de fuente e interlineado para que el texto encaje perfectamente en los 5 renglones impresos sin desbordarse hacia la columna contigua.
+                    </p>
                   </div>
                 </div>
 

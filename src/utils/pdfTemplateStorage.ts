@@ -646,6 +646,7 @@ export const DEFAULT_FORMATO_1: PdfTemplateConfig = {
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
+      width: 310,
       sampleValue: 'Prueba'
     },
 

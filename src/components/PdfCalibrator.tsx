@@ -904,9 +904,13 @@ export default function PdfCalibrator({
                       fontWeight: field.fontWeight || 'normal',
                       color: field.color || '#000000',
                       textAlign: field.align || 'left',
-                      width: field.width ? `${field.width}px` : 'auto',
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1.1,
+                      width: field.width ? `${field.width}px` : (field.id === 'servicio_descripcion' ? '320px' : field.id === 'objetos_de_valor' ? '310px' : 'auto'),
+                      maxWidth: field.id === 'servicio_descripcion' || field.id === 'objetos_de_valor' ? '320px' : undefined,
+                      maxHeight: field.id === 'servicio_descripcion' ? '98px' : field.id === 'objetos_de_valor' ? '38px' : undefined,
+                      whiteSpace: field.id === 'servicio_descripcion' || field.id === 'objetos_de_valor' || field.id === 'inspeccion_componentes_motor' ? 'pre-wrap' : 'nowrap',
+                      wordBreak: 'break-word',
+                      overflow: 'hidden',
+                      lineHeight: field.id === 'servicio_descripcion' ? 1.8 : 1.1,
                       cursor: isDragging && isSelected ? 'grabbing' : 'grab',
                       zIndex: isSelected ? 40 : 25
                     }}

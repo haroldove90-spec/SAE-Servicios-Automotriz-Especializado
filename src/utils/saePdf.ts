@@ -184,18 +184,49 @@ export function getSaeHtml(
   const template = getTemplateConfig('formato1');
   const formatoBgUrl = template.bgUrl || "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato1.png";
 
-  // Helper to get CSS style for any calibrated field
-  const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; width?: number }) => {
+  // Helper to get CSS style for any calibrated field with bounding box & overflow protection
+  const getStyle = (
+    fieldId: string, 
+    fallback: { 
+      x: number; 
+      y: number; 
+      fontSize?: number; 
+      fontWeight?: string; 
+      color?: string; 
+      align?: string; 
+      width?: number;
+      maxWidth?: number;
+      maxHeight?: number;
+      wrap?: boolean;
+      lineHeight?: number | string;
+    }
+  ) => {
     const f = template.fields.find(item => item.id === fieldId);
     const x = f ? f.x : fallback.x;
     const y = f ? f.y : fallback.y;
-    const fontSize = f?.fontSize ?? fallback.fontSize ?? 11;
+    let fontSize = f?.fontSize ?? fallback.fontSize ?? 11;
+    // When dynamic auto-shrink is activated (fallback.fontSize is smaller), prioritize smaller size to fit bounding box
+    if (fallback.fontSize && fallback.fontSize < fontSize) {
+      fontSize = fallback.fontSize;
+    }
     const fontWeight = f?.fontWeight ?? fallback.fontWeight ?? 'normal';
     const color = f?.color ?? fallback.color ?? '#000000';
     const align = f?.align ?? fallback.align ?? 'left';
     const width = f?.width ?? fallback.width;
+    const maxWidth = fallback.maxWidth ?? width;
+    const maxHeight = fallback.maxHeight;
+    const wrap = fallback.wrap ?? false;
+    const lineHeight = fallback.lineHeight ?? (wrap ? '1.25' : '1.1');
 
-    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: 1.1 !important; white-space: nowrap !important; z-index: 10 !important;`;
+    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${
+      width ? `width: ${width}px !important;` : ''
+    } ${maxWidth ? `max-width: ${maxWidth}px !important;` : ''} ${
+      maxHeight ? `max-height: ${maxHeight}px !important;` : ''
+    } text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: ${lineHeight} !important; ${
+      wrap
+        ? `white-space: pre-wrap !important; word-break: break-word !important; overflow-wrap: break-word !important; overflow: hidden !important;`
+        : `white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;`
+    } z-index: 10 !important;`;
   };
 
   // Helper for checklist mark ('X')
@@ -264,15 +295,15 @@ export function getSaeHtml(
 
         <!-- Section 2: Datos del auto -->
         <!-- Auto (Marca) -->
-        <div style="${getStyle('auto_marca', { x: 140, y: 268, fontSize: 11, fontWeight: 'bold' })}">
+        <div style="${getStyle('auto_marca', { x: 140, y: 268, fontSize: 11, fontWeight: 'bold', width: 200, maxWidth: 200 })}">
           ${vehicle?.brand || ''}
         </div>
         <!-- Modelo -->
-        <div style="${getStyle('auto_modelo_anio', { x: 354, y: 268, fontSize: 11 })}">
+        <div style="${getStyle('auto_modelo_anio', { x: 354, y: 268, fontSize: 11, width: 150, maxWidth: 150 })}">
           ${vehicle?.model || ''} ${vehicle?.year ? `(${vehicle.year})` : ''}
         </div>
         <!-- Placas -->
-        <div style="${getStyle('auto_placas', { x: 512, y: 268, fontSize: 11, fontWeight: 'bold', align: 'center' })}">
+        <div style="${getStyle('auto_placas', { x: 512, y: 268, fontSize: 11, fontWeight: 'bold', align: 'center', width: 150, maxWidth: 150 })}">
           ${vehicle?.plate || ''}
         </div>
         <!-- Kms -->
@@ -280,15 +311,15 @@ export function getSaeHtml(
           ${vehicle?.mileage ? vehicle.mileage.toLocaleString() : ''}
         </div>
         <!-- No. de Serie -->
-        <div style="${getStyle('auto_serie_vin', { x: 175, y: 288, fontSize: 10.5 })} font-family: monospace !important;">
+        <div style="${getStyle('auto_serie_vin', { x: 175, y: 288, fontSize: 10.5, width: 280, maxWidth: 280 })} font-family: monospace !important;">
           ${vehicle?.serie || vehicle?.vin || ''}
         </div>
-        <!-- Motor -->
-        <div style="${getStyle('auto_motor', { x: 470, y: 288, fontSize: 11 })}">
+        <!-- Motor (con límite de ancho para no invadir el color) -->
+        <div style="${getStyle('auto_motor', { x: 470, y: 288, fontSize: 11, width: 155, maxWidth: 155 })}">
           ${vehicle?.motor || ''}
         </div>
         <!-- Color -->
-        <div style="${getStyle('auto_color', { x: 636, y: 288, fontSize: 11 })}">
+        <div style="${getStyle('auto_color', { x: 636, y: 288, fontSize: 11, width: 100, maxWidth: 100 })}">
           ${vehicle?.color || ''}
         </div>
 
@@ -316,17 +347,87 @@ export function getSaeHtml(
         </div>
 
         <!-- Inspección Componentes de Motor -->
-        <div style="${getStyle('inspeccion_componentes_motor', { x: 158, y: 482, fontSize: 10.5 })}">
+        <div style="${(() => {
+          const text = order.checklist?.inspeccionMotor || 'Ninguno';
+          const fieldX = template.fields.find(f => f.id === 'inspeccion_componentes_motor')?.x ?? 158;
+          const availWidth = Math.max(160, 365 - fieldX);
+          return getStyle('inspeccion_componentes_motor', { 
+            x: 158, 
+            y: 482, 
+            fontSize: text.length > 45 ? 9 : 10.5, 
+            width: availWidth,
+            maxWidth: availWidth,
+            wrap: true,
+            maxHeight: 36,
+            lineHeight: text.length > 45 ? '14px' : '18px'
+          });
+        })()}">
           ${order.checklist?.inspeccionMotor || 'Ninguno'}
         </div>
 
-        <!-- Objetos de Valor -->
-        <div style="${getStyle('objetos_de_valor', { x: 55, y: 552, fontSize: 10.5 })}">
+        <!-- Objetos de Valor (Auto-ajuste dinámico: multilínea y auto-escalado para no salirse a columna 4) -->
+        <div style="${(() => {
+          const text = order.checklist?.objetosValor || 'Ninguno';
+          const fieldX = template.fields.find(f => f.id === 'objetos_de_valor')?.x ?? 55;
+          const availWidth = Math.max(160, 365 - fieldX);
+          
+          let fSize = 10.5;
+          let lHeight = '18px';
+          if (text.length > 80) {
+            fSize = 8;
+            lHeight = '13px';
+          } else if (text.length > 40) {
+            fSize = 9;
+            lHeight = '15px';
+          }
+          
+          return getStyle('objetos_de_valor', { 
+            x: 55, 
+            y: 552, 
+            fontSize: fSize, 
+            width: availWidth, 
+            maxWidth: availWidth,
+            wrap: true, 
+            maxHeight: 38, 
+            lineHeight: lHeight 
+          });
+        })()}">
           ${order.checklist?.objetosValor || 'Ninguno'}
         </div>
 
-        <!-- Section 3: Descripción del servicio -->
-        <div style="${getStyle('servicio_descripcion', { x: 38, y: 660, fontSize: 11, fontWeight: 'bold', width: 320 })}">
+        <!-- Section 3: Descripción del servicio (Auto-ajuste milimétrico a los 5 renglones y límite de ancho a columna 4) -->
+        <div style="${(() => {
+          const text = order.reportedFailure || 'Servicio General';
+          const fieldX = template.fields.find(f => f.id === 'servicio_descripcion')?.x ?? 38;
+          const availWidth = Math.max(220, 365 - fieldX);
+          
+          const lineCount = (text.match(/\n/g) || []).length + 1;
+          let fSize = 10.5;
+          let lHeight = '20px'; // Altura exacta de los renglones impresos de fondo
+          
+          if (text.length > 250 || lineCount > 5) {
+            fSize = 8;
+            lHeight = '15px';
+          } else if (text.length > 140 || lineCount > 4) {
+            fSize = 9.2;
+            lHeight = '18px';
+          } else if (text.length > 70 || lineCount > 2) {
+            fSize = 10;
+            lHeight = '19px';
+          }
+          
+          return getStyle('servicio_descripcion', { 
+            x: 38, 
+            y: 660, 
+            fontSize: fSize, 
+            fontWeight: 'normal', 
+            width: availWidth, 
+            maxWidth: availWidth,
+            wrap: true, 
+            maxHeight: 98, // Límite exacto de los 5 renglones (~98px)
+            lineHeight: lHeight 
+          });
+        })()}">
           ${order.reportedFailure || 'Servicio General'}
         </div>
 
