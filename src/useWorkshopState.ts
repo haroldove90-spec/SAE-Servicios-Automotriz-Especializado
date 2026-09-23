@@ -78,6 +78,12 @@ export function useWorkshopState() {
       setTransactions(localTransactions ? sortNewestFirst(JSON.parse(localTransactions)) : sortNewestFirst(INITIAL_TRANSACTIONS));
       
       let parsedSettings = localSettings ? JSON.parse(localSettings) : INITIAL_SETTINGS;
+      if (parsedSettings) {
+        // Strip out database metadata fields that might exist in old localStorage
+        delete (parsedSettings as any).updated_at;
+        delete (parsedSettings as any).created_at;
+        delete (parsedSettings as any).id;
+      }
       if (parsedSettings && parsedSettings.address && (parsedSettings.address.includes('Palmas') || parsedSettings.address.includes('palmas'))) {
         parsedSettings.address = INITIAL_SETTINGS.address;
         parsedSettings.phone = INITIAL_SETTINGS.phone;
@@ -162,7 +168,8 @@ export function useWorkshopState() {
       setTransactions(prev => sortNewestFirst(mergeLocalAndRemote(prev, txData || [])));
       
       if (settingsData) {
-        setSettings(prev => ({ ...prev, ...settingsData }));
+        const { id, created_at, updated_at, ...cleanSettingsData } = settingsData as any;
+        setSettings(prev => ({ ...prev, ...cleanSettingsData }));
       }
 
       console.log('Fidelidad Supabase: Todo sincronizado correctamente.');
@@ -180,6 +187,20 @@ export function useWorkshopState() {
       setIsSyncing(false);
     }
   };
+
+  // Helper to format workshop settings payload safely for Supabase schema (strips updated_at/created_at)
+  const formatWorkshopSettingsPayload = (st: any) => ({
+    id: 'default',
+    name: st?.name || '',
+    rfc: st?.rfc || '',
+    address: st?.address || '',
+    phone: st?.phone || '',
+    email: st?.email || '',
+    logoUrl: st?.logoUrl || '',
+    terms: st?.terms || '',
+    taxRate: typeof st?.taxRate === 'number' ? st.taxRate : 16,
+    bankDetails: st?.bankDetails || ''
+  });
 
   const uploadToSupabase = async () => {
     setIsSyncing(true);
@@ -222,7 +243,7 @@ export function useWorkshopState() {
         if (error) throw error;
       }
       if (settings) {
-        const { error } = await supabase.from('workshop_settings').upsert({ id: 'default', ...settings });
+        const { error } = await supabase.from('workshop_settings').upsert(formatWorkshopSettingsPayload(settings));
         if (error) throw error;
       }
 
@@ -240,7 +261,11 @@ export function useWorkshopState() {
   // Helper to centralize safe background syncing with Supabase
   const safeUpsert = async (table: string, data: any) => {
     try {
-      const { error } = await supabase.from(table).upsert(data);
+      let payload = data;
+      if (table === 'workshop_settings' && payload && typeof payload === 'object' && !Array.isArray(payload)) {
+        payload = formatWorkshopSettingsPayload(payload);
+      }
+      const { error } = await supabase.from(table).upsert(payload);
       if (error) {
         console.warn(`Error auto-syncing table ${table}:`, error.message);
       }
@@ -350,7 +375,7 @@ export function useWorkshopState() {
     if (!loaded) return;
     localStorage.setItem('wt_settings', JSON.stringify(settings));
     if (supabaseConnected && !isSyncing) {
-      safeUpsert('workshop_settings', { id: 'default', ...settings });
+      safeUpsert('workshop_settings', formatWorkshopSettingsPayload(settings));
     }
   }, [settings, loaded, supabaseConnected]);
 
