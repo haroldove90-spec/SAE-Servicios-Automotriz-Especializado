@@ -909,8 +909,8 @@ export default function PdfCalibrator({
                       maxHeight: field.id === 'servicio_descripcion' ? '98px' : field.id === 'objetos_de_valor' ? '38px' : undefined,
                       whiteSpace: field.id === 'servicio_descripcion' || field.id === 'objetos_de_valor' || field.id === 'inspeccion_componentes_motor' ? 'pre-wrap' : 'nowrap',
                       wordBreak: 'break-word',
-                      overflow: 'hidden',
-                      lineHeight: field.id === 'servicio_descripcion' ? 1.8 : 1.1,
+                      overflow: 'visible',
+                      lineHeight: field.id === 'servicio_descripcion' ? 1.4 : 'normal',
                       cursor: isDragging && isSelected ? 'grabbing' : 'grab',
                       zIndex: isSelected ? 40 : 25
                     }}

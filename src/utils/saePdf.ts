@@ -26,7 +26,7 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
     const align = f?.align ?? fallback.align ?? 'left';
     const width = f?.width ?? fallback.width;
 
-    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: 1.1 !important; white-space: nowrap !important; z-index: 10 !important;`;
+    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: normal !important; white-space: nowrap !important; overflow: visible !important; z-index: 10 !important;`;
   };
 
   // Get table column coordinates from template fields or fallbacks
@@ -216,7 +216,7 @@ export function getSaeHtml(
     const maxWidth = fallback.maxWidth ?? width;
     const maxHeight = fallback.maxHeight;
     const wrap = fallback.wrap ?? false;
-    const lineHeight = fallback.lineHeight ?? (wrap ? '1.25' : '1.1');
+    const lineHeight = fallback.lineHeight ?? (wrap ? '1.3' : 'normal');
 
     return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${
       width ? `width: ${width}px !important;` : ''
@@ -224,8 +224,8 @@ export function getSaeHtml(
       maxHeight ? `max-height: ${maxHeight}px !important;` : ''
     } text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: ${lineHeight} !important; ${
       wrap
-        ? `white-space: pre-wrap !important; word-break: break-word !important; overflow-wrap: break-word !important; overflow: hidden !important;`
-        : `white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;`
+        ? `white-space: pre-wrap !important; word-break: break-word !important; overflow-wrap: break-word !important; overflow: visible !important;`
+        : `white-space: nowrap !important; overflow: visible !important;`
     } z-index: 10 !important;`;
   };
 
@@ -255,7 +255,7 @@ export function getSaeHtml(
       <div style="position: absolute !important; top: 0 !important; left: 0 !important; width: 750px !important; height: 980px !important; z-index: 10 !important; font-size: 11px !important;">
 
         <!-- Folio Number (Positioned inside the capsule box at top right) -->
-        <div style="${getStyle('folio', { x: 655, y: 41, fontSize: 18, fontWeight: '900', color: '#D32F2F', align: 'center', width: 100 })} font-family: 'Courier New', monospace, sans-serif !important;">
+        <div style="${getStyle('folio', { x: 655, y: 38, fontSize: 18, fontWeight: '900', color: '#D32F2F', align: 'center', width: 100 })} font-family: 'Courier New', monospace, sans-serif !important;">
           ${order.folio || order.id.replace('OS-', '')}
         </div>
 
@@ -835,7 +835,7 @@ export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
     const align = f?.align ?? fallback.align ?? 'left';
     const width = f?.width ?? fallback.width;
 
-    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: 1.1 !important; white-space: nowrap !important; z-index: 10 !important;`;
+    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} text-align: ${align} !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; line-height: normal !important; white-space: nowrap !important; overflow: visible !important; z-index: 10 !important;`;
   };
 
   // Get table column coordinates from template fields or fallbacks
