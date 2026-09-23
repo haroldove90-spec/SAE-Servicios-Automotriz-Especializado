@@ -57,6 +57,7 @@ export default function App() {
     addPurchaseOrder,
     receivePurchaseOrder,
     createServiceOrder,
+    deleteServiceOrder,
     updateOrderStatus,
     updateOrderDiagnostics,
     addOrderItem,
@@ -542,6 +543,7 @@ export default function App() {
                     addVehicle={addVehicle}
                     updateVehicle={updateVehicle}
                     createServiceOrder={createServiceOrder}
+                    deleteServiceOrder={deleteServiceOrder}
                     addOrderItem={addOrderItem}
                     deleteOrderItem={deleteOrderItem}
                     approveBudgetLine={approveBudgetLine}

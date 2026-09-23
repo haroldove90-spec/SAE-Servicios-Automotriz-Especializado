@@ -107,15 +107,21 @@ export interface Checklist {
   estereo?: boolean;
   tarjetaCirculacion?: boolean;
   compVerificacion?: boolean;
+  verificacion?: boolean;
   polizaSeguro?: boolean;
   segurosRuedas?: boolean;
+  segurosRueda?: boolean;
   gato?: boolean;
   herramienta?: boolean;
+  llaveRuedas?: boolean;
   extintor?: boolean;
   llantaRefaccion?: boolean;
   sensoresPresencia?: boolean;
+  sensoresReversa?: boolean;
   camaraReversa?: boolean;
   
+  gasolina?: string;
+  kilometraje?: number;
   inspeccionMotor?: string;
   objetosValor?: string;
 }
@@ -283,7 +289,18 @@ export interface TimeLog {
   reason?: string; // e.g. "Falta de refacción"
 }
 
-export type OrderStatus = 'Diagnostico' | 'Esperando_Refacciones' | 'En_Reparacion' | 'Control_Calidad' | 'Listo_Entrega';
+export type OrderStatus =
+  | 'Recibido'
+  | 'Diagnostico'
+  | 'Aprobado'
+  | 'Esperando_Piezas'
+  | 'Esperando_Refacciones'
+  | 'En_Progreso'
+  | 'En_Reparacion'
+  | 'Control_Calidad'
+  | 'Listo_Entrega'
+  | 'Entregado'
+  | 'Cancelado';
 
 export interface ServiceOrder {
   id: string; // OS-XXXX

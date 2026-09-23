@@ -3,7 +3,8 @@ import {
   Plus, Search, UserPlus, Car, CheckSquare, Calendar, History, Send, 
   Trash, Check, X, FileText, ChevronRight, AlertCircle, MapPin, Sparkles, UserCheck, User,
   Camera, Upload, Trash2, AlertTriangle, Download, Sparkle, Copy, Image, Share2, Mail,
-  HelpCircle, Printer, RefreshCw, Edit2, Eye, DollarSign, ClipboardList, LogOut, Sliders, Wrench
+  HelpCircle, Printer, RefreshCw, Edit2, Eye, DollarSign, ClipboardList, LogOut, Sliders, Wrench,
+  CheckCircle, Clock, ShieldCheck, Gauge, FileSpreadsheet
 } from 'lucide-react';
 import { Client, Vehicle, Employee, InventoryItem, ServiceOrder, BudgetLineItem, OrderStatus, Checklist, Presupuesto, PresupuestoItem, OrdenReparacion, OrdenReparacionItem, NotaSalida, NotaSalidaItem } from '../types';
 import PdfCalibrator from './PdfCalibrator';
@@ -39,6 +40,7 @@ interface AdvisorDashboardProps {
   addVehicle: (v: Omit<Vehicle, 'id'>) => Vehicle;
   updateVehicle: (v: Vehicle) => void;
   createServiceOrder: (o: Omit<ServiceOrder, 'id' | 'items' | 'timeLogs' | 'isClockedIn' | 'isPaused' | 'totalHoursWorked' | 'payments' | 'folio' | 'fecha' | 'hora' | 'tecnico'> & { folio?: string; fecha?: string; hora?: string; tecnico?: string }) => ServiceOrder;
+  deleteServiceOrder?: (id: string) => void;
   addOrderItem: (orderId: string, item: Omit<BudgetLineItem, 'id' | 'approved'>) => void;
   deleteOrderItem: (orderId: string, itemId: string) => void;
   approveBudgetLine: (orderId: string, itemId: string, approved: boolean) => void;
@@ -72,6 +74,7 @@ export default function AdvisorDashboard({
   addVehicle,
   updateVehicle,
   createServiceOrder,
+  deleteServiceOrder,
   addOrderItem,
   deleteOrderItem,
   approveBudgetLine,
@@ -97,6 +100,14 @@ export default function AdvisorDashboard({
   // Search filter states
   const [clientSearch, setClientSearch] = useState('');
   const [crmSearch, setCrmSearch] = useState('');
+
+  // Reception Sub-Tab: Formulario vs Historial
+  const [receptionSubTab, setReceptionSubTab] = useState<'formulario' | 'historial'>('formulario');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>('all');
+  const [viewingOrderDetail, setViewingOrderDetail] = useState<ServiceOrder | null>(null);
+  const [deleteConfirmOrderId, setDeleteConfirmOrderId] = useState<string | null>(null);
+  const [recSuccessMessage, setRecSuccessMessage] = useState<string | null>(null);
 
   // Reception workflow states
   const [selectedClientId, setSelectedClientId] = useState('');
@@ -1392,6 +1403,82 @@ export default function AdvisorDashboard({
 
   const clientVehicles = vehicles.filter(v => v.ownerId === selectedClientId);
 
+  const getOrderStatusBadge = (status: OrderStatus) => {
+    switch (status) {
+      case 'Recibido':
+        return { label: 'Recibido', bg: 'bg-blue-100 text-blue-800 border-blue-200' };
+      case 'Diagnostico':
+        return { label: 'En Diagnóstico', bg: 'bg-purple-100 text-purple-800 border-purple-200' };
+      case 'Aprobado':
+        return { label: 'Presupuesto Aprobado', bg: 'bg-indigo-100 text-indigo-800 border-indigo-200' };
+      case 'Esperando_Piezas':
+        return { label: 'Esperando Refacciones', bg: 'bg-amber-100 text-amber-800 border-amber-200' };
+      case 'En_Progreso':
+        return { label: 'En Reparación', bg: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+      case 'Listo_Entrega':
+        return { label: 'Listo para Entrega', bg: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+      case 'Entregado':
+        return { label: 'Entregado', bg: 'bg-slate-100 text-slate-800 border-slate-200' };
+      case 'Cancelado':
+        return { label: 'Cancelado', bg: 'bg-rose-100 text-rose-800 border-rose-200' };
+      default:
+        return { label: String(status).replace('_', ' '), bg: 'bg-slate-100 text-slate-700 border-slate-200' };
+    }
+  };
+
+  const handleSendOrderWhatsApp = (o: ServiceOrder) => {
+    const client = clients.find(c => c.id === o.clientId);
+    const vehicle = vehicles.find(v => v.id === o.vehicleId);
+    const rawPhone = (client?.phone || '').replace(/\D/g, '');
+    if (!rawPhone) {
+      alert('El cliente no cuenta con número telefónico registrado.');
+      return;
+    }
+    const cleanPhone = rawPhone.startsWith('52') ? rawPhone : `52${rawPhone}`;
+    const folio = o.folio || o.id;
+    const badge = getOrderStatusBadge(o.status);
+    const message = encodeURIComponent(
+      `*SERVICIO AUTOMOTRIZ ESPECIALIZADO (SAE)*\n` +
+      `Estimado(a) *${client?.name || 'Cliente'}*,\n\n` +
+      `Le compartimos la información de su vehículo en taller:\n` +
+      `📋 *Orden / Folio:* #${folio}\n` +
+      `🚗 *Vehículo:* ${vehicle?.brand || ''} ${vehicle?.model || ''} ${vehicle?.year || ''} (Placas: ${vehicle?.plate || 'S/P'})\n` +
+      `⚙️ *Estado actual:* ${badge.label}\n` +
+      `📝 *Motivo / Falla:* ${o.reportedFailure || 'Revisión General'}\n\n` +
+      `Cualquier duda o actualización, estamos a su servicio.`
+    );
+    window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+  };
+
+  const handleDownloadOrderPdf = async (o: ServiceOrder) => {
+    try {
+      const client = clients.find(c => c.id === o.clientId);
+      const vehicle = vehicles.find(v => v.id === o.vehicleId);
+      await generateSaePdf(o, client, vehicle, employees);
+    } catch (err) {
+      console.error('Error al generar PDF de la orden:', err);
+      alert('Error al generar el PDF de la orden. Por favor reintente.');
+    }
+  };
+
+  const filteredReceptionOrders = orders.filter(o => {
+    if (orderStatusFilter !== 'all' && o.status !== orderStatusFilter) {
+      return false;
+    }
+    if (!orderSearchQuery.trim()) return true;
+    const q = orderSearchQuery.toLowerCase().trim();
+    const c = clients.find(cl => cl.id === o.clientId);
+    const v = vehicles.find(vh => vh.id === o.vehicleId);
+    const folio = (o.folio || o.id || '').toLowerCase();
+    const clientName = (c?.name || '').toLowerCase();
+    const clientPhone = (c?.phone || '').toLowerCase();
+    const plate = (v?.plate || '').toLowerCase();
+    const brand = (v?.brand || '').toLowerCase();
+    const model = (v?.model || '').toLowerCase();
+    const failure = (o.reportedFailure || '').toLowerCase();
+    return folio.includes(q) || clientName.includes(q) || clientPhone.includes(q) || plate.includes(q) || brand.includes(q) || model.includes(q) || failure.includes(q);
+  });
+
   return (
     <div id="advisor-dashboard-container" className="space-y-6 pb-28 md:pb-32">
       {/* Tab Menu */}
@@ -1485,8 +1572,75 @@ export default function AdvisorDashboard({
       {/* RECEPTION & CHECK-IN TAB */}
       {activeTab === 'reception' && (
         <div className="space-y-6">
-          {/* TOP BAR: SELECT CLIENT & VEHICLE SEARCH */}
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl">
+          {/* RECEPCION Y ORDENES MODULE SUB-NAVIGATION */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setReceptionSubTab('formulario')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  receptionSubTab === 'formulario'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <Plus size={15} />
+                <span>+ Nueva Recepción (Hoja SAE)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setReceptionSubTab('historial')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                  receptionSubTab === 'historial'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <History size={15} />
+                <span>Historial de Recepción y Órdenes ({orders.length})</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-500 font-medium">
+                Total Registradas: <strong className="text-slate-900 font-black">{orders.length}</strong>
+              </span>
+              {receptionSubTab === 'formulario' && orders.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setReceptionSubTab('historial')}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <History size={14} />
+                  Ver Historial de Órdenes ({orders.length})
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* MENSAJE DE FEEDBACK */}
+          {recSuccessMessage && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-3.5 rounded-xl text-xs font-semibold flex items-center justify-between animate-fade-in shadow-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle size={16} className="text-emerald-600 shrink-0" />
+                <span>{recSuccessMessage}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRecSuccessMessage(null)}
+                className="text-emerald-500 hover:text-emerald-800 text-sm font-bold ml-2 cursor-pointer"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {/* SUB-TAB 1: FORMULARIO DE RECEPCIÓN */}
+          {receptionSubTab === 'formulario' && (
+            <>
+              {/* TOP BAR: SELECT CLIENT & VEHICLE SEARCH */}
+              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               
               {/* SELECT CLIENT */}
@@ -2211,6 +2365,564 @@ export default function AdvisorDashboard({
               </p>
             </div>
           )}
+          </>
+        )}
+
+        {/* SUB-TAB 2: HISTORIAL DE RECEPCIÓN Y ÓRDENES */}
+        {receptionSubTab === 'historial' && (
+          <div className="space-y-6">
+            {/* KPI SUMMARY CARDS */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Órdenes</span>
+                  <span className="text-xl font-black text-slate-900 font-mono">{orders.length}</span>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                  <History size={18} />
+                </div>
+              </div>
+
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">En Diagnóstico</span>
+                  <span className="text-xl font-black text-purple-700 font-mono">
+                    {orders.filter(o => o.status === 'Recibido' || o.status === 'Diagnostico').length}
+                  </span>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+                  <Eye size={18} />
+                </div>
+              </div>
+
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">En Taller</span>
+                  <span className="text-xl font-black text-yellow-700 font-mono">
+                    {orders.filter(o => o.status === 'En_Progreso' || o.status === 'Esperando_Piezas' || o.status === 'Aprobado').length}
+                  </span>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center text-yellow-600">
+                  <Wrench size={18} />
+                </div>
+              </div>
+
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Listos Entrega</span>
+                  <span className="text-xl font-black text-emerald-700 font-mono">
+                    {orders.filter(o => o.status === 'Listo_Entrega').length}
+                  </span>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                  <CheckCircle size={18} />
+                </div>
+              </div>
+
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between col-span-2 sm:col-span-1">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Entregadas</span>
+                  <span className="text-xl font-black text-slate-700 font-mono">
+                    {orders.filter(o => o.status === 'Entregado').length}
+                  </span>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                  <LogOut size={18} />
+                </div>
+              </div>
+            </div>
+
+            {/* MAIN TABLE CONTAINER */}
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="font-bold text-slate-800 text-base font-display flex items-center gap-2">
+                    <History className="text-amber-600" size={20} />
+                    Historial de Recepciones y Órdenes de Servicio ({filteredReceptionOrders.length})
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Consulta, reimprime en PDF oficial Formato 1 SAE, monitorea el checklist o envía por WhatsApp a tus clientes.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5">
+                  {/* BUSCADOR */}
+                  <div className="relative min-w-[240px]">
+                    <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
+                    <input
+                      type="text"
+                      value={orderSearchQuery}
+                      onChange={(e) => setOrderSearchQuery(e.target.value)}
+                      placeholder="Buscar por folio, cliente, auto o falla..."
+                      className="w-full pl-9 pr-8 py-1.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                    {orderSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setOrderSearchQuery('')}
+                        className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+
+                  {/* FILTRO DE ESTADO */}
+                  <select
+                    value={orderStatusFilter}
+                    onChange={(e) => setOrderStatusFilter(e.target.value)}
+                    className="p-1.5 border border-slate-200 rounded-xl text-xs bg-slate-50 font-semibold text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="all">Todos los Estados ({orders.length})</option>
+                    <option value="Recibido">Recibido ({orders.filter(o => o.status === 'Recibido').length})</option>
+                    <option value="Diagnostico">En Diagnóstico ({orders.filter(o => o.status === 'Diagnostico').length})</option>
+                    <option value="Aprobado">Presupuesto Aprobado ({orders.filter(o => o.status === 'Aprobado').length})</option>
+                    <option value="Esperando_Piezas">Esperando Refacciones ({orders.filter(o => o.status === 'Esperando_Piezas').length})</option>
+                    <option value="En_Progreso">En Reparación ({orders.filter(o => o.status === 'En_Progreso').length})</option>
+                    <option value="Listo_Entrega">Listo para Entrega ({orders.filter(o => o.status === 'Listo_Entrega').length})</option>
+                    <option value="Entregado">Entregado ({orders.filter(o => o.status === 'Entregado').length})</option>
+                    <option value="Cancelado">Cancelado ({orders.filter(o => o.status === 'Cancelado').length})</option>
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={() => setReceptionSubTab('formulario')}
+                    className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm shadow-amber-600/20 cursor-pointer"
+                  >
+                    <Plus size={14} />
+                    <span>Nueva Recepción</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* TABLA DE ÓRDENES */}
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                      <th className="p-3">Folio / Fecha</th>
+                      <th className="p-3">Cliente</th>
+                      <th className="p-3">Vehículo</th>
+                      <th className="p-3">Motivo / Falla</th>
+                      <th className="p-3 text-center">Combustible</th>
+                      <th className="p-3">Estado</th>
+                      <th className="p-3 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredReceptionOrders.map((o) => {
+                      const client = clients.find(c => c.id === o.clientId);
+                      const vehicle = vehicles.find(v => v.id === o.vehicleId);
+                      const statusBadge = getOrderStatusBadge(o.status);
+                      const folioDisplay = o.folio || o.id;
+                      const dateDisplay = o.fecha || (o.dateOpened ? o.dateOpened.split(' ')[0] : '-');
+                      const timeDisplay = o.hora || (o.dateOpened ? o.dateOpened.split(' ')[1] : '');
+
+                      return (
+                        <tr key={o.id} className="hover:bg-amber-50/30 transition-colors">
+                          {/* FOLIO Y FECHA */}
+                          <td className="p-3 align-top whitespace-nowrap">
+                            <span className="font-mono font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded text-xs block w-fit">
+                              #{folioDisplay}
+                            </span>
+                            <span className="text-[10px] text-slate-500 mt-1 block">
+                              {dateDisplay} {timeDisplay && `• ${timeDisplay}`}
+                            </span>
+                          </td>
+
+                          {/* CLIENTE */}
+                          <td className="p-3 align-top">
+                            <p className="font-bold text-slate-900">{client?.name || 'Cliente no asignado'}</p>
+                            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
+                              <span>{client?.phone || 'Sin teléfono'}</span>
+                              {client?.phone && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSendOrderWhatsApp(o)}
+                                  className="text-emerald-600 hover:text-emerald-700 font-semibold cursor-pointer"
+                                  title="Enviar WhatsApp"
+                                >
+                                  <Send size={11} className="inline ml-0.5" />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* VEHÍCULO */}
+                          <td className="p-3 align-top whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-1.5 py-0.5 rounded bg-slate-900 text-amber-300 font-mono font-bold text-[10px] border border-slate-700 shadow-sm">
+                                {vehicle?.plate || 'S/P'}
+                              </span>
+                              <span className="font-semibold text-slate-800">
+                                {vehicle?.brand} {vehicle?.model} {vehicle?.year ? `'${String(vehicle.year).slice(-2)}` : ''}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 block mt-0.5">
+                              {vehicle?.color || ''} {vehicle?.mileage ? `• ${vehicle.mileage.toLocaleString()} kms` : ''}
+                            </span>
+                          </td>
+
+                          {/* MOTIVO / FALLA */}
+                          <td className="p-3 align-top max-w-[220px]">
+                            <p className="text-slate-700 line-clamp-2" title={o.reportedFailure}>
+                              {o.reportedFailure || <span className="text-slate-400 italic">Sin reporte</span>}
+                            </p>
+                            {o.checklist?.objetosValor && (
+                              <span className="inline-block mt-1 text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-semibold truncate max-w-[200px]" title={o.checklist.objetosValor}>
+                                Valores: {o.checklist.objetosValor}
+                              </span>
+                            )}
+                          </td>
+
+                          {/* COMBUSTIBLE */}
+                          <td className="p-3 align-top text-center whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono font-bold text-[11px] border border-slate-200">
+                              <Gauge size={12} className="text-amber-600" />
+                              {o.checklist?.gasolina || '1/2'}
+                            </span>
+                          </td>
+
+                          {/* ESTADO CON SELECTOR RÁPIDO */}
+                          <td className="p-3 align-top whitespace-nowrap">
+                            <select
+                              value={o.status}
+                              onChange={(e) => updateOrderStatus(o.id, e.target.value as any)}
+                              className={`text-[11px] font-bold px-2 py-1 rounded-lg border focus:outline-none cursor-pointer ${statusBadge.bg}`}
+                            >
+                              <option value="Recibido">Recibido</option>
+                              <option value="Diagnostico">En Diagnóstico</option>
+                              <option value="Aprobado">Aprobado</option>
+                              <option value="Esperando_Piezas">Esperando Piezas</option>
+                              <option value="En_Progreso">En Reparación</option>
+                              <option value="Listo_Entrega">Listo p/ Entrega</option>
+                              <option value="Entregado">Entregado</option>
+                              <option value="Cancelado">Cancelado</option>
+                            </select>
+                          </td>
+
+                          {/* ACCIONES */}
+                          <td className="p-3 align-top text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1">
+                              {/* VER DETALLE / CHECKLIST */}
+                              <button
+                                type="button"
+                                onClick={() => setViewingOrderDetail(o)}
+                                className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                                title="Ver Checklist Completo e Inspección"
+                              >
+                                <Eye size={15} />
+                              </button>
+
+                              {/* DESCARGAR PDF FORMATO 1 SAE */}
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadOrderPdf(o)}
+                                className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                title="Descargar Orden Formato 1 SAE (PDF Oficial)"
+                              >
+                                <Download size={15} />
+                              </button>
+
+                              {/* ENVIAR WHATSAPP */}
+                              <button
+                                type="button"
+                                onClick={() => handleSendOrderWhatsApp(o)}
+                                className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                                title="Enviar Notificación por WhatsApp"
+                              >
+                                <Send size={15} />
+                              </button>
+
+                              {/* COTIZAR / IR A PRESUPUESTOS */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedOrderId(o.id);
+                                  setActiveTab('quotes');
+                                  setPresupuestoSubTab('ordenes');
+                                }}
+                                className="p-1.5 text-amber-700 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                                title="Cotizar Presupuesto para esta Orden"
+                              >
+                                <DollarSign size={15} />
+                              </button>
+
+                              {/* ELIMINAR */}
+                              {deleteServiceOrder && (
+                                <button
+                                  type="button"
+                                  onClick={() => setDeleteConfirmOrderId(o.id)}
+                                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                  title="Eliminar Orden del Historial"
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+
+                    {filteredReceptionOrders.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="p-10 text-center text-slate-400">
+                          <div className="flex flex-col items-center justify-center space-y-2">
+                            <History size={36} className="text-slate-300" />
+                            <p className="font-semibold text-slate-600 text-sm">No se encontraron órdenes con los filtros actuales.</p>
+                            <p className="text-xs text-slate-400">Intenta cambiar el término de búsqueda o registra una nueva orden.</p>
+                            <button
+                              type="button"
+                              onClick={() => setReceptionSubTab('formulario')}
+                              className="mt-2 px-4 py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 transition-all cursor-pointer"
+                            >
+                              + Nueva Recepción de Auto
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: CONFIRMACIÓN DE ELIMINACIÓN */}
+        {deleteConfirmOrderId && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 animate-fade-in">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-5 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+                <AlertTriangle size={24} />
+              </div>
+              <div className="text-center space-y-1">
+                <h4 className="font-bold text-slate-800 text-base font-display">¿Eliminar Orden de Servicio?</h4>
+                <p className="text-xs text-slate-500">
+                  Esta acción removerá la orden permanentemente de la base de datos y de la sincronización con Supabase.
+                </p>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setDeleteConfirmOrderId(null)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (deleteServiceOrder && deleteConfirmOrderId) {
+                      deleteServiceOrder(deleteConfirmOrderId);
+                      setRecSuccessMessage('Orden eliminada correctamente del historial.');
+                      setDeleteConfirmOrderId(null);
+                    }
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all shadow-md shadow-red-600/20 cursor-pointer"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: VER DETALLE COMPLETO Y CHECKLIST */}
+        {viewingOrderDetail && (() => {
+          const o = viewingOrderDetail;
+          const client = clients.find(c => c.id === o.clientId);
+          const vehicle = vehicles.find(v => v.id === o.vehicleId);
+          const statusBadge = getOrderStatusBadge(o.status);
+
+          return (
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 overflow-y-auto animate-fade-in">
+              <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto border border-slate-200 p-6 space-y-5">
+                {/* HEADER */}
+                <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono font-black text-red-700 text-lg bg-red-50 border border-red-200 px-3 py-1 rounded-xl">
+                      #{o.folio || o.id}
+                    </span>
+                    <div>
+                      <h3 className="font-bold text-slate-900 text-base font-display">
+                        Detalle de Orden de Recepción SAE
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Fecha: {o.fecha || (o.dateOpened ? o.dateOpened.split(' ')[0] : '')} {o.hora && `• Hora: ${o.hora}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${statusBadge.bg}`}>
+                      {statusBadge.label}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setViewingOrderDetail(null)}
+                      className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2 COLUMNS: CLIENT & VEHICLE */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* CLIENT */}
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
+                    <h5 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-amber-700">
+                      <User size={14} />
+                      Datos del Cliente
+                    </h5>
+                    <p><strong className="text-slate-700">Nombre:</strong> {client?.name || 'N/A'}</p>
+                    <p><strong className="text-slate-700">Teléfono:</strong> {client?.phone || 'N/A'}</p>
+                    <p><strong className="text-slate-700">Email:</strong> {client?.email || 'N/A'}</p>
+                    <p><strong className="text-slate-700">Dirección:</strong> {client?.address || `${client?.calle || ''} ${client?.colonia || ''} ${client?.alcaldia || ''}` || 'N/A'}</p>
+                  </div>
+
+                  {/* VEHICLE */}
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
+                    <h5 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-amber-700">
+                      <Car size={14} />
+                      Datos del Vehículo
+                    </h5>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-slate-900 text-amber-400 font-mono font-bold text-xs border border-slate-700">
+                        {vehicle?.plate || 'S/P'}
+                      </span>
+                      <span className="font-bold text-slate-800">{vehicle?.brand} {vehicle?.model} ({vehicle?.year})</span>
+                    </div>
+                    <p><strong className="text-slate-700">Color:</strong> {vehicle?.color || 'N/A'} • <strong className="text-slate-700">Kms:</strong> {vehicle?.mileage?.toLocaleString() || o.checklist?.kilometraje || 0}</p>
+                    <p><strong className="text-slate-700">Motor:</strong> {vehicle?.motor || 'N/A'}</p>
+                    <p><strong className="text-slate-700">Serie / VIN:</strong> {vehicle?.serie || vehicle?.vin || 'N/A'}</p>
+                  </div>
+                </div>
+
+                {/* MOTIVO DE INGRESO / FALLA */}
+                <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-200/60 space-y-1.5 text-xs">
+                  <h5 className="font-bold text-amber-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <FileText size={14} />
+                    Motivo de Visita / Falla Reportada por el Cliente
+                  </h5>
+                  <p className="text-slate-800 leading-relaxed font-medium">
+                    {o.reportedFailure || 'Sin falla reportada registrada.'}
+                  </p>
+                </div>
+
+                {/* CHECKLIST E INSPECCIÓN FÍSICA */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <h5 className="font-bold text-slate-800 uppercase tracking-wider text-[11px] flex items-center gap-1.5 text-amber-700">
+                      <CheckSquare size={14} />
+                      Checklist de Entrada e Inventario de Accesorios
+                    </h5>
+                    <span className="font-mono font-bold text-slate-700 bg-white px-2 py-0.5 rounded-lg border border-slate-200">
+                      Combustible: {o.checklist?.gasolina || '1/2'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+                    {[
+                      { label: 'Tarjeta Circulación', val: o.checklist?.tarjetaCirculacion },
+                      { label: 'Póliza de Seguro', val: o.checklist?.polizaSeguro },
+                      { label: 'Verificación', val: o.checklist?.verificacion },
+                      { label: 'Tapetes', val: o.checklist?.tapetes },
+                      { label: 'Seguros de Rueda', val: o.checklist?.segurosRueda },
+                      { label: 'Llave de Ruedas', val: o.checklist?.llaveRuedas },
+                      { label: 'Gato', val: o.checklist?.gato },
+                      { label: 'Extintor', val: o.checklist?.extintor },
+                      { label: 'Llanta Refacción', val: o.checklist?.llantaRefaccion },
+                      { label: 'Estéreo', val: o.checklist?.estereo },
+                      { label: 'Encendedor', val: o.checklist?.encendedor },
+                      { label: 'Sensores Reversa', val: o.checklist?.sensoresReversa },
+                      { label: 'Cámara Reversa', val: o.checklist?.camaraReversa }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white border border-slate-200">
+                        <span className={`w-4 h-4 rounded flex items-center justify-center text-[10px] font-bold ${
+                          item.val ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'
+                        }`}>
+                          {item.val ? '✓' : '—'}
+                        </span>
+                        <span className={item.val ? 'text-slate-800 font-semibold' : 'text-slate-400'}>
+                          {item.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
+                    <div>
+                      <span className="font-bold text-slate-600 block text-[10px] uppercase">Objetos de Valor:</span>
+                      <p className="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 mt-1">
+                        {o.checklist?.objetosValor || 'Ninguno reportado.'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-600 block text-[10px] uppercase">Inspección Motor:</span>
+                      <p className="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 mt-1">
+                        {o.checklist?.inspeccionMotor || 'Sin anomalías registradas.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* FIRMAS DIGITALES */}
+                {(o.clientSignature || o.mechanicSignature) && (
+                  <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-3">
+                    <div className="text-center">
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Firma del Cliente</span>
+                      {o.clientSignature ? (
+                        <img src={o.clientSignature} alt="Firma Cliente" className="h-16 mx-auto object-contain bg-white rounded border border-slate-200 p-1" />
+                      ) : (
+                        <span className="text-xs text-slate-400 italic">Sin firma capturada</span>
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">Firma del Asesor / Taller</span>
+                      {o.mechanicSignature ? (
+                        <img src={o.mechanicSignature} alt="Firma Asesor" className="h-16 mx-auto object-contain bg-white rounded border border-slate-200 p-1" />
+                      ) : (
+                        <span className="text-xs text-slate-400 italic">Sin firma capturada</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* FOOTER ACTIONS */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadOrderPdf(o)}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-md shadow-red-600/20 transition-all cursor-pointer"
+                  >
+                    <Download size={15} />
+                    <span>Descargar Formato 1 SAE (PDF Oficial)</span>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSendOrderWhatsApp(o)}
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <Send size={14} />
+                      <span>Enviar WhatsApp</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewingOrderDetail(null)}
+                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all cursor-pointer"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         </div>
       )}
@@ -5476,21 +6188,34 @@ export default function AdvisorDashboard({
               <button
                 type="button"
                 onClick={() => setShowSaveSuccessModal(false)}
-                className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-all"
+                className="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer"
               >
                 Cerrar Ventana
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowSaveSuccessModal(false);
-                  if (setActiveTab) setActiveTab('quotes');
-                }}
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-2"
-              >
-                <span>Ir a Cotizador y Presupuesto</span>
-                <ChevronRight size={14} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSaveSuccessModal(false);
+                    setReceptionSubTab('historial');
+                  }}
+                  className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                >
+                  <History size={14} />
+                  <span>Ver en Historial</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSaveSuccessModal(false);
+                    if (setActiveTab) setActiveTab('quotes');
+                  }}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Ir a Cotizador y Presupuesto</span>
+                  <ChevronRight size={14} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

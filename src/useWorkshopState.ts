@@ -555,6 +555,15 @@ export function useWorkshopState() {
     }));
   };
 
+  const deleteServiceOrder = (orderId: string) => {
+    setOrders(prev => prev.filter(o => o.id !== orderId));
+    if (supabaseConnected) {
+      supabase.from('service_orders').delete().eq('id', orderId).then(({ error }) => {
+        if (error) console.error('Error deleting service order from Supabase:', error);
+      });
+    }
+  };
+
   const approveBudgetLine = (orderId: string, itemId: string, approved: boolean) => {
     setOrders(prev => prev.map(o => {
       if (o.id === orderId) {
@@ -1018,6 +1027,7 @@ export function useWorkshopState() {
     addPurchaseOrder,
     receivePurchaseOrder,
     createServiceOrder,
+    deleteServiceOrder,
     updateOrderStatus,
     updateOrderDiagnostics,
     addOrderItem,
