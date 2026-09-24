@@ -16,6 +16,7 @@ import {
   INITIAL_NOTAS_SALIDA
 } from './mockData';
 import { supabase } from './lib/supabase';
+import { initPdfTemplatesFromCloud } from './utils/pdfTemplateStorage';
 
 const sortNewestFirst = <T extends { id: string }>(arr: T[]): T[] => {
   return [...arr].sort((a, b) => {
@@ -92,7 +93,10 @@ export function useWorkshopState() {
       setLoaded(true);
 
       // Now, try fetching from Supabase to hydrate with latest cloud data
-      await fetchFromSupabase(true);
+      await Promise.allSettled([
+        fetchFromSupabase(true),
+        initPdfTemplatesFromCloud()
+      ]);
     };
 
     initializeData();
@@ -102,6 +106,9 @@ export function useWorkshopState() {
     setIsSyncing(true);
     setSyncError(null);
     try {
+      // Pull templates in background
+      initPdfTemplatesFromCloud().catch(e => console.warn('Templates cloud fetch note:', e));
+
       // Pull clients
       const { data: clientsData, error: clientsErr } = await supabase.from('clients').select('*');
       if (clientsErr) throw clientsErr;

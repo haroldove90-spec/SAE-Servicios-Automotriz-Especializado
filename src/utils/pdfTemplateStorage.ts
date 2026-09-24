@@ -598,6 +598,8 @@ export const DEFAULT_FORMATO_1: PdfTemplateConfig = {
       width: 16,
       sampleValue: '✕'
     },
+    /*
+    // Desactivado temporalmente por solicitud del usuario
     {
       id: 'gasolina_nivel',
       label: 'Nivel de Gasolina (%)',
@@ -610,6 +612,7 @@ export const DEFAULT_FORMATO_1: PdfTemplateConfig = {
       align: 'center',
       sampleValue: '50%'
     },
+    */
 
     // Observaciones adicionales
     {
@@ -733,8 +736,8 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'numero_salida',
       label: 'Número de Folio / Presupuesto',
       section: 'encabezado',
-      x: 490,
-      y: 206,
+      x: 499,
+      y: 166,
       fontSize: 14,
       fontWeight: '900',
       color: '#D32F2F',
@@ -745,9 +748,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'fecha',
       label: 'Fecha del Presupuesto',
       section: 'encabezado',
-      x: 620,
-      y: 206,
-      fontSize: 10.5,
+      x: 609,
+      y: 162,
+      fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
       align: 'left',
@@ -759,10 +762,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'cliente_nombre',
       label: 'CLIENTE (Nombre / Razón Social)',
       section: 'cliente',
-      x: 140,
-      y: 214,
+      x: 143,
+      y: 187,
       fontSize: 11,
-      fontWeight: 'bold',
+      fontWeight: 'normal',
       color: '#000000',
       align: 'left',
       sampleValue: 'Congregación de la Misión'
@@ -771,9 +774,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'cliente_calle',
       label: 'Calle y Número',
       section: 'cliente',
-      x: 134,
-      y: 239,
-      fontSize: 10,
+      x: 146,
+      y: 208,
+      fontSize: 10.5,
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
@@ -783,9 +786,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'cliente_cp_colonia',
       label: 'C.P. / Colonia',
       section: 'cliente',
-      x: 139,
-      y: 258,
-      fontSize: 10,
+      x: 150,
+      y: 231,
+      fontSize: 10.5,
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
@@ -795,9 +798,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'cliente_alcaldia',
       label: 'Alcaldía / Municipio',
       section: 'cliente',
-      x: 137,
-      y: 276,
-      fontSize: 10,
+      x: 152,
+      y: 251,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
@@ -821,10 +824,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'vehiculo_marca_motor',
       label: 'Marca / Motor',
       section: 'auto',
-      x: 516,
-      y: 240,
-      fontSize: 10,
-      fontWeight: 'bold',
+      x: 513,
+      y: 201,
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'left',
       sampleValue: 'FORD-RANGER / 2.3L'
@@ -833,9 +836,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'vehiculo_modelo_color',
       label: 'Modelo / Color',
       section: 'auto',
-      x: 520,
-      y: 259,
-      fontSize: 10,
+      x: 525,
+      y: 227,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
@@ -845,10 +848,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'vehiculo_matricula',
       label: 'Matrícula / Placas',
       section: 'auto',
-      x: 495,
-      y: 277,
-      fontSize: 10,
-      fontWeight: 'bold',
+      x: 502,
+      y: 249,
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'left',
       sampleValue: '865-XXJ'
@@ -872,9 +875,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r1_codigo',
       label: 'R1: Código',
       section: 'tabla',
-      x: 73,
-      y: 345,
-      fontSize: 9.5,
+      x: 47,
+      y: 330,
+      fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
       align: 'center',
@@ -884,9 +887,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r1_descripcion',
       label: 'R1: Descripción Repuesto / Servicio',
       section: 'tabla',
-      x: 107,
-      y: 345,
-      fontSize: 9.5,
+      x: 106,
+      y: 330,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
@@ -896,10 +899,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r1_cantidad',
       label: 'R1: Cantidad',
       section: 'tabla',
-      x: 536,
-      y: 345,
-      fontSize: 9.5,
-      fontWeight: 'bold',
+      x: 572,
+      y: 330,
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'center',
       sampleValue: '1'
@@ -908,9 +911,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r1_unitario',
       label: 'R1: Importe Unitario',
       section: 'tabla',
-      x: 611,
-      y: 345,
-      fontSize: 9.5,
+      x: 608,
+      y: 329,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'right',
@@ -920,10 +923,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r1_total',
       label: 'R1: Total Partida',
       section: 'tabla',
-      x: 681,
-      y: 345,
-      fontSize: 9.5,
-      fontWeight: 'bold',
+      x: 674,
+      y: 329,
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'right',
       sampleValue: '1,450.00'
@@ -934,9 +937,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r2_codigo',
       label: 'R2: Código',
       section: 'tabla',
-      x: 73,
-      y: 368,
-      fontSize: 9.5,
+      x: 40,
+      y: 360,
+      fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
       align: 'center',
@@ -946,9 +949,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r2_descripcion',
       label: 'R2: Descripción Repuesto / Servicio',
       section: 'tabla',
-      x: 107,
-      y: 368,
-      fontSize: 9.5,
+      x: 106,
+      y: 359,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
@@ -958,10 +961,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r2_cantidad',
       label: 'R2: Cantidad',
       section: 'tabla',
-      x: 536,
-      y: 368,
-      fontSize: 9.5,
-      fontWeight: 'bold',
+      x: 571,
+      y: 358,
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'center',
       sampleValue: '2'
@@ -970,9 +973,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r2_unitario',
       label: 'R2: Importe Unitario',
       section: 'tabla',
-      x: 611,
-      y: 368,
-      fontSize: 9.5,
+      x: 612,
+      y: 357,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'right',
@@ -982,10 +985,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r2_total',
       label: 'R2: Total Partida',
       section: 'tabla',
-      x: 681,
-      y: 368,
-      fontSize: 9.5,
-      fontWeight: 'bold',
+      x: 676,
+      y: 359,
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'right',
       sampleValue: '700.00'
@@ -996,9 +999,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r3_codigo',
       label: 'R3: Código',
       section: 'tabla',
-      x: 73,
-      y: 391,
-      fontSize: 9.5,
+      x: 46,
+      y: 382,
+      fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
       align: 'center',
@@ -1009,8 +1012,8 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       label: 'R3: Descripción Repuesto / Servicio',
       section: 'tabla',
       x: 107,
-      y: 391,
-      fontSize: 9.5,
+      y: 385,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'left',
@@ -1020,10 +1023,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r3_cantidad',
       label: 'R3: Cantidad',
       section: 'tabla',
-      x: 536,
-      y: 391,
-      fontSize: 9.5,
-      fontWeight: 'bold',
+      x: 572,
+      y: 393,
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'center',
       sampleValue: '1'
@@ -1034,7 +1037,7 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       section: 'tabla',
       x: 611,
       y: 391,
-      fontSize: 9.5,
+      fontSize: 11,
       fontWeight: 'normal',
       color: '#000000',
       align: 'right',
@@ -1044,10 +1047,10 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'tabla_r3_total',
       label: 'R3: Total Partida',
       section: 'tabla',
-      x: 681,
+      x: 680,
       y: 391,
-      fontSize: 9.5,
-      fontWeight: 'bold',
+      fontSize: 11,
+      fontWeight: 'normal',
       color: '#000000',
       align: 'right',
       sampleValue: '850.00'
@@ -1058,8 +1061,8 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'orden_de_servicio_numero',
       label: "Ord. de Servicio # (Espacio derecha de 'ORD. DE SERV. #')",
       section: 'pie_pagina',
-      x: 504,
-      y: 929,
+      x: 522,
+      y: 955,
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
@@ -1070,9 +1073,9 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'total_general',
       label: "Total General (Casilla blanca debajo de 'Total')",
       section: 'pie_pagina',
-      x: 681,
-      y: 933,
-      fontSize: 12.5,
+      x: 642,
+      y: 882,
+      fontSize: 11,
       fontWeight: '900',
       color: '#000000',
       align: 'right',
@@ -1082,8 +1085,8 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
       id: 'forma_pago',
       label: 'Forma de Pago',
       section: 'pie_pagina',
-      x: 140,
-      y: 929,
+      x: 170,
+      y: 835,
       fontSize: 10,
       fontWeight: 'bold',
       color: '#000000',
@@ -1570,40 +1573,112 @@ export const INITIAL_TEMPLATES_MAP: Record<string, PdfTemplateConfig> = {
 
 const LOCAL_STORAGE_KEY_PREFIX = 'wt_pdf_template_';
 
+// In-memory cache for ultra-fast, synchronized access across the entire app
+const cachedTemplates: Record<string, PdfTemplateConfig> = {};
+
 /**
- * Gets the current active template configuration from localStorage (or fallback default)
+ * Initializes and hydrates all templates from Supabase cloud database.
+ * Updates in-memory cache and localStorage simultaneously.
+ */
+export async function initPdfTemplatesFromCloud(): Promise<void> {
+  try {
+    const { data, error } = await supabase.from('sae_pdf_templates').select('*');
+    if (!error && Array.isArray(data) && data.length > 0) {
+      data.forEach((row: any) => {
+        if (row && row.id && Array.isArray(row.fields)) {
+          const def = INITIAL_TEMPLATES_MAP[row.id] || DEFAULT_FORMATO_1;
+          const config: PdfTemplateConfig = {
+            id: row.id,
+            nombre: row.nombre || def.nombre,
+            bgUrl: row.bg_url || def.bgUrl,
+            width: row.canvas_width || def.width || 750,
+            height: row.canvas_height || def.height || 980,
+            fields: row.fields
+          };
+          // Cache in memory
+          cachedTemplates[row.id] = config;
+          // Persist to localStorage
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${row.id}`, JSON.stringify(config));
+          } catch (e) {
+            console.warn('Could not persist cloud template to localStorage:', e);
+          }
+        }
+      });
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('sae_templates_loaded'));
+      }
+    }
+  } catch (err) {
+    console.warn('Error hydrating templates from Supabase cloud:', err);
+  }
+}
+
+/**
+ * Gets the current active template configuration from in-memory cache, localStorage, or fallback default
  */
 export function getTemplateConfig(formatId: string = 'formato1'): PdfTemplateConfig {
+  // 1. Check in-memory cache
+  if (cachedTemplates[formatId]) {
+    return cachedTemplates[formatId];
+  }
+
+  // 2. Check localStorage
   try {
     const raw = localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}${formatId}`);
     if (raw) {
       const parsed = JSON.parse(raw) as PdfTemplateConfig;
-      // Merge with default fields in case new fields were introduced
-      const def = INITIAL_TEMPLATES_MAP[formatId] || DEFAULT_FORMATO_1;
-      const fieldMap = new Map(parsed.fields.map(f => [f.id, f]));
-      const mergedFields = def.fields.map(df => fieldMap.get(df.id) || df);
-      return {
-        ...def,
-        ...parsed,
-        fields: mergedFields
-      };
+      if (parsed && Array.isArray(parsed.fields)) {
+        const def = INITIAL_TEMPLATES_MAP[formatId] || DEFAULT_FORMATO_1;
+        const parsedFieldMap = new Map(parsed.fields.map(f => [f.id, f]));
+        // Keep all parsed fields, and append any default field that was newly introduced
+        const mergedFields: PdfTemplateField[] = [...parsed.fields];
+        def.fields.forEach(df => {
+          if (!parsedFieldMap.has(df.id)) {
+            mergedFields.push(df);
+          }
+        });
+        const result: PdfTemplateConfig = {
+          ...def,
+          ...parsed,
+          fields: mergedFields
+        };
+        cachedTemplates[formatId] = result;
+        return result;
+      }
     }
   } catch (err) {
     console.warn(`Error reading template ${formatId} from localStorage:`, err);
   }
-  return INITIAL_TEMPLATES_MAP[formatId] || DEFAULT_FORMATO_1;
+
+  const fallback = INITIAL_TEMPLATES_MAP[formatId] || DEFAULT_FORMATO_1;
+  cachedTemplates[formatId] = fallback;
+  return fallback;
 }
 
 /**
- * Saves a template configuration to localStorage and synchronizes with Supabase
+ * Saves a template configuration to in-memory cache, localStorage and synchronizes with Supabase
  */
 export async function saveTemplateConfig(config: PdfTemplateConfig): Promise<{ success: boolean; cloudSynced: boolean; message: string }> {
   try {
-    // 1. Local storage instant persistence
-    localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${config.id}`, JSON.stringify(config));
+    // 1. In-memory cache instant update
+    cachedTemplates[config.id] = config;
+
+    // 2. Local storage instant persistence
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${config.id}`, JSON.stringify(config));
+    } catch (lsErr) {
+      console.warn('Could not write template to localStorage:', lsErr);
+    }
+
+    // 3. Dispatch window event for instant UI and PDF generator reactivity
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('sae_pdf_template_updated', { detail: { formatId: config.id, config } }));
+    }
     
-    // 2. Try Supabase cloud persistence
+    // 4. Try Supabase cloud persistence
     let cloudSynced = false;
+    let errorDetail = '';
     try {
       const { error } = await supabase.from('sae_pdf_templates').upsert({
         id: config.id,
@@ -1617,9 +1692,11 @@ export async function saveTemplateConfig(config: PdfTemplateConfig): Promise<{ s
       if (!error) {
         cloudSynced = true;
       } else {
-        console.warn('Supabase template upsert note (table might need creation):', error.message);
+        errorDetail = error.message;
+        console.warn('Supabase template upsert note:', error.message);
       }
-    } catch (sbErr) {
+    } catch (sbErr: any) {
+      errorDetail = sbErr?.message || 'Sin conexión';
       console.warn('Supabase offline or table missing:', sbErr);
     }
 
@@ -1627,8 +1704,8 @@ export async function saveTemplateConfig(config: PdfTemplateConfig): Promise<{ s
       success: true,
       cloudSynced,
       message: cloudSynced 
-        ? 'Plantilla guardada localmente y sincronizada con la nube Supabase.' 
-        : 'Plantilla guardada con éxito en este dispositivo.'
+        ? `¡Calibración de ${config.nombre} guardada y sincronizada en la nube!` 
+        : `¡Calibración guardada con éxito en este navegador!${errorDetail ? ` (Aviso nube: ${errorDetail})` : ''}`
     };
   } catch (err: any) {
     console.error('Error saving template config:', err);
@@ -1641,11 +1718,19 @@ export async function saveTemplateConfig(config: PdfTemplateConfig): Promise<{ s
 }
 
 /**
- * Restores a template to its initial Gemini-calibrated defaults
+ * Restores a template to its initial calibrated defaults
  */
 export function resetTemplateConfig(formatId: string = 'formato1'): PdfTemplateConfig {
   const def = INITIAL_TEMPLATES_MAP[formatId] || DEFAULT_FORMATO_1;
-  localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${formatId}`, JSON.stringify(def));
+  cachedTemplates[formatId] = def;
+  try {
+    localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${formatId}`, JSON.stringify(def));
+  } catch (e) {
+    console.warn('Error resetting localStorage for template', e);
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('sae_pdf_template_updated', { detail: { formatId, config: def } }));
+  }
   return def;
 }
 

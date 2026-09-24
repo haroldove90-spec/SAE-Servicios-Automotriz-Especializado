@@ -6028,6 +6028,7 @@ export default function AdvisorDashboard({
             vehicles={vehicles}
             employees={employees}
             initialFormat={calibratorFormat}
+            onFormatChange={(fmt) => setCalibratorFormat(fmt)}
             onClose={() => setActiveTab(previousTab || 'reception')}
             returnTabName={previousTab === 'quotes' ? 'Presupuestos' : 'Recepción y Órdenes'}
           />

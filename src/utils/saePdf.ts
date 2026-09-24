@@ -30,31 +30,35 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
   };
 
   // Get table column coordinates from template fields or fallbacks
-  const colCod = template.fields.find(f => f.id === 'tabla_r1_codigo') || { x: 73, align: 'center', fontSize: 9.5 };
-  const colDesc = template.fields.find(f => f.id === 'tabla_r1_descripcion') || { x: 107, align: 'left', fontSize: 9.5 };
-  const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 536, align: 'center', fontSize: 9.5 };
-  const colUnit = template.fields.find(f => f.id === 'tabla_r1_unitario') || { x: 611, align: 'right', fontSize: 9.5 };
-  const colTot = template.fields.find(f => f.id === 'tabla_r1_total') || { x: 681, align: 'right', fontSize: 9.5 };
+  const colCod = template.fields.find(f => f.id === 'tabla_r1_codigo') || { x: 47, y: 330, align: 'center', fontSize: 11 };
+  const colDesc = template.fields.find(f => f.id === 'tabla_r1_descripcion') || { x: 106, y: 330, align: 'left', fontSize: 11 };
+  const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 572, y: 330, align: 'center', fontSize: 11 };
+  const colUnit = template.fields.find(f => f.id === 'tabla_r1_unitario') || { x: 608, y: 329, align: 'right', fontSize: 11 };
+  const colTot = template.fields.find(f => f.id === 'tabla_r1_total') || { x: 674, y: 329, align: 'right', fontSize: 11 };
 
-  // Calculate table rows (starting at y ~ 345, spacing ~ 23px, up to 24 rows)
+  const r2Cod = template.fields.find(f => f.id === 'tabla_r2_codigo');
+  const startY = (colCod as any).y ?? 330;
+  const rowSpacing = r2Cod && (r2Cod as any).y ? Math.max(18, Math.min(45, (r2Cod as any).y - startY)) : 28;
+
+  // Calculate table rows based on calibrated Y and spacing
   const items = presupuesto.items || [];
   const rowsHtml = items.slice(0, 24).map((item, idx) => {
-    const yPos = 345 + (idx * 23);
+    const yPos = startY + (idx * rowSpacing);
     const itemTotal = item.total || ((item.cantidad || 1) * (item.importeUnitario || 0));
     return `
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCod.x}px !important; font-size: ${colCod.fontSize || 9.5}px !important; font-weight: bold !important; text-align: ${colCod.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCod.x}px !important; font-size: ${colCod.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colCod.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.codigo || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 400px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 9.5}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 450px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 11}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.descripcion || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 9.5}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: normal !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.cantidad || 1}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colUnit.x}px !important; font-size: ${colUnit.fontSize || 9.5}px !important; text-align: ${colUnit.align || 'right'} !important; transform: translateX(-100%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colUnit.x}px !important; font-size: ${colUnit.fontSize || 11}px !important; text-align: ${colUnit.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         $${(item.importeUnitario || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colTot.x}px !important; font-size: ${colTot.fontSize || 9.5}px !important; font-weight: bold !important; text-align: ${colTot.align || 'right'} !important; transform: translateX(-100%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colTot.x}px !important; font-size: ${colTot.fontSize || 11}px !important; font-weight: normal !important; text-align: ${colTot.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         $${itemTotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
     `;
@@ -128,17 +132,17 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
         ${rowsHtml}
 
         <!-- ORD. DE SERV. # -->
-        <div style="${getStyle('orden_de_servicio_numero', { x: 504, y: 929, fontSize: 11, fontWeight: 'bold' })}">
+        <div style="${getStyle('orden_de_servicio_numero', { x: 522, y: 955, fontSize: 11, fontWeight: 'bold' })}">
           ${presupuesto.ordenServicioNumero || presupuesto.numero}
         </div>
 
         <!-- Total General -->
-        <div style="${getStyle('total_general', { x: 681, y: 933, fontSize: 12.5, fontWeight: '900', align: 'right' })}">
+        <div style="${getStyle('total_general', { x: 642, y: 882, fontSize: 11, fontWeight: '900', align: 'right' })}">
           $${(presupuesto.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
 
         <!-- Forma de Pago -->
-        <div style="${getStyle('forma_pago', { x: 140, y: 929, fontSize: 10, fontWeight: 'bold' })}">
+        <div style="${getStyle('forma_pago', { x: 170, y: 835, fontSize: 10, fontWeight: 'bold' })}">
           ${presupuesto.formaPago || 'CONTADO'}
         </div>
 

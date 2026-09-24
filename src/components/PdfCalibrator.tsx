@@ -28,6 +28,7 @@ interface PdfCalibratorProps {
   vehicles?: Vehicle[];
   employees?: Employee[];
   initialFormat?: string;
+  onFormatChange?: (formatId: string) => void;
   onClose?: () => void;
   returnTabName?: string;
 }
@@ -38,6 +39,7 @@ export default function PdfCalibrator({
   vehicles = [],
   employees = [],
   initialFormat = 'formato1',
+  onFormatChange,
   onClose,
   returnTabName
 }: PdfCalibratorProps) {
@@ -60,14 +62,17 @@ export default function PdfCalibrator({
   const dragStartPosRef = useRef<{ mouseX: number; mouseY: number; initialX: number; initialY: number } | null>(null);
   
   // UI notifications and modal
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showSqlModal, setShowSqlModal] = useState<boolean>(false);
   const [copiedSql, setCopiedSql] = useState<boolean>(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
 
   // Sync format with initialFormat if it changes externally
+  const prevInitialFormatRef = useRef(initialFormat);
   useEffect(() => {
-    if (initialFormat && initialFormat !== selectedFormatId) {
+    if (initialFormat && initialFormat !== prevInitialFormatRef.current) {
+      prevInitialFormatRef.current = initialFormat;
       setSelectedFormatId(initialFormat);
     }
   }, [initialFormat]);
@@ -81,6 +86,21 @@ export default function PdfCalibrator({
       setSelectedFieldId(loaded.fields[0].id);
     }
   }, [selectedFormatId]);
+
+  // Listen for cloud templates loaded event
+  useEffect(() => {
+    const handleCloudLoaded = () => {
+      const refreshed = getTemplateConfig(selectedFormatId);
+      setConfig(refreshed);
+    };
+    window.addEventListener('sae_templates_loaded', handleCloudLoaded);
+    return () => window.removeEventListener('sae_templates_loaded', handleCloudLoaded);
+  }, [selectedFormatId]);
+
+  const handleSelectFormat = (formatId: string) => {
+    setSelectedFormatId(formatId);
+    onFormatChange?.(formatId);
+  };
 
   const selectedField = config.fields.find(f => f.id === selectedFieldId) || config.fields[0];
 
@@ -131,12 +151,23 @@ export default function PdfCalibrator({
 
   // Handle Save
   const handleSave = async () => {
-    const res = await saveTemplateConfig(config);
-    setSaveStatus({
-      message: res.message,
-      type: res.success ? 'success' : 'error'
-    });
-    setTimeout(() => setSaveStatus(null), 4000);
+    setIsSaving(true);
+    try {
+      const res = await saveTemplateConfig(config);
+      setSaveStatus({
+        message: res.message,
+        type: res.success ? 'success' : 'error'
+      });
+      setTimeout(() => setSaveStatus(null), 6000);
+    } catch (err: any) {
+      setSaveStatus({
+        message: 'Error al guardar la calibración: ' + (err.message || 'Error desconocido'),
+        type: 'error'
+      });
+      setTimeout(() => setSaveStatus(null), 6000);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Handle Reset to Gemini Defaults
@@ -457,10 +488,11 @@ export default function PdfCalibrator({
 
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-[#8D6A28] hover:bg-[#aa8134] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-[#8D6A28]/20 transition-all cursor-pointer"
+              disabled={isSaving}
+              className="px-4 py-2 bg-[#8D6A28] hover:bg-[#aa8134] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-[#8D6A28]/20 transition-all cursor-pointer disabled:opacity-50"
             >
               <Save size={15} />
-              <span>Guardar Calibración</span>
+              <span>{isSaving ? 'Guardando en la nube...' : 'Guardar Calibración'}</span>
             </button>
 
             {onClose && (
@@ -480,11 +512,11 @@ export default function PdfCalibrator({
         {saveStatus && (
           <div className={`p-3 rounded-xl text-xs font-medium flex items-center gap-2 ${
             saveStatus.type === 'success' 
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-sm' 
+              : 'bg-red-50 text-red-800 border border-red-200 shadow-sm'
           }`}>
-            {saveStatus.type === 'success' ? <CheckCircle2 size={16} className="text-emerald-600" /> : <AlertCircle size={16} className="text-red-600" />}
-            <span>{saveStatus.message}</span>
+            {saveStatus.type === 'success' ? <CheckCircle2 size={16} className="text-emerald-600 shrink-0" /> : <AlertCircle size={16} className="text-red-600 shrink-0" />}
+            <span className="font-semibold">{saveStatus.message}</span>
           </div>
         )}
 
@@ -502,7 +534,7 @@ export default function PdfCalibrator({
             ].map(f => (
               <button
                 key={f.id}
-                onClick={() => setSelectedFormatId(f.id)}
+                onClick={() => handleSelectFormat(f.id)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
                   selectedFormatId === f.id
                     ? 'bg-slate-900 text-white shadow-sm'
