@@ -20,7 +20,7 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
     const f = template.fields.find(item => item.id === fieldId);
     const x = f ? f.x : fallback.x;
     const y = f ? f.y : fallback.y;
-    const fontSize = f?.fontSize ?? fallback.fontSize ?? 10;
+    const fontSize = f?.fontSize ?? fallback.fontSize ?? 11;
     const fontWeight = f?.fontWeight ?? fallback.fontWeight ?? 'normal';
     const color = f?.color ?? fallback.color ?? '#000000';
     const align = f?.align ?? fallback.align ?? 'left';
@@ -79,7 +79,7 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
         </div>
 
         <!-- Fecha -->
-        <div style="${getStyle('fecha', { x: 620, y: 206, fontSize: 10.5, fontWeight: 'bold', color: '#000000', align: 'left' })}">
+        <div style="${getStyle('fecha', { x: 620, y: 206, fontSize: 11, fontWeight: 'bold', color: '#000000', align: 'left' })}">
           ${presupuesto.fecha}
         </div>
 
@@ -89,42 +89,42 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
         </div>
 
         <!-- Calle -->
-        <div style="${getStyle('cliente_calle', { x: 134, y: 239, fontSize: 10 })}">
+        <div style="${getStyle('cliente_calle', { x: 134, y: 239, fontSize: 11 })}">
           ${presupuesto.clienteCalle || ''}
         </div>
 
         <!-- CP / Colonia -->
-        <div style="${getStyle('cliente_cp_colonia', { x: 139, y: 258, fontSize: 10 })}">
+        <div style="${getStyle('cliente_cp_colonia', { x: 139, y: 258, fontSize: 11 })}">
           ${presupuesto.clienteCpColonia || ''}
         </div>
 
         <!-- Alcaldía -->
-        <div style="${getStyle('cliente_alcaldia', { x: 137, y: 276, fontSize: 10 })}">
+        <div style="${getStyle('cliente_alcaldia', { x: 137, y: 276, fontSize: 11 })}">
           ${presupuesto.clienteAlcaldia || ''}
         </div>
 
         <!-- Teléfono -->
-        <div style="${getStyle('cliente_telefono', { x: 134, y: 293, fontSize: 10 })}">
+        <div style="${getStyle('cliente_telefono', { x: 134, y: 293, fontSize: 11 })}">
           ${presupuesto.clienteTelefono || ''}
         </div>
 
         <!-- Marca / Motor -->
-        <div style="${getStyle('vehiculo_marca_motor', { x: 516, y: 240, fontSize: 10, fontWeight: 'bold' })}">
+        <div style="${getStyle('vehiculo_marca_motor', { x: 516, y: 240, fontSize: 11, fontWeight: 'bold' })}">
           ${presupuesto.marcaMotor || ''}
         </div>
 
         <!-- Modelo / Color -->
-        <div style="${getStyle('vehiculo_modelo_color', { x: 520, y: 259, fontSize: 10 })}">
+        <div style="${getStyle('vehiculo_modelo_color', { x: 520, y: 259, fontSize: 11 })}">
           ${presupuesto.modeloColor || ''}
         </div>
 
         <!-- Matrícula -->
-        <div style="${getStyle('vehiculo_matricula', { x: 495, y: 277, fontSize: 10, fontWeight: 'bold' })}">
+        <div style="${getStyle('vehiculo_matricula', { x: 495, y: 277, fontSize: 11, fontWeight: 'bold' })}">
           ${presupuesto.matriculaVin || ''}
         </div>
 
         <!-- Kilómetros -->
-        <div style="${getStyle('vehiculo_kilometros', { x: 504, y: 295, fontSize: 10 })}">
+        <div style="${getStyle('vehiculo_kilometros', { x: 504, y: 295, fontSize: 11 })}">
           ${presupuesto.kilometros ? `${presupuesto.kilometros.toLocaleString()} Kms` : ''}
         </div>
 
@@ -142,7 +142,7 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
         </div>
 
         <!-- Forma de Pago -->
-        <div style="${getStyle('forma_pago', { x: 170, y: 835, fontSize: 10, fontWeight: 'bold' })}">
+        <div style="${getStyle('forma_pago', { x: 170, y: 835, fontSize: 11, fontWeight: 'bold' })}">
           ${presupuesto.formaPago || 'CONTADO'}
         </div>
 
@@ -767,15 +767,9 @@ export async function generateSaePresupuestoPdfBlob(presupuesto: Presupuesto): P
       format: 'letter'
     });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-    const imgX = (pdfWidth - imgWidth * ratio) / 2;
-    const imgY = 5;
-
-    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    const pdfWidth = 215.9; // Letter width in mm
+    const pdfHeight = 279.4; // Letter height in mm
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     return pdf.output('blob');
   } catch (error) {
     console.error('Error generating Presupuesto PDF blob:', error);
@@ -835,7 +829,7 @@ export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
     const f = template.fields.find(item => item.id === fieldId);
     const x = f ? f.x : fallback.x;
     const y = f ? f.y : fallback.y;
-    const fontSize = f?.fontSize ?? fallback.fontSize ?? 10.5;
+    const fontSize = f?.fontSize ?? fallback.fontSize ?? 11;
     const fontWeight = f?.fontWeight ?? fallback.fontWeight ?? 'normal';
     const color = f?.color ?? fallback.color ?? '#000000';
     const align = f?.align ?? fallback.align ?? 'left';
@@ -845,22 +839,26 @@ export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
   };
 
   // Get table column coordinates from template fields or fallbacks
-  const colMarca = template.fields.find(f => f.id === 'tabla_r1_marca') || { x: 82, align: 'center', fontSize: 9.5 };
-  const colDesc = template.fields.find(f => f.id === 'tabla_r1_descripcion') || { x: 128, align: 'left', fontSize: 9.5 };
-  const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 664, align: 'center', fontSize: 9.5 };
+  const colMarca = template.fields.find(f => f.id === 'tabla_r1_marca') || { x: 82, y: 320, align: 'center', fontSize: 11 };
+  const colDesc = template.fields.find(f => f.id === 'tabla_r1_descripcion') || { x: 128, y: 320, align: 'left', fontSize: 11 };
+  const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 664, y: 320, align: 'center', fontSize: 11 };
 
-  // Calculate table rows (starting at y ~ 320, spacing ~ 24px, up to 24 rows)
+  const r2Marca = template.fields.find(f => f.id === 'tabla_r2_marca');
+  const startY = (colMarca as any).y ?? 320;
+  const rowSpacing = r2Marca && (r2Marca as any).y ? Math.max(18, Math.min(45, (r2Marca as any).y - startY)) : 24;
+
+  // Calculate table rows (using calibrated coordinates and spacing)
   const items = orden.items || [];
   const rowsHtml = items.slice(0, 24).map((item, idx) => {
-    const yPos = 320 + (idx * 24);
+    const yPos = startY + (idx * rowSpacing);
     return `
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colMarca.x}px !important; font-size: ${colMarca.fontSize || 9.5}px !important; font-weight: bold !important; text-align: ${colMarca.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colMarca.x}px !important; font-size: ${colMarca.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colMarca.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.marca || item.codigo || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 510px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 9.5}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 510px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 11}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.descripcion || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 9.5}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.cantidad || 1}
       </div>
     `;
@@ -922,15 +920,15 @@ export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
           ${matriculaPlacas}
         </div>
 
-        <div style="${getStyle('marca_motor', { x: 495, y: 212, fontSize: 10.5, fontWeight: 'normal', align: 'left' })}">
+        <div style="${getStyle('marca_motor', { x: 495, y: 212, fontSize: 11, fontWeight: 'normal', align: 'left' })}">
           ${orden.marcaMotor}
         </div>
 
-        <div style="${getStyle('modelo_color', { x: 500, y: 237, fontSize: 10.5, fontWeight: 'normal', align: 'left' })}">
+        <div style="${getStyle('modelo_color', { x: 500, y: 237, fontSize: 11, fontWeight: 'normal', align: 'left' })}">
           ${orden.modeloColor}
         </div>
 
-        <div style="${getStyle('kilometraje', { x: 450, y: 259, fontSize: 10.5, fontWeight: 'normal', align: 'left' })}">
+        <div style="${getStyle('kilometraje', { x: 450, y: 259, fontSize: 11, fontWeight: 'normal', align: 'left' })}">
           ${orden.kilometros ? `${orden.kilometros.toLocaleString('es-MX')} km` : ''}
         </div>
 
@@ -939,7 +937,7 @@ export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
 
         <!-- Técnico Responsable -->
         ${tecnicoResponsable ? `
-          <div style="${getStyle('tecnico_responsable', { x: 115, y: 934, fontSize: 10.5, fontWeight: 'bold', align: 'left' })}">
+          <div style="${getStyle('tecnico_responsable', { x: 115, y: 934, fontSize: 11, fontWeight: 'bold', align: 'left' })}">
             ${tecnicoResponsable}
           </div>
         ` : ''}
@@ -989,15 +987,9 @@ export async function generateSaeOrdenDeReparacionPdfBlob(orden: OrdenReparacion
       format: 'letter'
     });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-    const imgX = (pdfWidth - imgWidth * ratio) / 2;
-    const imgY = 5;
-
-    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    const pdfWidth = 215.9; // Letter width in mm
+    const pdfHeight = 279.4; // Letter height in mm
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     return pdf.output('blob');
   } catch (error) {
     console.error('Error generating Orden de Reparación PDF blob:', error);
@@ -1059,47 +1051,48 @@ export function getSaeNotaSalidaHtml(nota: NotaSalida): string {
   const template = getTemplateConfig('formato4');
   const formatoBgUrl = template.bgUrl || 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204.png';
 
-  const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; fontFamily?: string }) => {
+  const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; fontFamily?: string; width?: number }) => {
     const f = template.fields.find(item => item.id === fieldId);
     const x = f ? f.x : fallback.x;
     const y = f ? f.y : fallback.y;
-    const fontSize = f ? f.fontSize : (fallback.fontSize || 10);
+    const fontSize = f?.fontSize ?? fallback.fontSize ?? 11;
     const fontWeight = f?.fontWeight || fallback.fontWeight || 'normal';
     const color = f?.color || fallback.color || '#000000';
     const align = f?.align || fallback.align || 'left';
     const fontFamily = f?.fontFamily || fallback.fontFamily || 'Arial, sans-serif';
+    const width = f?.width ?? fallback.width;
 
-    let transform = '';
-    if (align === 'center') transform = 'translateX(-50%)';
-    else if (align === 'right') transform = 'translateX(-100%)';
-
-    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; text-align: ${align} !important; transform: ${transform} !important; font-family: ${fontFamily} !important; white-space: nowrap !important; z-index: 10 !important;`;
+    return `position: absolute !important; top: ${y}px !important; left: ${x}px !important; ${width ? `width: ${width}px !important;` : ''} font-size: ${fontSize}px !important; font-weight: ${fontWeight} !important; color: ${color} !important; text-align: ${align} !important; font-family: ${fontFamily} !important; line-height: normal !important; white-space: nowrap !important; overflow: visible !important; z-index: 10 !important;`;
   };
 
-  const colCodigo = template.fields.find(f => f.id === 'tabla_r1_codigo') || { x: 73, align: 'center', fontSize: 9 };
-  const colDesc = template.fields.find(f => f.id === 'tabla_r1_descripcion') || { x: 107, align: 'left', fontSize: 9 };
-  const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 536, align: 'center', fontSize: 9 };
-  const colImporte = template.fields.find(f => f.id === 'tabla_r1_importe') || { x: 611, align: 'right', fontSize: 9 };
-  const colTotal = template.fields.find(f => f.id === 'tabla_r1_total') || { x: 681, align: 'right', fontSize: 9 };
+  const colCodigo = template.fields.find(f => f.id === 'tabla_r1_codigo') || { x: 73, y: 328, align: 'center', fontSize: 11 };
+  const colDesc = template.fields.find(f => f.id === 'tabla_r1_descripcion') || { x: 107, y: 328, align: 'left', fontSize: 11 };
+  const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 536, y: 328, align: 'center', fontSize: 11 };
+  const colImporte = template.fields.find(f => f.id === 'tabla_r1_importe') || { x: 611, y: 328, align: 'right', fontSize: 11 };
+  const colTotal = template.fields.find(f => f.id === 'tabla_r1_total') || { x: 681, y: 328, align: 'right', fontSize: 11 };
+
+  const r2Codigo = template.fields.find(f => f.id === 'tabla_r2_codigo');
+  const startY = (colCodigo as any).y ?? 328;
+  const rowSpacing = r2Codigo && (r2Codigo as any).y ? Math.max(18, Math.min(45, (r2Codigo as any).y - startY)) : 23.5;
 
   const items = nota.items || [];
   // Row limits: Y superior = 33.2% (~328px), Y inferior = 91.5% (~897px)
   const rowsHtml = items.slice(0, 24).map((item, idx) => {
-    const yPos = 328 + (idx * 23.5);
+    const yPos = startY + (idx * rowSpacing);
     return `
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCodigo.x}px !important; font-size: ${colCodigo.fontSize || 9}px !important; font-weight: bold !important; font-family: monospace !important; text-align: ${colCodigo.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCodigo.x}px !important; font-size: ${colCodigo.fontSize || 11}px !important; font-weight: bold !important; font-family: monospace !important; text-align: ${colCodigo.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.codigo || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 410px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 9}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 410px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 11}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.descripcion || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 9}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; transform: translateX(-50%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.cantidad || 1}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colImporte.x}px !important; font-size: ${colImporte.fontSize || 9}px !important; font-family: monospace !important; text-align: ${colImporte.align || 'right'} !important; transform: translateX(-100%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colImporte.x}px !important; font-size: ${colImporte.fontSize || 11}px !important; font-family: monospace !important; text-align: ${colImporte.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         ${(item.importeUnitario || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colTotal.x}px !important; font-size: ${colTotal.fontSize || 9}px !important; font-weight: bold !important; font-family: monospace !important; text-align: ${colTotal.align || 'right'} !important; transform: translateX(-100%) !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colTotal.x}px !important; font-size: ${colTotal.fontSize || 11}px !important; font-weight: bold !important; font-family: monospace !important; text-align: ${colTotal.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         ${(item.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
     `;
@@ -1120,40 +1113,40 @@ export function getSaeNotaSalidaHtml(nota: NotaSalida): string {
         </div>
 
         <!-- Datos del Cliente -->
-        <div style="${getStyle('cliente_nombre', { x: 140, y: 214, fontSize: 10, fontWeight: '700', align: 'left' })}">
+        <div style="${getStyle('cliente_nombre', { x: 140, y: 214, fontSize: 11, fontWeight: '700', align: 'left' })}">
           ${nota.clienteNombre || ''}
         </div>
 
-        <div style="${getStyle('cliente_calle', { x: 134, y: 239, fontSize: 9.5, fontWeight: '600', align: 'left' })}">
+        <div style="${getStyle('cliente_calle', { x: 134, y: 239, fontSize: 11, fontWeight: '600', align: 'left' })}">
           ${nota.clienteCalle || ''}
         </div>
 
-        <div style="${getStyle('cliente_cp_colonia', { x: 139, y: 258, fontSize: 9.5, fontWeight: '600', align: 'left' })}">
+        <div style="${getStyle('cliente_cp_colonia', { x: 139, y: 258, fontSize: 11, fontWeight: '600', align: 'left' })}">
           ${nota.clienteCpColonia || ''}
         </div>
 
-        <div style="${getStyle('cliente_alcaldia', { x: 137, y: 276, fontSize: 9.5, fontWeight: '600', align: 'left' })}">
+        <div style="${getStyle('cliente_alcaldia', { x: 137, y: 276, fontSize: 11, fontWeight: '600', align: 'left' })}">
           ${nota.clienteAlcaldia || ''}
         </div>
 
-        <div style="${getStyle('cliente_telefono', { x: 134, y: 293, fontSize: 9.5, fontWeight: '600', align: 'left' })}">
+        <div style="${getStyle('cliente_telefono', { x: 134, y: 293, fontSize: 11, fontWeight: '600', align: 'left' })}">
           ${nota.clienteTelefono || ''}
         </div>
 
         <!-- Datos del Vehículo -->
-        <div style="${getStyle('vehiculo_marca_motor', { x: 516, y: 240, fontSize: 9.5, fontWeight: '600', align: 'left' })}">
+        <div style="${getStyle('vehiculo_marca_motor', { x: 516, y: 240, fontSize: 11, fontWeight: '600', align: 'left' })}">
           ${nota.marcaMotor || ''}
         </div>
 
-        <div style="${getStyle('vehiculo_modelo_color', { x: 520, y: 259, fontSize: 9.5, fontWeight: '600', align: 'left' })}">
+        <div style="${getStyle('vehiculo_modelo_color', { x: 520, y: 259, fontSize: 11, fontWeight: '600', align: 'left' })}">
           ${nota.modeloColor || ''}
         </div>
 
-        <div style="${getStyle('vehiculo_matricula', { x: 495, y: 277, fontSize: 10, fontWeight: '800', align: 'left' })}">
+        <div style="${getStyle('vehiculo_matricula', { x: 495, y: 277, fontSize: 11, fontWeight: '800', align: 'left' })}">
           ${nota.matriculaVin || ''}
         </div>
 
-        <div style="${getStyle('vehiculo_kilometros', { x: 504, y: 295, fontSize: 9.5, fontWeight: '600', align: 'left' })}">
+        <div style="${getStyle('vehiculo_kilometros', { x: 504, y: 295, fontSize: 11, fontWeight: '600', align: 'left' })}">
           ${nota.kilometros ? `${nota.kilometros.toLocaleString('es-MX')} km` : ''}
         </div>
 
@@ -1162,7 +1155,7 @@ export function getSaeNotaSalidaHtml(nota: NotaSalida): string {
 
         <!-- Pie de Página: Orden de Servicio # -->
         ${nota.ordenServicioNumero ? `
-          <div style="${getStyle('orden_de_servicio_numero', { x: 504, y: 929, fontSize: 10, fontWeight: '700', align: 'left' })}">
+          <div style="${getStyle('orden_de_servicio_numero', { x: 504, y: 929, fontSize: 11, fontWeight: '700', align: 'left' })}">
             ${nota.ordenServicioNumero}
           </div>
         ` : ''}
@@ -1231,15 +1224,9 @@ export async function generateSaeNotaSalidaPdfBlob(nota: NotaSalida): Promise<Bl
       format: 'letter'
     });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-    const imgX = (pdfWidth - imgWidth * ratio) / 2;
-    const imgY = 5;
-
-    pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    const pdfWidth = 215.9; // Letter width in mm
+    const pdfHeight = 279.4; // Letter height in mm
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     return pdf.output('blob');
   } catch (error) {
     console.error('Error generating Nota de Salida PDF blob:', error);

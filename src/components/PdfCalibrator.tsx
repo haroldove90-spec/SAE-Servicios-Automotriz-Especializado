@@ -748,6 +748,20 @@ export default function PdfCalibrator({
                 { id: 'auto', label: 'Vehículo' },
                 { id: 'tabla', label: 'Tabla Repuestos' },
                 { id: 'pie_pagina', label: 'Pie y Totales' }
+              ] : selectedFormatId === 'formato3' ? [
+                { id: 'todos', label: 'Todos' },
+                { id: 'encabezado', label: 'Folio y Fecha' },
+                { id: 'revisiones', label: 'Revisiones' },
+                { id: 'auto', label: 'Vehículo' },
+                { id: 'tabla', label: 'Tabla Repuestos' },
+                { id: 'pie_pagina', label: 'Pie de Página' }
+              ] : selectedFormatId === 'formato4' ? [
+                { id: 'todos', label: 'Todos' },
+                { id: 'encabezado_control', label: 'Folio / Control' },
+                { id: 'datos_cliente', label: 'Cliente' },
+                { id: 'datos_vehiculo', label: 'Vehículo' },
+                { id: 'tabla_repuestos', label: 'Tabla Repuestos' },
+                { id: 'pie_pagina', label: 'Pie de Página' }
               ] : [
                 { id: 'todos', label: 'Todos' },
                 { id: 'encabezado', label: 'Folio' },
