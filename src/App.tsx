@@ -99,10 +99,11 @@ export default function App() {
     return (saved as UserRole) || 'admin';
   });
   
-  // Landing page active state
+  // Landing page active state: defaults to false so browser refresh preserves session and current tab!
   const [showLanding, setShowLanding] = useState<boolean>(() => {
     const saved = localStorage.getItem('sae_show_landing');
-    return saved !== null ? saved === 'true' : true;
+    // Only show landing if user explicitly clicked "Salir"
+    return saved === 'true';
   });
 
   // Persistent active tabs for each role, allowing persistent selection between role switches!

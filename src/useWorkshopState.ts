@@ -27,6 +27,41 @@ const sortNewestFirst = <T extends { id: string }>(arr: T[]): T[] => {
   });
 };
 
+const DELETED_IDS_KEY = 'wt_deleted_ids';
+
+export const getDeletedIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(DELETED_IDS_KEY);
+    if (!raw) return new Set<string>();
+    const parsed = JSON.parse(raw);
+    return new Set<string>(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set<string>();
+  }
+};
+
+export const recordDeletedId = (id: string) => {
+  if (!id) return;
+  try {
+    const current = getDeletedIds();
+    current.add(id);
+    localStorage.setItem(DELETED_IDS_KEY, JSON.stringify(Array.from(current)));
+  } catch (e) {
+    console.warn('Error saving deleted ID:', e);
+  }
+};
+
+export const recordDeletedIds = (ids: string[]) => {
+  if (!ids || ids.length === 0) return;
+  try {
+    const current = getDeletedIds();
+    ids.forEach(id => { if (id) current.add(id); });
+    localStorage.setItem(DELETED_IDS_KEY, JSON.stringify(Array.from(current)));
+  } catch (e) {
+    console.warn('Error saving deleted IDs:', e);
+  }
+};
+
 export function useWorkshopState() {
   const [clients, setClients] = useState<Client[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -51,6 +86,27 @@ export function useWorkshopState() {
   // Initialize data from LocalStorage or mock data, then fetch from Supabase
   useEffect(() => {
     const initializeData = async () => {
+      const deletedIds = getDeletedIds();
+      const hasInitialized = localStorage.getItem('wt_initialized') === 'true';
+
+      const parseAndFilter = <T extends { id: string }>(raw: string | null, fallback: T[]): T[] => {
+        if (raw !== null) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              return parsed.filter(item => item && !deletedIds.has(item.id));
+            }
+          } catch (e) {
+            console.warn('JSON parse error in local state:', e);
+          }
+        }
+        // If never initialized before, seed with initial mock data filtered by deletedIds
+        if (!hasInitialized) {
+          return fallback.filter(item => item && !deletedIds.has(item.id));
+        }
+        return [];
+      };
+
       const localClients = localStorage.getItem('wt_clients');
       const localVehicles = localStorage.getItem('wt_vehicles');
       const localEmployees = localStorage.getItem('wt_employees');
@@ -65,18 +121,20 @@ export function useWorkshopState() {
       const localTransactions = localStorage.getItem('wt_transactions');
       const localSettings = localStorage.getItem('wt_settings');
 
-      setClients(localClients ? sortNewestFirst(JSON.parse(localClients)) : sortNewestFirst(INITIAL_CLIENTS));
-      setVehicles(localVehicles ? sortNewestFirst(JSON.parse(localVehicles)) : sortNewestFirst(INITIAL_VEHICLES));
-      setEmployees(localEmployees ? sortNewestFirst(JSON.parse(localEmployees)) : sortNewestFirst(INITIAL_EMPLOYEES));
-      setInventory(localInventory ? sortNewestFirst(JSON.parse(localInventory)) : sortNewestFirst(INITIAL_INVENTORY));
-      setSuppliers(localSuppliers ? sortNewestFirst(JSON.parse(localSuppliers)) : sortNewestFirst(INITIAL_SUPPLIERS));
-      setPurchaseOrders(localPurchaseOrders ? sortNewestFirst(JSON.parse(localPurchaseOrders)) : sortNewestFirst(INITIAL_PURCHASE_ORDERS));
-      setRequisitions(localRequisitions ? sortNewestFirst(JSON.parse(localRequisitions)) : sortNewestFirst(INITIAL_REQUISITIONS));
-      setOrders(localOrders ? sortNewestFirst(JSON.parse(localOrders)) : sortNewestFirst(INITIAL_ORDERS));
-      setPresupuestos(localPresupuestos ? sortNewestFirst(JSON.parse(localPresupuestos)) : sortNewestFirst(INITIAL_PRESUPUESTOS));
-      setOrdenesReparacion(localOrdenesReparacion ? sortNewestFirst(JSON.parse(localOrdenesReparacion)) : sortNewestFirst(INITIAL_ORDENES_REPARACION));
-      setNotasSalida(localNotasSalida ? sortNewestFirst(JSON.parse(localNotasSalida)) : sortNewestFirst(INITIAL_NOTAS_SALIDA));
-      setTransactions(localTransactions ? sortNewestFirst(JSON.parse(localTransactions)) : sortNewestFirst(INITIAL_TRANSACTIONS));
+      setClients(sortNewestFirst(parseAndFilter(localClients, INITIAL_CLIENTS)));
+      setVehicles(sortNewestFirst(parseAndFilter(localVehicles, INITIAL_VEHICLES)));
+      setEmployees(sortNewestFirst(parseAndFilter(localEmployees, INITIAL_EMPLOYEES)));
+      setInventory(sortNewestFirst(parseAndFilter(localInventory, INITIAL_INVENTORY)));
+      setSuppliers(sortNewestFirst(parseAndFilter(localSuppliers, INITIAL_SUPPLIERS)));
+      setPurchaseOrders(sortNewestFirst(parseAndFilter(localPurchaseOrders, INITIAL_PURCHASE_ORDERS)));
+      setRequisitions(sortNewestFirst(parseAndFilter(localRequisitions, INITIAL_REQUISITIONS)));
+      setOrders(sortNewestFirst(parseAndFilter(localOrders, INITIAL_ORDERS)));
+      setPresupuestos(sortNewestFirst(parseAndFilter(localPresupuestos, INITIAL_PRESUPUESTOS)));
+      setOrdenesReparacion(sortNewestFirst(parseAndFilter(localOrdenesReparacion, INITIAL_ORDENES_REPARACION)));
+      setNotasSalida(sortNewestFirst(parseAndFilter(localNotasSalida, INITIAL_NOTAS_SALIDA)));
+      setTransactions(sortNewestFirst(parseAndFilter(localTransactions, INITIAL_TRANSACTIONS)));
+
+      localStorage.setItem('wt_initialized', 'true');
       
       let parsedSettings = localSettings ? JSON.parse(localSettings) : INITIAL_SETTINGS;
       if (parsedSettings) {
@@ -109,77 +167,153 @@ export function useWorkshopState() {
       // Pull templates in background
       initPdfTemplatesFromCloud().catch(e => console.warn('Templates cloud fetch note:', e));
 
-      // Pull clients
-      const { data: clientsData, error: clientsErr } = await supabase.from('clients').select('*');
-      if (clientsErr) throw clientsErr;
-      
-      // Pull vehicles
-      const { data: vehiclesData, error: vehiclesErr } = await supabase.from('vehicles').select('*');
-      if (vehiclesErr) throw vehiclesErr;
+      // Fetch all tables from Supabase in parallel
+      const [
+        clientsRes,
+        vehiclesRes,
+        employeesRes,
+        inventoryRes,
+        suppliersRes,
+        poRes,
+        requisitionsRes,
+        ordersRes,
+        txRes,
+        settingsRes,
+        presupuestosRes,
+        ordenesRepRes,
+        notasSalidaRes
+      ] = await Promise.all([
+        supabase.from('clients').select('*'),
+        supabase.from('vehicles').select('*'),
+        supabase.from('employees').select('*'),
+        supabase.from('inventory').select('*'),
+        supabase.from('suppliers').select('*'),
+        supabase.from('purchase_orders').select('*'),
+        supabase.from('requisitions').select('*'),
+        supabase.from('service_orders').select('*'),
+        supabase.from('transactions').select('*'),
+        supabase.from('workshop_settings').select('*').eq('id', 'default').maybeSingle(),
+        supabase.from('presupuestos').select('*'),
+        supabase.from('ordenes_reparacion').select('*'),
+        supabase.from('notas_salida').select('*')
+      ]);
 
-      // Pull employees
-      const { data: employeesData, error: employeesErr } = await supabase.from('employees').select('*');
-      if (employeesErr) throw employeesErr;
-
-      // Pull inventory
-      const { data: inventoryData, error: inventoryErr } = await supabase.from('inventory').select('*');
-      if (inventoryErr) throw inventoryErr;
-
-      // Pull suppliers
-      const { data: suppliersData, error: suppliersErr } = await supabase.from('suppliers').select('*');
-      if (suppliersErr) throw suppliersErr;
-
-      // Pull purchase_orders
-      const { data: poData, error: poErr } = await supabase.from('purchase_orders').select('*');
-      if (poErr) throw poErr;
-
-      // Pull requisitions
-      const { data: requisitionsData, error: requisitionsErr } = await supabase.from('requisitions').select('*');
-      if (requisitionsErr) throw requisitionsErr;
-
-      // Pull service_orders
-      const { data: ordersData, error: ordersErr } = await supabase.from('service_orders').select('*');
-      if (ordersErr) throw ordersErr;
-
-      // Pull transactions
-      const { data: txData, error: txErr } = await supabase.from('transactions').select('*');
-      if (txErr) throw txErr;
-
-      // Pull settings
-      const { data: settingsData, error: settingsErr } = await supabase.from('workshop_settings').select('*').eq('id', 'default').maybeSingle();
-      if (settingsErr) throw settingsErr;
+      if (clientsRes.error) throw clientsRes.error;
+      if (vehiclesRes.error) throw vehiclesRes.error;
+      if (employeesRes.error) throw employeesRes.error;
+      if (inventoryRes.error) throw inventoryRes.error;
+      if (suppliersRes.error) throw suppliersRes.error;
+      if (poRes.error) throw poRes.error;
+      if (requisitionsRes.error) throw requisitionsRes.error;
+      if (ordersRes.error) throw ordersRes.error;
+      if (txRes.error) throw txRes.error;
 
       // Connection is successful
       setSupabaseConnected(true);
 
-      const mergeLocalAndRemote = <T extends { id: string }>(local: T[], remote: T[]): T[] => {
-        const remoteMap = new Map(remote.map(item => [item.id, item]));
-        const merged = [...remote];
-        local.forEach(localItem => {
-          if (!remoteMap.has(localItem.id)) {
-            merged.push(localItem);
-          }
-        });
-        return merged;
-      };
+      const deletedIds = getDeletedIds();
 
-      // Update local states by merging remote data with current local data and sorting newest-first
-      setClients(prev => sortNewestFirst(mergeLocalAndRemote(prev, clientsData || [])));
-      setVehicles(prev => sortNewestFirst(mergeLocalAndRemote(prev, vehiclesData || [])));
-      setEmployees(prev => sortNewestFirst(mergeLocalAndRemote(prev, employeesData || [])));
-      setInventory(prev => sortNewestFirst(mergeLocalAndRemote(prev, inventoryData || [])));
-      setSuppliers(prev => sortNewestFirst(mergeLocalAndRemote(prev, suppliersData || [])));
-      setPurchaseOrders(prev => sortNewestFirst(mergeLocalAndRemote(prev, poData || [])));
-      setRequisitions(prev => sortNewestFirst(mergeLocalAndRemote(prev, requisitionsData || [])));
-      setOrders(prev => sortNewestFirst(mergeLocalAndRemote(prev, ordersData || [])));
-      setTransactions(prev => sortNewestFirst(mergeLocalAndRemote(prev, txData || [])));
-      
-      if (settingsData) {
-        const { id, created_at, updated_at, ...cleanSettingsData } = settingsData as any;
-        setSettings(prev => ({ ...prev, ...cleanSettingsData }));
+      // Proactively scrub any records from Supabase that were deleted locally
+      const remoteDatasets: { table: string; items: any[] | null }[] = [
+        { table: 'clients', items: clientsRes.data },
+        { table: 'vehicles', items: vehiclesRes.data },
+        { table: 'employees', items: employeesRes.data },
+        { table: 'inventory', items: inventoryRes.data },
+        { table: 'suppliers', items: suppliersRes.data },
+        { table: 'purchase_orders', items: poRes.data },
+        { table: 'requisitions', items: requisitionsRes.data },
+        { table: 'service_orders', items: ordersRes.data },
+        { table: 'transactions', items: txRes.data },
+        { table: 'presupuestos', items: presupuestosRes.data },
+        { table: 'ordenes_reparacion', items: ordenesRepRes.data },
+        { table: 'notas_salida', items: notasSalidaRes.data }
+      ];
+
+      for (const ds of remoteDatasets) {
+        if (ds.items && ds.items.length > 0) {
+          const zombies = ds.items.filter(item => item && deletedIds.has(item.id));
+          for (const z of zombies) {
+            supabase.from(ds.table).delete().eq('id', z.id).catch(err => {
+              console.warn(`Error background scrubbing deleted record ${z.id} from ${ds.table}:`, err);
+            });
+          }
+        }
       }
 
-      console.log('Fidelidad Supabase: Todo sincronizado correctamente.');
+      const filterDeleted = <T extends { id: string }>(items: T[] | null | undefined): T[] => {
+        if (!items) return [];
+        return items.filter(i => i && !deletedIds.has(i.id));
+      };
+
+      // Set clean authoritative data from Supabase directly into state
+      if (clientsRes.data) {
+        const clean = sortNewestFirst(filterDeleted(clientsRes.data));
+        setClients(clean);
+        localStorage.setItem('wt_clients', JSON.stringify(clean));
+      }
+      if (vehiclesRes.data) {
+        const clean = sortNewestFirst(filterDeleted(vehiclesRes.data));
+        setVehicles(clean);
+        localStorage.setItem('wt_vehicles', JSON.stringify(clean));
+      }
+      if (employeesRes.data) {
+        const clean = sortNewestFirst(filterDeleted(employeesRes.data));
+        setEmployees(clean);
+        localStorage.setItem('wt_employees', JSON.stringify(clean));
+      }
+      if (inventoryRes.data) {
+        const clean = sortNewestFirst(filterDeleted(inventoryRes.data));
+        setInventory(clean);
+        localStorage.setItem('wt_inventory', JSON.stringify(clean));
+      }
+      if (suppliersRes.data) {
+        const clean = sortNewestFirst(filterDeleted(suppliersRes.data));
+        setSuppliers(clean);
+        localStorage.setItem('wt_suppliers', JSON.stringify(clean));
+      }
+      if (poRes.data) {
+        const clean = sortNewestFirst(filterDeleted(poRes.data));
+        setPurchaseOrders(clean);
+        localStorage.setItem('wt_purchase_orders', JSON.stringify(clean));
+      }
+      if (requisitionsRes.data) {
+        const clean = sortNewestFirst(filterDeleted(requisitionsRes.data));
+        setRequisitions(clean);
+        localStorage.setItem('wt_requisitions', JSON.stringify(clean));
+      }
+      if (ordersRes.data) {
+        const clean = sortNewestFirst(filterDeleted(ordersRes.data));
+        setOrders(clean);
+        localStorage.setItem('wt_orders', JSON.stringify(clean));
+      }
+      if (txRes.data) {
+        const clean = sortNewestFirst(filterDeleted(txRes.data));
+        setTransactions(clean);
+        localStorage.setItem('wt_transactions', JSON.stringify(clean));
+      }
+      if (!presupuestosRes.error && presupuestosRes.data) {
+        const clean = sortNewestFirst(filterDeleted(presupuestosRes.data));
+        setPresupuestos(clean);
+        localStorage.setItem('wt_presupuestos', JSON.stringify(clean));
+      }
+      if (!ordenesRepRes.error && ordenesRepRes.data) {
+        const clean = sortNewestFirst(filterDeleted(ordenesRepRes.data));
+        setOrdenesReparacion(clean);
+        localStorage.setItem('wt_ordenes_reparacion', JSON.stringify(clean));
+      }
+      if (!notasSalidaRes.error && notasSalidaRes.data) {
+        const clean = sortNewestFirst(filterDeleted(notasSalidaRes.data));
+        setNotasSalida(clean);
+        localStorage.setItem('wt_notas_salida', JSON.stringify(clean));
+      }
+      
+      if (settingsRes.data) {
+        const { id, created_at, updated_at, ...cleanSettingsData } = settingsRes.data as any;
+        setSettings(prev => ({ ...prev, ...cleanSettingsData }));
+        localStorage.setItem('wt_settings', JSON.stringify(cleanSettingsData));
+      }
+
+      console.log('Fidelidad Supabase: Todo sincronizado correctamente sin registros eliminados.');
     } catch (err: any) {
       console.warn('Supabase Connection or Schema issue:', err);
       // If table/relation doesn't exist yet, we still set connection as True but with distinct warning
@@ -213,40 +347,70 @@ export function useWorkshopState() {
     setIsSyncing(true);
     setSyncError(null);
     try {
-      if (clients.length > 0) {
-        const { error } = await supabase.from('clients').upsert(clients);
+      const deletedIds = getDeletedIds();
+      const filterActive = <T extends { id: string }>(items: T[]): T[] => {
+        return items.filter(i => i && !deletedIds.has(i.id));
+      };
+
+      const activeClients = filterActive(clients);
+      const activeVehicles = filterActive(vehicles);
+      const activeEmployees = filterActive(employees);
+      const activeInventory = filterActive(inventory);
+      const activeSuppliers = filterActive(suppliers);
+      const activePO = filterActive(purchaseOrders);
+      const activeReq = filterActive(requisitions);
+      const activeOrders = filterActive(orders);
+      const activeTx = filterActive(transactions);
+      const activePres = filterActive(presupuestos);
+      const activeOrdRep = filterActive(ordenesReparacion);
+      const activeNotas = filterActive(notasSalida);
+
+      if (activeClients.length > 0) {
+        const { error } = await supabase.from('clients').upsert(activeClients);
         if (error) throw error;
       }
-      if (vehicles.length > 0) {
-        const { error } = await supabase.from('vehicles').upsert(vehicles);
+      if (activeVehicles.length > 0) {
+        const { error } = await supabase.from('vehicles').upsert(activeVehicles);
         if (error) throw error;
       }
-      if (employees.length > 0) {
-        const { error } = await supabase.from('employees').upsert(employees);
+      if (activeEmployees.length > 0) {
+        const { error } = await supabase.from('employees').upsert(activeEmployees);
         if (error) throw error;
       }
-      if (inventory.length > 0) {
-        const { error } = await supabase.from('inventory').upsert(inventory);
+      if (activeInventory.length > 0) {
+        const { error } = await supabase.from('inventory').upsert(activeInventory);
         if (error) throw error;
       }
-      if (suppliers.length > 0) {
-        const { error } = await supabase.from('suppliers').upsert(suppliers);
+      if (activeSuppliers.length > 0) {
+        const { error } = await supabase.from('suppliers').upsert(activeSuppliers);
         if (error) throw error;
       }
-      if (purchaseOrders.length > 0) {
-        const { error } = await supabase.from('purchase_orders').upsert(purchaseOrders);
+      if (activePO.length > 0) {
+        const { error } = await supabase.from('purchase_orders').upsert(activePO);
         if (error) throw error;
       }
-      if (requisitions.length > 0) {
-        const { error } = await supabase.from('requisitions').upsert(requisitions);
+      if (activeReq.length > 0) {
+        const { error } = await supabase.from('requisitions').upsert(activeReq);
         if (error) throw error;
       }
-      if (orders.length > 0) {
-        const { error } = await supabase.from('service_orders').upsert(orders);
+      if (activeOrders.length > 0) {
+        const { error } = await supabase.from('service_orders').upsert(activeOrders);
         if (error) throw error;
       }
-      if (transactions.length > 0) {
-        const { error } = await supabase.from('transactions').upsert(transactions);
+      if (activeTx.length > 0) {
+        const { error } = await supabase.from('transactions').upsert(activeTx);
+        if (error) throw error;
+      }
+      if (activePres.length > 0) {
+        const { error } = await supabase.from('presupuestos').upsert(activePres);
+        if (error) throw error;
+      }
+      if (activeOrdRep.length > 0) {
+        const { error } = await supabase.from('ordenes_reparacion').upsert(activeOrdRep);
+        if (error) throw error;
+      }
+      if (activeNotas.length > 0) {
+        const { error } = await supabase.from('notas_salida').upsert(activeNotas);
         if (error) throw error;
       }
       if (settings) {
@@ -271,6 +435,13 @@ export function useWorkshopState() {
       let payload = data;
       if (table === 'workshop_settings' && payload && typeof payload === 'object' && !Array.isArray(payload)) {
         payload = formatWorkshopSettingsPayload(payload);
+      }
+      if (Array.isArray(payload)) {
+        const deletedIds = getDeletedIds();
+        payload = payload.filter((item: any) => item && !deletedIds.has(item.id));
+      }
+      if (Array.isArray(payload) && payload.length === 0) {
+        return;
       }
       const { error } = await supabase.from(table).upsert(payload);
       if (error) {
@@ -405,16 +576,42 @@ export function useWorkshopState() {
   };
 
   const deleteClient = (clientId: string) => {
+    // 1. Collect cascaded dependent IDs
+    const clientVehicles = vehicles.filter(v => v.ownerId === clientId);
+    const vehicleIds = clientVehicles.map(v => v.id);
+    const clientOrders = orders.filter(o => o.clientId === clientId);
+    const orderIds = clientOrders.map(o => o.id);
+    const clientPresupuestos = presupuestos.filter(p => p.clientId === clientId);
+    const presIds = clientPresupuestos.map(p => p.id);
+    const clientOrdenesRep = ordenesReparacion.filter(o => o.clientId === clientId);
+    const ordRepIds = clientOrdenesRep.map(o => o.id);
+    const clientNotas = notasSalida.filter(n => n.clientId === clientId);
+    const notaIds = clientNotas.map(n => n.id);
+
+    const allDeletedIds = [clientId, ...vehicleIds, ...orderIds, ...presIds, ...ordRepIds, ...notaIds];
+    recordDeletedIds(allDeletedIds);
+
+    // 2. Immediate local state cleanup
     setClients(prev => prev.filter(c => c.id !== clientId));
     setVehicles(prev => prev.filter(v => v.ownerId !== clientId));
-    if (supabaseConnected) {
-      supabase.from('clients').delete().eq('id', clientId).then(({ error }) => {
-        if (error) console.error('Error deleting client from Supabase:', error);
-      });
-      supabase.from('vehicles').delete().eq('ownerId', clientId).then(({ error }) => {
-        if (error) console.error('Error deleting vehicles of client from Supabase:', error);
-      });
-    }
+    setOrders(prev => prev.filter(o => o.clientId !== clientId));
+    setPresupuestos(prev => prev.filter(p => p.clientId !== clientId));
+    setOrdenesReparacion(prev => prev.filter(o => o.clientId !== clientId));
+    setNotasSalida(prev => prev.filter(n => n.clientId !== clientId));
+
+    // 3. Delete from Supabase
+    Promise.allSettled([
+      supabase.from('clients').delete().eq('id', clientId),
+      supabase.from('vehicles').delete().eq('ownerId', clientId),
+      supabase.from('service_orders').delete().eq('clientId', clientId),
+      supabase.from('presupuestos').delete().eq('clientId', clientId),
+      supabase.from('ordenes_reparacion').delete().eq('clientId', clientId),
+      supabase.from('notas_salida').delete().eq('clientId', clientId)
+    ]).then(results => {
+      console.log('Client and associated records removed from Supabase successfully.');
+    }).catch(err => {
+      console.error('Error deleting client from Supabase:', err);
+    });
   };
 
   // 2. Vehicles
@@ -432,12 +629,26 @@ export function useWorkshopState() {
   };
 
   const deleteVehicle = (vehicleId: string) => {
+    const relatedOrders = orders.filter(o => o.vehicleId === vehicleId);
+    const orderIds = relatedOrders.map(o => o.id);
+    const allDeleted = [vehicleId, ...orderIds];
+    recordDeletedIds(allDeleted);
+
     setVehicles(prev => prev.filter(v => v.id !== vehicleId));
-    if (supabaseConnected) {
-      supabase.from('vehicles').delete().eq('id', vehicleId).then(({ error }) => {
-        if (error) console.error('Error deleting vehicle from Supabase:', error);
-      });
-    }
+    setOrders(prev => prev.filter(o => o.vehicleId !== vehicleId));
+    setPresupuestos(prev => prev.filter(p => p.vehicleId !== vehicleId));
+    setOrdenesReparacion(prev => prev.filter(o => o.vehicleId !== vehicleId));
+    setNotasSalida(prev => prev.filter(n => n.vehicleId !== vehicleId));
+
+    Promise.allSettled([
+      supabase.from('vehicles').delete().eq('id', vehicleId),
+      supabase.from('service_orders').delete().eq('vehicleId', vehicleId),
+      supabase.from('presupuestos').delete().eq('vehicleId', vehicleId),
+      supabase.from('ordenes_reparacion').delete().eq('vehicleId', vehicleId),
+      supabase.from('notas_salida').delete().eq('vehicleId', vehicleId)
+    ]).catch(err => {
+      console.error('Error deleting vehicle from Supabase:', err);
+    });
   };
 
   // 3. Employees & Commissions
@@ -454,12 +665,11 @@ export function useWorkshopState() {
   };
 
   const deleteEmployee = (employeeId: string) => {
+    recordDeletedId(employeeId);
     setEmployees(prev => prev.filter(e => e.id !== employeeId));
-    if (supabaseConnected) {
-      supabase.from('employees').delete().eq('id', employeeId).then(({ error }) => {
-        if (error) console.error('Error deleting employee from Supabase:', error);
-      });
-    }
+    supabase.from('employees').delete().eq('id', employeeId).then(({ error }) => {
+      if (error) console.error('Error deleting employee from Supabase:', error);
+    });
   };
 
   // 4. Inventory
@@ -476,12 +686,11 @@ export function useWorkshopState() {
   };
 
   const deleteInventoryItem = (itemId: string) => {
+    recordDeletedId(itemId);
     setInventory(prev => prev.filter(i => i.id !== itemId));
-    if (supabaseConnected) {
-      supabase.from('inventory').delete().eq('id', itemId).then(({ error }) => {
-        if (error) console.error('Error deleting inventory item from Supabase:', error);
-      });
-    }
+    supabase.from('inventory').delete().eq('id', itemId).then(({ error }) => {
+      if (error) console.error('Error deleting inventory item from Supabase:', error);
+    });
   };
 
   // 5. Purchase Orders
@@ -495,12 +704,11 @@ export function useWorkshopState() {
   };
 
   const deletePurchaseOrder = (poId: string) => {
+    recordDeletedId(poId);
     setPurchaseOrders(prev => prev.filter(p => p.id !== poId));
-    if (supabaseConnected) {
-      supabase.from('purchase_orders').delete().eq('id', poId).then(({ error }) => {
-        if (error) console.error('Error deleting purchase order from Supabase:', error);
-      });
-    }
+    supabase.from('purchase_orders').delete().eq('id', poId).then(({ error }) => {
+      if (error) console.error('Error deleting purchase order from Supabase:', error);
+    });
   };
 
   const receivePurchaseOrder = (poId: string) => {
@@ -612,12 +820,25 @@ export function useWorkshopState() {
   };
 
   const deleteServiceOrder = (orderId: string) => {
+    // 1. Gather linked requisitions and child records
+    const linkedReqs = requisitions.filter(r => r.orderId === orderId);
+    const reqIds = linkedReqs.map(r => r.id);
+    const allDeletedIds = [orderId, ...reqIds];
+    recordDeletedIds(allDeletedIds);
+
+    // 2. Remove locally
     setOrders(prev => prev.filter(o => o.id !== orderId));
-    if (supabaseConnected) {
-      supabase.from('service_orders').delete().eq('id', orderId).then(({ error }) => {
-        if (error) console.error('Error deleting service order from Supabase:', error);
-      });
-    }
+    setRequisitions(prev => prev.filter(r => r.orderId !== orderId));
+
+    // 3. Remove in Supabase
+    Promise.allSettled([
+      supabase.from('service_orders').delete().eq('id', orderId),
+      supabase.from('requisitions').delete().eq('orderId', orderId)
+    ]).then(() => {
+      console.log(`Service order ${orderId} permanently removed from Supabase.`);
+    }).catch(err => {
+      console.error('Error deleting service order from Supabase:', err);
+    });
   };
 
   const approveBudgetLine = (orderId: string, itemId: string, approved: boolean) => {
@@ -784,12 +1005,11 @@ export function useWorkshopState() {
   };
 
   const deleteRequisition = (reqId: string) => {
+    recordDeletedId(reqId);
     setRequisitions(prev => prev.filter(r => r.id !== reqId));
-    if (supabaseConnected) {
-      supabase.from('requisitions').delete().eq('id', reqId).then(({ error }) => {
-        if (error) console.error('Error deleting requisition from Supabase:', error);
-      });
-    }
+    supabase.from('requisitions').delete().eq('id', reqId).then(({ error }) => {
+      if (error) console.error('Error deleting requisition from Supabase:', error);
+    });
   };
 
   // 8. Financial Transactions (Payments / Invoicing)
@@ -803,12 +1023,11 @@ export function useWorkshopState() {
   };
 
   const deleteTransaction = (txId: string) => {
+    recordDeletedId(txId);
     setTransactions(prev => prev.filter(t => t.id !== txId));
-    if (supabaseConnected) {
-      supabase.from('transactions').delete().eq('id', txId).then(({ error }) => {
-        if (error) console.error('Error deleting transaction from Supabase:', error);
-      });
-    }
+    supabase.from('transactions').delete().eq('id', txId).then(({ error }) => {
+      if (error) console.error('Error deleting transaction from Supabase:', error);
+    });
   };
 
   const registerOrderPayment = (orderId: string, amount: number, method: 'Efectivo' | 'Tarjeta' | 'Transferencia' | 'Credito') => {
@@ -881,12 +1100,11 @@ export function useWorkshopState() {
   };
 
   const deleteSupplier = (supplierId: string) => {
+    recordDeletedId(supplierId);
     setSuppliers(prev => prev.filter(s => s.id !== supplierId));
-    if (supabaseConnected) {
-      supabase.from('suppliers').delete().eq('id', supplierId).then(({ error }) => {
-        if (error) console.error('Error deleting supplier from Supabase:', error);
-      });
-    }
+    supabase.from('suppliers').delete().eq('id', supplierId).then(({ error }) => {
+      if (error) console.error('Error deleting supplier from Supabase:', error);
+    });
   };
 
   // 7. Presupuestos (Budgets / Estimates)
@@ -906,12 +1124,11 @@ export function useWorkshopState() {
   };
 
   const deletePresupuesto = (id: string) => {
+    recordDeletedId(id);
     setPresupuestos(prev => prev.filter(p => p.id !== id));
-    if (supabaseConnected) {
-      supabase.from('presupuestos').delete().eq('id', id).then(({ error }) => {
-        if (error) console.error('Error deleting presupuesto from Supabase:', error);
-      });
-    }
+    supabase.from('presupuestos').delete().eq('id', id).then(({ error }) => {
+      if (error) console.error('Error deleting presupuesto from Supabase:', error);
+    });
   };
 
   const addOrdenReparacion = (ord: Omit<OrdenReparacion, 'id' | 'createdAt'>) => {
@@ -930,12 +1147,11 @@ export function useWorkshopState() {
   };
 
   const deleteOrdenReparacion = (id: string) => {
+    recordDeletedId(id);
     setOrdenesReparacion(prev => prev.filter(o => o.id !== id));
-    if (supabaseConnected) {
-      supabase.from('ordenes_reparacion').delete().eq('id', id).then(({ error }) => {
-        if (error) console.error('Error deleting orden de reparacion from Supabase:', error);
-      });
-    }
+    supabase.from('ordenes_reparacion').delete().eq('id', id).then(({ error }) => {
+      if (error) console.error('Error deleting orden de reparacion from Supabase:', error);
+    });
   };
 
   const convertPresupuestoToOrder = (presupuestoId: string): ServiceOrder | null => {
@@ -1051,16 +1267,22 @@ export function useWorkshopState() {
   };
 
   const deleteNotaSalida = (id: string) => {
+    recordDeletedId(id);
     setNotasSalida(prev => prev.filter(n => n.id !== id));
-    if (supabaseConnected) {
-      supabase.from('notas_salida').delete().eq('id', id).then(({ error }) => {
-        if (error) console.error('Error deleting nota de salida from Supabase:', error);
-      });
-    }
+    supabase.from('notas_salida').delete().eq('id', id).then(({ error }) => {
+      if (error) console.error('Error deleting nota de salida from Supabase:', error);
+    });
   };
 
   // Reset database to initial values
   const resetDatabase = () => {
+    try {
+      localStorage.removeItem(DELETED_IDS_KEY);
+      localStorage.removeItem('wt_initialized');
+    } catch (e) {
+      console.warn('Error resetting deleted ids storage:', e);
+    }
+
     setClients(INITIAL_CLIENTS);
     setVehicles(INITIAL_VEHICLES);
     setEmployees(INITIAL_EMPLOYEES);
