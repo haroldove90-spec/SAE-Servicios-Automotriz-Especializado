@@ -1378,7 +1378,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontFamily: 'monospace',
       fontWeight: '900',
       color: '#DC2626',
-      align: 'left'
+      align: 'left',
+      sampleValue: '0187'
     },
     {
       id: 'fecha',
@@ -1389,7 +1390,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: '24/09/2026'
     },
     // Datos del Cliente
     {
@@ -1401,7 +1403,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: 'Congregación Misión'
     },
     {
       id: 'cliente_calle',
@@ -1412,7 +1415,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: 'Av. Coyoacán 124'
     },
     {
       id: 'cliente_cp_colonia',
@@ -1423,7 +1427,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: '03100 Col. Valle'
     },
     {
       id: 'cliente_alcaldia',
@@ -1434,7 +1439,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: 'Benito Juárez'
     },
     {
       id: 'cliente_telefono',
@@ -1445,7 +1451,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: '55 1234 5678'
     },
     // Datos del Vehículo
     {
@@ -1457,7 +1464,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: 'CHEVROLET'
     },
     {
       id: 'vehiculo_modelo_color',
@@ -1468,7 +1476,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: 'AVEO 2018 BLANCO'
     },
     {
       id: 'vehiculo_matricula',
@@ -1479,7 +1488,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: '900',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: '789-DEF'
     },
     {
       id: 'vehiculo_kilometros',
@@ -1490,9 +1500,10 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: '89,300'
     },
-    // Columnas de la Tabla de Repuestos
+    // Columnas de la Tabla de Repuestos (Valores numéricos y concisos para evitar textos encimados en Calibrador)
     {
       id: 'tabla_r1_codigo',
       label: 'Columna Código',
@@ -1502,7 +1513,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'center'
+      align: 'center',
+      sampleValue: '101'
     },
     {
       id: 'tabla_r1_descripcion',
@@ -1513,7 +1525,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: 'Balatas cerámicas'
     },
     {
       id: 'tabla_r1_cantidad',
@@ -1524,7 +1537,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'center'
+      align: 'center',
+      sampleValue: '1'
     },
     {
       id: 'tabla_r1_importe',
@@ -1535,7 +1549,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'right'
+      align: 'right',
+      sampleValue: '450.00'
     },
     {
       id: 'tabla_r1_total',
@@ -1546,7 +1561,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'right'
+      align: 'right',
+      sampleValue: '450.00'
     },
     // Pie de Página
     {
@@ -1558,7 +1574,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontSize: 11,
       fontWeight: 'bold',
       color: '#000000',
-      align: 'left'
+      align: 'left',
+      sampleValue: 'ORD-1045'
     },
     {
       id: 'total_general',
@@ -1570,7 +1587,8 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       fontFamily: 'monospace',
       fontWeight: '900',
       color: '#000000',
-      align: 'right'
+      align: 'right',
+      sampleValue: '450.00'
     }
   ]
 };
@@ -1642,8 +1660,15 @@ export function getTemplateConfig(formatId: string = 'formato1'): PdfTemplateCon
       if (parsed && Array.isArray(parsed.fields)) {
         const def = INITIAL_TEMPLATES_MAP[formatId] || DEFAULT_FORMATO_1;
         const parsedFieldMap = new Map(parsed.fields.map(f => [f.id, f]));
-        // Keep all parsed fields, and append any default field that was newly introduced
-        const mergedFields: PdfTemplateField[] = [...parsed.fields];
+        const defMap = new Map(def.fields.map(df => [df.id, df]));
+        // Keep all parsed fields, enrich with sampleValue if missing, and append any default field newly introduced
+        const mergedFields: PdfTemplateField[] = parsed.fields.map(pf => {
+          const df = defMap.get(pf.id);
+          return {
+            ...pf,
+            sampleValue: pf.sampleValue || df?.sampleValue
+          };
+        });
         def.fields.forEach(df => {
           if (!parsedFieldMap.has(df.id)) {
             mergedFields.push(df);

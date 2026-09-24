@@ -438,11 +438,17 @@ export default function PdfCalibrator({
                 <Sliders size={20} />
               </span>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                Calibrador de Formatos y Plantillas PDF
+                {selectedFormatId === 'formato1' && 'Calibrador Recepción y Órdenes (Formato 1)'}
+                {selectedFormatId === 'formato2' && 'Calibrador Presupuestos (Formato 2)'}
+                {selectedFormatId === 'formato3' && 'Calibrador Órdenes de Reparación (Formato 3)'}
+                {selectedFormatId === 'formato4' && 'Calibrador Salidas de Almacén (Formato 4)'}
+                {!['formato1', 'formato2', 'formato3', 'formato4'].includes(selectedFormatId) && (config.nombre || 'Calibrador de Formatos y Plantillas PDF')}
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-1 max-w-2xl">
-              Ajusta manualmente y al milímetro las coordenadas (X, Y) de cada texto, folio y casilla "X" para que encajen a la perfección sobre la plantilla impresa.
+              {selectedFormatId === 'formato4' 
+                ? 'Calibra y alinea visualmente los campos numéricos de la Hoja de Salida (Formato 4). Los campos de código y cantidad se muestran en formato numérico real para evitar sobreposiciones.' 
+                : 'Ajusta manualmente y al milímetro las coordenadas (X, Y) de cada texto, folio y casilla "X" para que encajen a la perfección sobre la plantilla impresa.'}
             </p>
           </div>
 
@@ -527,10 +533,10 @@ export default function PdfCalibrator({
               Formato:
             </span>
             {[
-              { id: 'formato1', label: '1. Orden de Recepción SAE', active: true, badge: 'Calibrado' },
-              { id: 'formato2', label: '2. Presupuestos (Formato 2)', active: true, badge: 'Activo' },
-              { id: 'formato3', label: '3. Orden de Reparación', active: true, badge: 'Activo' },
-              { id: 'formato4', label: '4. Salida', active: true, badge: 'Activo' }
+              { id: 'formato1', label: '1. Calibrador Recepción y Órdenes', active: true, badge: 'Formato 1' },
+              { id: 'formato2', label: '2. Calibrador Presupuestos', active: true, badge: 'Formato 2' },
+              { id: 'formato3', label: '3. Calibrador Órdenes de Reparación', active: true, badge: 'Formato 3' },
+              { id: 'formato4', label: '4. Calibrador Salidas de Almacén', active: true, badge: 'Formato 4' }
             ].map(f => (
               <button
                 key={f.id}
@@ -932,7 +938,32 @@ export default function PdfCalibrator({
               {/* Render Every Calibrated Field */}
               {config.fields.map(field => {
                 const isSelected = field.id === selectedFieldId;
-                const sample = field.sampleValue || field.label;
+                
+                // Formato 4 (Salidas) - Evitar textos encimados mostrando números reales en código y cantidad
+                let sample = field.sampleValue || field.label;
+                if (config.id === 'formato4') {
+                  if (field.id === 'tabla_r1_codigo' || field.id.includes('codigo')) {
+                    sample = (field.sampleValue && !field.sampleValue.toLowerCase().includes('código') && !field.sampleValue.toLowerCase().includes('columna'))
+                      ? field.sampleValue
+                      : '101';
+                  } else if (field.id === 'tabla_r1_cantidad' || field.id.includes('cantidad') || field.id.includes('cant')) {
+                    sample = (field.sampleValue && !field.sampleValue.toLowerCase().includes('cantidad') && !field.sampleValue.toLowerCase().includes('columna'))
+                      ? field.sampleValue
+                      : '1';
+                  } else if (field.id === 'tabla_r1_descripcion') {
+                    sample = (field.sampleValue && !field.sampleValue.toLowerCase().includes('columna'))
+                      ? field.sampleValue
+                      : 'Balatas cerámicas';
+                  } else if (field.id === 'tabla_r1_importe') {
+                    sample = (field.sampleValue && !field.sampleValue.toLowerCase().includes('columna'))
+                      ? field.sampleValue
+                      : '450.00';
+                  } else if (field.id === 'tabla_r1_total') {
+                    sample = (field.sampleValue && !field.sampleValue.toLowerCase().includes('columna'))
+                      ? field.sampleValue
+                      : '450.00';
+                  }
+                }
 
                 return (
                   <div

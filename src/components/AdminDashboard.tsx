@@ -305,7 +305,7 @@ export default function AdminDashboard({
             }`}
           >
             <Sliders size={16} />
-            Calibrador PDF
+            Calibrador de Formatos PDF
           </button>
         </div>
         

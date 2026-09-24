@@ -1600,9 +1600,10 @@ export default function AdvisorDashboard({
                 ? 'bg-[#8D6A28] text-white shadow-md'
                 : 'text-slate-300 hover:text-amber-300 hover:bg-slate-800'
             }`}
+            title="Abrir Calibrador visual de coordenadas para la Hoja de Recepción (Formato 1 SAE)"
           >
             <Sliders size={16} />
-            <span>Calibrador PDF</span>
+            <span>Calibrador Recepción y Órdenes</span>
           </button>
         </div>
       </div>
@@ -2488,7 +2489,7 @@ export default function AdvisorDashboard({
                       title="Abrir Calibrador visual de coordenadas para la Orden de Recepción PDF Formato 1"
                     >
                       <Sliders size={18} className="text-amber-500" />
-                      <span>Calibrador PDF (Ajustar Coordenadas de Impresión Formato 1)</span>
+                      <span>Calibrador Recepción y Órdenes (Formato 1)</span>
                     </button>
                   </div>
                 </div>
@@ -3434,7 +3435,7 @@ export default function AdvisorDashboard({
                 title="Abrir Calibrador visual de coordenadas para el Formato 2 Presupuestos"
               >
                 <Sliders size={14} className="text-amber-500" />
-                <span>Calibrar Formato 2 PDF</span>
+                <span>Calibrador Presupuestos (Formato 2)</span>
               </button>
 
               <div className="text-xs text-slate-500 font-medium hidden sm:block">
@@ -4513,7 +4514,7 @@ export default function AdvisorDashboard({
                 title="Abrir Calibrador visual de coordenadas para el Formato 3 Orden de Reparación"
               >
                 <Sliders size={14} className="text-amber-400" />
-                <span>Calibrar PDF Formato 3</span>
+                <span>Calibrador Órdenes de Reparación (Formato 3)</span>
               </button>
             </div>
 
@@ -4959,7 +4960,7 @@ export default function AdvisorDashboard({
                     title="Alinear y calibrar campos visuales sobre el formato físico oficial"
                   >
                     <Sliders size={15} />
-                    <span>Calibrar Formato 3</span>
+                    <span>Calibrador Órdenes de Reparación (Formato 3)</span>
                   </button>
 
                   <button
@@ -5333,7 +5334,7 @@ export default function AdvisorDashboard({
                 title="Abrir Calibrador visual de coordenadas para el Formato 4 Salida"
               >
                 <Sliders size={14} className="text-amber-400" />
-                <span>Calibrar Formato 4</span>
+                <span>Calibrador Salidas (Formato 4)</span>
               </button>
             </div>
 
@@ -5825,6 +5826,20 @@ export default function AdvisorDashboard({
                       <button
                         type="button"
                         onClick={() => {
+                          setCalibratorFormat('formato4');
+                          setPreviousTab('salidas');
+                          setActiveTab('calibrador');
+                        }}
+                        className="bg-slate-800 hover:bg-slate-900 text-amber-400 hover:text-amber-300 font-bold px-3.5 py-2.5 rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-amber-500/30"
+                        title="Abrir Calibrador visual de coordenadas para la Hoja de Salida (Formato 4 SAE)"
+                      >
+                        <Sliders size={15} />
+                        <span>Calibrador Salidas (Formato 4)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
                           const nObj: NotaSalida = {
                             id: editingSalidaId || 'temp-sal',
                             numero: salNumero,
@@ -6188,7 +6203,15 @@ export default function AdvisorDashboard({
             initialFormat={calibratorFormat}
             onFormatChange={(fmt) => setCalibratorFormat(fmt)}
             onClose={() => setActiveTab(previousTab || 'reception')}
-            returnTabName={previousTab === 'quotes' ? 'Presupuestos' : 'Recepción y Órdenes'}
+            returnTabName={
+              previousTab === 'quotes' 
+                ? 'Presupuestos' 
+                : previousTab === 'ordenes_reparacion'
+                ? 'Órdenes de Reparación'
+                : previousTab === 'salidas'
+                ? 'Salidas de Almacén'
+                : 'Recepción y Órdenes'
+            }
           />
         </div>
       )}
