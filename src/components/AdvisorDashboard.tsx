@@ -25,6 +25,7 @@ import {
   shareSaeNotaSalidaMobile
 } from '../utils/saePdf';
 import { SignaturePad } from './SignaturePad';
+import { getTodayIsoDate, getTodayDisplayDate, getCurrentTime, formatDateToDisplay, formatDateToIso } from '../utils/dateUtils';
 
 interface AdvisorDashboardProps {
   clients: Client[];
@@ -188,8 +189,8 @@ export default function AdvisorDashboard({
 
   // Custom SAE Order states
   const [orderFolio, setOrderFolio] = useState('');
-  const [orderFecha, setOrderFecha] = useState(new Date().toISOString().split('T')[0]);
-  const [orderHora, setOrderHora] = useState(new Date().toTimeString().split(' ')[0].substring(0, 5));
+  const [orderFecha, setOrderFecha] = useState(getTodayIsoDate);
+  const [orderHora, setOrderHora] = useState(getCurrentTime);
   const [orderTecnicoId, setOrderTecnicoId] = useState('');
 
   // Signature states & WhatsApp states
@@ -269,7 +270,7 @@ export default function AdvisorDashboard({
   const [editingPresupuestoId, setEditingPresupuestoId] = useState<string | null>(null);
 
   const [presNumero, setPresNumero] = useState(() => (202 + (presupuestos?.length || 0) + 1).toString());
-  const [presFecha, setPresFecha] = useState(() => new Date().toISOString().split('T')[0]);
+  const [presFecha, setPresFecha] = useState(getTodayDisplayDate);
   const [presAsesor, setPresAsesor] = useState('Alberto Flores Hdz.');
   
   const [presClienteNombre, setPresClienteNombre] = useState('');
@@ -284,7 +285,7 @@ export default function AdvisorDashboard({
   const [presKilometros, setPresKilometros] = useState<number>(0);
   
   const [presItems, setPresItems] = useState<PresupuestoItem[]>([
-    { id: 'pi-1', codigo: '0266', descripcion: 'Servicio de mantenimiento mayor con aceite de motor multigrado', cantidad: 1, importeUnitario: 3850, total: 3850 }
+    { id: 'pi-1', codigo: '', descripcion: '', cantidad: 1, importeUnitario: 0, total: 0 }
   ]);
   
   const [presFormaPago, setPresFormaPago] = useState('CONTADO');
@@ -403,7 +404,7 @@ export default function AdvisorDashboard({
 
     const payload = {
       numero: presNumero,
-      fecha: presFecha,
+      fecha: formatDateToDisplay(presFecha),
       asesor: presAsesor,
       clienteNombre: presClienteNombre,
       clienteCalle: presClienteCalle,
@@ -430,19 +431,21 @@ export default function AdvisorDashboard({
         createdAt: new Date().toISOString()
       });
       setPresSuccessMessage(`✅ Presupuesto #${presNumero} actualizado exitosamente.`);
+      setEditingPresupuestoId(null);
+      handleResetPresupuestoForm();
     } else if (addPresupuesto) {
       addPresupuesto(payload);
       setPresSuccessMessage(`🎉 Presupuesto #${presNumero} registrado correctamente en el historial.`);
+      handleResetPresupuestoForm();
     }
 
-    setEditingPresupuestoId(null);
-    setTimeout(() => setPresSuccessMessage(null), 3000);
+    setTimeout(() => setPresSuccessMessage(null), 3500);
   };
 
   const handleEditPresupuestoFromList = (p: Presupuesto) => {
     setEditingPresupuestoId(p.id);
     setPresNumero(p.numero);
-    setPresFecha(p.fecha);
+    setPresFecha(formatDateToDisplay(p.fecha));
     setPresAsesor(p.asesor || 'Alberto Flores Hdz.');
     setPresClienteNombre(p.clienteNombre);
     setPresClienteCalle(p.clienteCalle);
@@ -464,7 +467,7 @@ export default function AdvisorDashboard({
   const handleResetPresupuestoForm = () => {
     setEditingPresupuestoId(null);
     setPresNumero((202 + (presupuestos?.length || 0) + 1).toString());
-    setPresFecha(new Date().toISOString().split('T')[0]);
+    setPresFecha(getTodayDisplayDate());
     setPresClienteNombre('');
     setPresClienteCalle('');
     setPresClienteCpColonia('');
@@ -474,6 +477,10 @@ export default function AdvisorDashboard({
     setPresModeloColor('');
     setPresMatriculaVin('');
     setPresKilometros(0);
+    setPresFormaPago('CONTADO');
+    setPresValidezDias(12);
+    setPresDiasEntrega(3);
+    setPresNotas('DOCUMENTO SIN VALOR FISCAL. COSTOS APROXIMADOS POR POSIBLES PARTES EXTRAS DAÑADAS.');
     setPresItems([
       { id: `pi-${Date.now()}`, codigo: '', descripcion: '', cantidad: 1, importeUnitario: 0, total: 0 }
     ]);
@@ -485,7 +492,7 @@ export default function AdvisorDashboard({
     
     let text = `*SERVICIO AUTOMOTRIZ ESPECIALIZADO (SAE)*\n`;
     text += `*PRESUPUESTO DE SERVICIO #${p.numero}*\n`;
-    text += `📅 Fecha: ${p.fecha}\n`;
+    text += `📅 Fecha: ${formatDateToDisplay(p.fecha)}\n`;
     text += `👤 Cliente: *${p.clienteNombre}*\n`;
     text += `🚗 Vehículo: *${p.marcaMotor}* | Placas: *${p.matriculaVin}*\n`;
     text += `------------------------------------\n`;
@@ -538,13 +545,13 @@ export default function AdvisorDashboard({
   const [editingOrdenId, setEditingOrdenId] = useState<string | null>(null);
 
   const [ordNumero, setOrdNumero] = useState(() => (180 + (ordenesReparacion?.length || 0) + 1).toString());
-  const [ordFecha, setOrdFecha] = useState(() => new Date().toISOString().split('T')[0]);
+  const [ordFecha, setOrdFecha] = useState(getTodayDisplayDate);
   const [ordAsesor, setOrdAsesor] = useState('Alberto Flores Hdz.');
   const [ordTecnico, setOrdTecnico] = useState('Ing. Carlos Mendoza');
 
-  const [ordRotacionAireLlantas, setOrdRotacionAireLlantas] = useState('OK (32 PSI)');
-  const [ordRevLimpiaParabrisas, setOrdRevLimpiaParabrisas] = useState('OK');
-  const [ordRevLucesNivelesEngral, setOrdRevLucesNivelesEngral] = useState('Niveles OK');
+  const [ordRotacionAireLlantas, setOrdRotacionAireLlantas] = useState('');
+  const [ordRevLimpiaParabrisas, setOrdRevLimpiaParabrisas] = useState('');
+  const [ordRevLucesNivelesEngral, setOrdRevLucesNivelesEngral] = useState('');
 
   const [ordClienteNombre, setOrdClienteNombre] = useState('');
   const [ordClienteCalle, setOrdClienteCalle] = useState('');
@@ -558,7 +565,7 @@ export default function AdvisorDashboard({
   const [ordKilometros, setOrdKilometros] = useState<number>(0);
 
   const [ordItems, setOrdItems] = useState<OrdenReparacionItem[]>([
-    { id: 'ori-1', codigo: '0266', descripcion: 'Servicio de mantenimiento mayor con aceite de motor multigrado', cantidad: 1 }
+    { id: 'ori-1', codigo: '', descripcion: '', cantidad: 1 }
   ]);
 
   const [ordNotas, setOrdNotas] = useState('');
@@ -665,7 +672,7 @@ export default function AdvisorDashboard({
 
     const payload = {
       numero: ordNumero,
-      fecha: ordFecha,
+      fecha: formatDateToDisplay(ordFecha),
       asesor: ordAsesor,
       tecnico: ordTecnico,
       rotacionAireLlantas: ordRotacionAireLlantas,
@@ -694,19 +701,21 @@ export default function AdvisorDashboard({
         createdAt: new Date().toISOString()
       });
       setOrdSuccessMessage(`✅ Órden de Reparación #${ordNumero} actualizada exitosamente.`);
+      setEditingOrdenId(null);
+      handleResetOrdenForm();
     } else if (addOrdenReparacion) {
       addOrdenReparacion(payload);
       setOrdSuccessMessage(`🎉 Órden de Reparación #${ordNumero} registrada correctamente en el historial.`);
+      handleResetOrdenForm();
     }
 
-    setEditingOrdenId(null);
-    setTimeout(() => setOrdSuccessMessage(null), 3000);
+    setTimeout(() => setOrdSuccessMessage(null), 3500);
   };
 
   const handleEditOrdenFromList = (ord: OrdenReparacion) => {
     setEditingOrdenId(ord.id);
     setOrdNumero(ord.numero);
-    setOrdFecha(ord.fecha);
+    setOrdFecha(formatDateToDisplay(ord.fecha));
     setOrdAsesor(ord.asesor || 'Alberto Flores Hdz.');
     setOrdTecnico(ord.tecnico || 'Ing. Carlos Mendoza');
     setOrdRotacionAireLlantas(ord.rotacionAireLlantas || '');
@@ -729,7 +738,12 @@ export default function AdvisorDashboard({
   const handleResetOrdenForm = () => {
     setEditingOrdenId(null);
     setOrdNumero((180 + (ordenesReparacion?.length || 0) + 1).toString());
-    setOrdFecha(new Date().toISOString().split('T')[0]);
+    setOrdFecha(getTodayDisplayDate());
+    setOrdAsesor('Alberto Flores Hdz.');
+    setOrdTecnico('Ing. Carlos Mendoza');
+    setOrdRotacionAireLlantas('');
+    setOrdRevLimpiaParabrisas('');
+    setOrdRevLucesNivelesEngral('');
     setOrdClienteNombre('');
     setOrdClienteCalle('');
     setOrdClienteCpColonia('');
@@ -739,6 +753,9 @@ export default function AdvisorDashboard({
     setOrdModeloColor('');
     setOrdMatriculaVin('');
     setOrdKilometros(0);
+    setOrdNotas('');
+    setSelectedClientForOrden(null);
+    setSelectedVehicleForOrden(null);
     setOrdItems([
       { id: `ori-${Date.now()}`, codigo: '', descripcion: '', cantidad: 1 }
     ]);
@@ -750,7 +767,7 @@ export default function AdvisorDashboard({
 
     let text = `*SERVICIO AUTOMOTRIZ ESPECIALIZADO (SAE)*\n`;
     text += `*ÓRDEN DE REPARACIÓN #${ord.numero}*\n`;
-    text += `📅 Fecha: ${ord.fecha}\n`;
+    text += `📅 Fecha: ${formatDateToDisplay(ord.fecha)}\n`;
     text += `👤 Cliente: *${ord.clienteNombre}*\n`;
     text += `🚗 Vehículo: *${ord.marcaMotor}* | Placas: *${ord.matriculaVin}*\n`;
     text += `👨‍🔧 Técnico: ${ord.tecnico}\n`;
@@ -772,44 +789,27 @@ export default function AdvisorDashboard({
   const [salidaSubTab, setSalidaSubTab] = useState<'formulario' | 'historial' | 'presupuestos' | 'crm'>('formulario');
   const [editingSalidaId, setEditingSalidaId] = useState<string | null>(null);
 
-  const [salNumero, setSalNumero] = useState(() => (187 + (notasSalida?.length || 0)).toString());
-  const [salFecha, setSalFecha] = useState(() => '16/07/2026');
+  const [salNumero, setSalNumero] = useState(() => (187 + (notasSalida?.length || 0) + 1).toString());
+  const [salFecha, setSalFecha] = useState(getTodayDisplayDate);
   const [salAsesor, setSalAsesor] = useState('Alberto Flores Hdz.');
 
-  const [salClienteNombre, setSalClienteNombre] = useState('Congregación de la misión');
-  const [salClienteCalle, setSalClienteCalle] = useState('Av.San Fernando #154');
-  const [salClienteCpColonia, setSalClienteCpColonia] = useState('14000 Tlalpan Centro');
-  const [salClienteAlcaldia, setSalClienteAlcaldia] = useState('Tlalpan');
-  const [salClienteTelefono, setSalClienteTelefono] = useState('73 5266 8332');
+  const [salClienteNombre, setSalClienteNombre] = useState('');
+  const [salClienteCalle, setSalClienteCalle] = useState('');
+  const [salClienteCpColonia, setSalClienteCpColonia] = useState('');
+  const [salClienteAlcaldia, setSalClienteAlcaldia] = useState('');
+  const [salClienteTelefono, setSalClienteTelefono] = useState('');
 
-  const [salMarcaMotor, setSalMarcaMotor] = useState('FORD-RANGER / 2.3L');
-  const [salModeloColor, setSalModeloColor] = useState('2012 / BLANCO');
-  const [salMatriculaVin, setSalMatriculaVin] = useState('865-XXJ / 8AFER5AD8C6453240');
-  const [salKilometros, setSalKilometros] = useState<number>(161282);
+  const [salMarcaMotor, setSalMarcaMotor] = useState('');
+  const [salModeloColor, setSalModeloColor] = useState('');
+  const [salMatriculaVin, setSalMatriculaVin] = useState('');
+  const [salKilometros, setSalKilometros] = useState<number>(0);
 
   const [salFormaPago, setSalFormaPago] = useState('CONTADO');
   const [salGarantia, setSalGarantia] = useState('30 DIAS Ó 2,000 KMS. LO QUE OCURRA PRIMERO');
-  const [salOrdenServicioNumero, setSalOrdenServicioNumero] = useState('378A');
+  const [salOrdenServicioNumero, setSalOrdenServicioNumero] = useState('');
 
   const [salItems, setSalItems] = useState<NotaSalidaItem[]>([
-    { id: 'nsi-1', codigo: '0266', descripcion: 'Servicio de mantenimiento mayor con aceite de motor multigrado, (camionetas de carga hasta 2500)', cantidad: 1, importeUnitario: 3850.00, total: 3850.00 },
-    { id: 'nsi-2', codigo: '0242', descripcion: 'Solventes y materiales diversos', cantidad: 1, importeUnitario: 350.00, total: 350.00 },
-    { id: 'nsi-3', codigo: '0105', descripcion: 'Prueba dinamica, prueba de monitores y verificación general.', cantidad: 1, importeUnitario: 1700.00, total: 1700.00 },
-    { id: 'nsi-4', codigo: '', descripcion: 'Lavar y engrasar baleros delanteros', cantidad: 1, importeUnitario: 1200.00, total: 1200.00 },
-    { id: 'nsi-5', codigo: '', descripcion: 'Amortiguadores delanteros', cantidad: 2, importeUnitario: 1350.00, total: 2700.00 },
-    { id: 'nsi-6', codigo: '', descripcion: 'Bujes de horquillas inferiores', cantidad: 2, importeUnitario: 975.00, total: 1950.00 },
-    { id: 'nsi-7', codigo: '', descripcion: 'Tornillos estabilizadores', cantidad: 2, importeUnitario: 713.00, total: 1426.00 },
-    { id: 'nsi-8', codigo: '', descripcion: 'Gomas de barra estabilizadora', cantidad: 2, importeUnitario: 580.00, total: 1160.00 },
-    { id: 'nsi-9', codigo: '0103', descripcion: 'Alineación a cuatro planos', cantidad: 1, importeUnitario: 850.00, total: 850.00 },
-    { id: 'nsi-10', codigo: '0214', descripcion: 'Balanceo R/15 R/16 R17 R/18 Rin deportivo', cantidad: 4, importeUnitario: 240.00, total: 960.00 },
-    { id: 'nsi-11', codigo: '', descripcion: 'Mano de obra.', cantidad: 1, importeUnitario: 3800.00, total: 3800.00 },
-    { id: 'nsi-12', codigo: '', descripcion: 'Tapon de deposito de anticongelante', cantidad: 1, importeUnitario: 950.00, total: 950.00 },
-    { id: 'nsi-13', codigo: '0108', descripcion: 'Anticongelante concentrado', cantidad: 2, importeUnitario: 280.00, total: 560.00 },
-    { id: 'nsi-14', codigo: '', descripcion: 'Mano de obra.', cantidad: 1, importeUnitario: 450.00, total: 450.00 },
-    { id: 'nsi-15', codigo: '', descripcion: 'Sellar carter de diferencial', cantidad: 1, importeUnitario: 1200.00, total: 1200.00 },
-    { id: 'nsi-16', codigo: '', descripcion: 'Aceite de diferencial', cantidad: 4, importeUnitario: 298.00, total: 1192.00 },
-    { id: 'nsi-17', codigo: '', descripcion: 'Balancear cardan y cambiar cruzetas', cantidad: 1, importeUnitario: 6500.00, total: 6500.00 },
-    { id: 'nsi-18', codigo: '', descripcion: 'Acumulador de energia LTH', cantidad: 1, importeUnitario: 3975.00, total: 3975.00 }
+    { id: 'nsi-1', codigo: '', descripcion: '', cantidad: 1, importeUnitario: 0, total: 0 }
   ]);
 
   const [salSearchQuery, setSalSearchQuery] = useState('');
@@ -924,7 +924,7 @@ export default function AdvisorDashboard({
 
     const payload: Omit<NotaSalida, 'id' | 'createdAt'> = {
       numero: salNumero,
-      fecha: salFecha,
+      fecha: formatDateToDisplay(salFecha),
       asesor: salAsesor,
       clienteNombre: salClienteNombre,
       clienteCalle: salClienteCalle,
@@ -952,19 +952,21 @@ export default function AdvisorDashboard({
         createdAt: new Date().toISOString()
       });
       setSalSuccessMessage(`✅ Nota de Salida #${salNumero} actualizada exitosamente.`);
+      setEditingSalidaId(null);
+      handleResetSalidaForm();
     } else if (addNotaSalida) {
       addNotaSalida(payload);
       setSalSuccessMessage(`🎉 Nota de Salida #${salNumero} registrada correctamente en el historial.`);
+      handleResetSalidaForm();
     }
 
-    setEditingSalidaId(null);
-    setTimeout(() => setSalSuccessMessage(null), 3000);
+    setTimeout(() => setSalSuccessMessage(null), 3500);
   };
 
   const handleEditSalidaFromList = (nota: NotaSalida) => {
     setEditingSalidaId(nota.id);
     setSalNumero(nota.numero);
-    setSalFecha(nota.fecha);
+    setSalFecha(formatDateToDisplay(nota.fecha));
     setSalAsesor(nota.asesor || 'Alberto Flores Hdz.');
     setSalClienteNombre(nota.clienteNombre);
     setSalClienteCalle(nota.clienteCalle);
@@ -984,8 +986,9 @@ export default function AdvisorDashboard({
 
   const handleResetSalidaForm = () => {
     setEditingSalidaId(null);
-    setSalNumero((187 + (notasSalida?.length || 0)).toString());
-    setSalFecha(new Date().toISOString().split('T')[0]);
+    setSalNumero((187 + (notasSalida?.length || 0) + 1).toString());
+    setSalFecha(getTodayDisplayDate());
+    setSalAsesor('Alberto Flores Hdz.');
     setSalClienteNombre('');
     setSalClienteCalle('');
     setSalClienteCpColonia('');
@@ -998,7 +1001,11 @@ export default function AdvisorDashboard({
     setSalFormaPago('CONTADO');
     setSalGarantia('30 DIAS Ó 2,000 KMS. LO QUE OCURRA PRIMERO');
     setSalOrdenServicioNumero('');
-    setSalItems([]);
+    setSelectedClientForSalida(null);
+    setSelectedVehicleForSalida(null);
+    setSalItems([
+      { id: `nsi-${Date.now()}`, codigo: '', descripcion: '', cantidad: 1, importeUnitario: 0, total: 0 }
+    ]);
   };
 
   const handleSendSalidaWhatsApp = (nota: NotaSalida) => {
@@ -1225,7 +1232,7 @@ export default function AdvisorDashboard({
       status: 'Diagnostico',
       dateOpened: `${orderFecha} ${orderHora}:00`,
       folio: finalFolio,
-      fecha: orderFecha,
+      fecha: formatDateToDisplay(orderFecha),
       hora: orderHora,
       tecnico: assignedMechanic?.name || 'Técnico de Guardia',
       clientSignature: finalClientSig,
@@ -1271,11 +1278,36 @@ export default function AdvisorDashboard({
       generateSaePdf(created, freshClient, freshVehicle, employees);
     }, 200);
 
-    // Reset fields & Signatures
+    // Reset completely so next record starts fresh
+    handleResetReceptionForm();
+  };
+
+  const handleResetReceptionForm = () => {
+    setSelectedClientId('');
+    setSelectedVehicleId('');
     setReportedFailure('');
     setOrderFolio('');
+    setOrderFecha(getTodayIsoDate());
+    setOrderHora(getCurrentTime());
+    setOrderTecnicoId('');
     setClientSignature(undefined);
     setMechanicSignature(undefined);
+    setClientHasWhatsapp(true);
+    setOrderClientCalle('');
+    setOrderClientCp('');
+    setOrderClientColonia('');
+    setOrderClientAlcaldia('');
+    setOrderClientTelFijo('');
+    setOrderClientEmail('');
+    setOrderClientPhone('');
+    setOrderVehMotor('');
+    setOrderVehSerie('');
+    setOrderVehColor('');
+    setOrderVehMileage(0);
+    setOrderVehBrand('');
+    setOrderVehModel('');
+    setOrderVehYear(new Date().getFullYear());
+    setOrderVehPlate('');
     setChecklist({
       scratches: false,
       dents: false,
@@ -1826,6 +1858,15 @@ export default function AdvisorDashboard({
                   <p className="text-xs text-slate-500">Captura la información oficial para el Formato Especializado SAE</p>
                 </div>
                 <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleResetReceptionForm}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-300 rounded-lg text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                    title="Limpiar formulario para un nuevo registro sin datos anteriores"
+                  >
+                    <RefreshCw size={13} className="text-amber-600" />
+                    <span>Limpiar / Nuevo</span>
+                  </button>
                   <div className="text-right">
                     <label className="block text-[10px] font-bold text-slate-500 uppercase">FOLIO ORDEN</label>
                     <input
@@ -1848,21 +1889,41 @@ export default function AdvisorDashboard({
                 {/* METADATA BLOCK: FECHA, HORA, TECNICO */}
                 <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-slate-500 font-bold text-[10px] uppercase mb-1">Fecha de Ingreso</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-slate-500 font-bold text-[10px] uppercase">Fecha de Ingreso</label>
+                      <button
+                        type="button"
+                        onClick={() => setOrderFecha(getTodayIsoDate())}
+                        className="text-[9px] font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded cursor-pointer"
+                        title="Restablecer a fecha automática de hoy"
+                      >
+                        📅 Hoy ({getTodayDisplayDate()})
+                      </button>
+                    </div>
                     <input
                       type="date"
-                      value={orderFecha}
+                      value={formatDateToIso(orderFecha)}
                       onChange={(e) => setOrderFecha(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-500 font-bold text-[10px] uppercase mb-1">Hora de Ingreso</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-slate-500 font-bold text-[10px] uppercase">Hora de Ingreso</label>
+                      <button
+                        type="button"
+                        onClick={() => setOrderHora(getCurrentTime())}
+                        className="text-[9px] font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-1.5 py-0.5 rounded cursor-pointer"
+                        title="Hora actual"
+                      >
+                        ⏰ Ahora ({getCurrentTime()})
+                      </button>
+                    </div>
                     <input
                       type="time"
                       value={orderHora}
                       onChange={(e) => setOrderHora(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500 font-semibold"
                     />
                   </div>
                   <div>
@@ -2346,6 +2407,15 @@ export default function AdvisorDashboard({
                     </button>
                     <button
                       type="button"
+                      onClick={handleResetReceptionForm}
+                      className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-4 px-5 rounded-xl transition-all flex items-center justify-center gap-2 text-sm border border-slate-300 cursor-pointer"
+                      title="Limpiar todos los campos para iniciar un nuevo registro en blanco"
+                    >
+                      <RefreshCw size={15} />
+                      Limpiar / Nuevo
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => {
                         // Trigger a quick layout simulation
                         const dummyOrder: ServiceOrder = {
@@ -2361,7 +2431,7 @@ export default function AdvisorDashboard({
                           status: 'Diagnostico',
                           dateOpened: `${orderFecha} ${orderHora}:00`,
                           folio: orderFolio || 'PREV-01',
-                          fecha: orderFecha,
+                          fecha: formatDateToDisplay(orderFecha),
                           hora: orderHora,
                           tecnico: employees.find(e => e.id === orderTecnicoId)?.name || 'Técnico de Guardia',
                           items: [],
@@ -2588,7 +2658,7 @@ export default function AdvisorDashboard({
                       const vehicle = vehicles.find(v => v.id === o.vehicleId);
                       const statusBadge = getOrderStatusBadge(o.status);
                       const folioDisplay = o.folio || o.id;
-                      const dateDisplay = o.fecha || (o.dateOpened ? o.dateOpened.split(' ')[0] : '-');
+                      const dateDisplay = formatDateToDisplay(o.fecha || (o.dateOpened ? o.dateOpened.split(' ')[0] : ''));
                       const timeDisplay = o.hora || (o.dateOpened ? o.dateOpened.split(' ')[1] : '');
 
                       return (
@@ -2823,7 +2893,7 @@ export default function AdvisorDashboard({
                         Detalle de Orden de Recepción SAE
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Fecha: {o.fecha || (o.dateOpened ? o.dateOpened.split(' ')[0] : '')} {o.hora && `• Hora: ${o.hora}`}
+                        Fecha: {formatDateToDisplay(o.fecha || (o.dateOpened ? o.dateOpened.split(' ')[0] : ''))} {o.hora && `• Hora: ${o.hora}`}
                       </p>
                     </div>
                   </div>
@@ -3309,15 +3379,20 @@ export default function AdvisorDashboard({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setPresupuestoSubTab('formulario')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                onClick={() => {
+                  if (editingPresupuestoId) {
+                    handleResetPresupuestoForm();
+                  }
+                  setPresupuestoSubTab('formulario');
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   presupuestoSubTab === 'formulario'
                     ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 <Plus size={15} />
-                <span>Formulario Presupuesto (Hoja SAE)</span>
+                <span>+ Nuevo Presupuesto (Hoja SAE)</span>
               </button>
 
               <button
@@ -3394,8 +3469,18 @@ export default function AdvisorDashboard({
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <button
                     type="button"
+                    onClick={handleResetPresupuestoForm}
+                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-400 hover:text-amber-300 border border-amber-500/20 font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                    title="Limpiar todos los campos para registrar un nuevo presupuesto en blanco"
+                  >
+                    <RefreshCw size={14} />
+                    <span>Nuevo Presupuesto (Limpiar)</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleAutoFillPresupuestoFromSelection}
-                    className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all"
+                    className="bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <User size={14} className="text-amber-400" />
                     <span>Cargar de Cliente/Auto Seleccionado</span>
@@ -3404,7 +3489,7 @@ export default function AdvisorDashboard({
                   <button
                     type="button"
                     onClick={handleLoadSamplePresupuestoPaperData}
-                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all"
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Sparkles size={14} />
                     <span>Ejemplo Muestra Hoja SAE (Folio 202)</span>
@@ -3414,7 +3499,7 @@ export default function AdvisorDashboard({
                     <button
                       type="button"
                       onClick={handleResetPresupuestoForm}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-3 py-1.5 rounded-lg transition-all"
+                      className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer"
                     >
                       Cancelar Edición
                     </button>
@@ -3506,15 +3591,29 @@ export default function AdvisorDashboard({
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-600 font-bold mb-1">Fecha de Registro</label>
-                    <input
-                      type="text"
-                      required
-                      value={presFecha}
-                      onChange={(e) => setPresFecha(e.target.value)}
-                      className="w-full p-2 border border-slate-300 rounded-lg bg-white"
-                      placeholder="DD/MM/AAAA"
-                    />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-slate-600 font-bold text-xs">Fecha de Registro</label>
+                      <button
+                        type="button"
+                        onClick={() => setPresFecha(getTodayDisplayDate())}
+                        className="text-[10px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded cursor-pointer"
+                        title="Restablecer a fecha automática de hoy"
+                      >
+                        📅 Hoy ({getTodayDisplayDate()})
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="date"
+                        required
+                        value={formatDateToIso(presFecha)}
+                        onChange={(e) => setPresFecha(formatDateToDisplay(e.target.value))}
+                        className="w-full p-2 border border-slate-300 rounded-lg bg-white font-bold text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                      <span className="shrink-0 text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-2 rounded-lg border border-slate-200" title="Formato oficial SAE DD/MM/AAAA">
+                        {formatDateToDisplay(presFecha)}
+                      </span>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-slate-600 font-bold mb-1">Asesor / Atendido Por</label>
@@ -3945,7 +4044,7 @@ export default function AdvisorDashboard({
                                 <span className="font-mono bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded text-xs">
                                   Folio #{p.numero}
                                 </span>
-                                <span className="text-[11px] text-slate-400 block mt-1">{p.fecha}</span>
+                                <span className="text-[11px] text-slate-400 block mt-1">{formatDateToDisplay(p.fecha)}</span>
                               </div>
                               <span className="text-lg font-bold text-slate-800 font-mono">
                                 ${p.total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
@@ -4361,15 +4460,20 @@ export default function AdvisorDashboard({
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                onClick={() => setOrdenSubTab('formulario')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                onClick={() => {
+                  if (editingOrdenId) {
+                    handleResetOrdenForm();
+                  }
+                  setOrdenSubTab('formulario');
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   ordenSubTab === 'formulario'
                     ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 <Plus size={15} />
-                <span>Formulario Órden de Reparación</span>
+                <span>+ Nueva Órden (Hoja SAE)</span>
               </button>
 
               <button
@@ -4442,6 +4546,16 @@ export default function AdvisorDashboard({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={handleResetOrdenForm}
+                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-400 hover:text-amber-300 border border-amber-500/20 font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                    title="Limpiar todos los campos para registrar una nueva órden en blanco"
+                  >
+                    <RefreshCw size={14} />
+                    <span>Nueva Órden (Limpiar)</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleLoadSampleOrdenPaperData}
@@ -4552,14 +4666,29 @@ export default function AdvisorDashboard({
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-600 font-bold mb-1">Fecha</label>
-                    <input
-                      type="date"
-                      required
-                      value={ordFecha}
-                      onChange={(e) => setOrdFecha(e.target.value)}
-                      className="w-full p-2 border border-slate-300 rounded-lg bg-white font-bold text-slate-800"
-                    />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-slate-600 font-bold text-xs">Fecha</label>
+                      <button
+                        type="button"
+                        onClick={() => setOrdFecha(getTodayDisplayDate())}
+                        className="text-[10px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded cursor-pointer"
+                        title="Restablecer a fecha automática de hoy"
+                      >
+                        📅 Hoy ({getTodayDisplayDate()})
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="date"
+                        required
+                        value={formatDateToIso(ordFecha)}
+                        onChange={(e) => setOrdFecha(formatDateToDisplay(e.target.value))}
+                        className="w-full p-2 border border-slate-300 rounded-lg bg-white font-bold text-slate-800 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                      <span className="shrink-0 text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-2 rounded-lg border border-slate-200" title="Formato oficial SAE DD/MM/AAAA">
+                        {formatDateToDisplay(ordFecha)}
+                      </span>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-slate-600 font-bold mb-1">Atención Personal (Asesor)</label>
@@ -4961,7 +5090,7 @@ export default function AdvisorDashboard({
                     ).map((ord) => (
                       <tr key={ord.id} className="border-b border-slate-100 hover:bg-amber-50/40 transition-colors">
                         <td className="p-3 font-mono font-bold text-red-700">#{ord.numero}</td>
-                        <td className="p-3 text-slate-600">{ord.fecha}</td>
+                        <td className="p-3 text-slate-600">{formatDateToDisplay(ord.fecha)}</td>
                         <td className="p-3 font-bold text-slate-800">{ord.clienteNombre}</td>
                         <td className="p-3 text-slate-600">{ord.marcaMotor} ({ord.matriculaVin})</td>
                         <td className="p-3 text-slate-600">{ord.tecnico}</td>
@@ -5138,15 +5267,20 @@ export default function AdvisorDashboard({
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                onClick={() => setSalidaSubTab('formulario')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                onClick={() => {
+                  if (editingSalidaId) {
+                    handleResetSalidaForm();
+                  }
+                  setSalidaSubTab('formulario');
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   salidaSubTab === 'formulario'
                     ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 <Plus size={15} />
-                <span>Formulario Nota de Salida</span>
+                <span>+ Nueva Nota de Salida (Hoja SAE)</span>
               </button>
 
               <button
@@ -5232,6 +5366,16 @@ export default function AdvisorDashboard({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={handleResetSalidaForm}
+                    className="bg-zinc-800 hover:bg-zinc-700 text-amber-400 hover:text-amber-300 border border-amber-500/20 font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                    title="Limpiar todos los campos para registrar una nueva nota de salida en blanco"
+                  >
+                    <RefreshCw size={14} />
+                    <span>Nueva Salida (Limpiar)</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleLoadSampleSalidaPaperData}
@@ -5337,15 +5481,29 @@ export default function AdvisorDashboard({
                     />
                   </div>
                   <div>
-                    <label className="block text-zinc-300 font-bold mb-1 uppercase tracking-wider text-[10px]">Fecha de Emisión</label>
-                    <input
-                      type="text"
-                      required
-                      value={salFecha}
-                      onChange={(e) => setSalFecha(e.target.value)}
-                      className="w-full p-2 border border-zinc-700 rounded-lg bg-zinc-950 font-semibold text-white"
-                      placeholder="DD/MM/AAAA"
-                    />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-zinc-300 font-bold uppercase tracking-wider text-[10px]">Fecha de Emisión</label>
+                      <button
+                        type="button"
+                        onClick={() => setSalFecha(getTodayDisplayDate())}
+                        className="text-[10px] font-bold text-amber-400 hover:text-amber-300 bg-zinc-800 hover:bg-zinc-700 px-2 py-0.5 rounded cursor-pointer"
+                        title="Restablecer a fecha automática de hoy"
+                      >
+                        📅 Hoy ({getTodayDisplayDate()})
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="date"
+                        required
+                        value={formatDateToIso(salFecha)}
+                        onChange={(e) => setSalFecha(formatDateToDisplay(e.target.value))}
+                        className="w-full p-2 border border-zinc-700 rounded-lg bg-zinc-950 font-bold text-white text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                      <span className="shrink-0 text-xs font-mono font-bold text-amber-400 bg-zinc-900 px-2.5 py-2 rounded-lg border border-zinc-700" title="Formato oficial SAE DD/MM/AAAA">
+                        {formatDateToDisplay(salFecha)}
+                      </span>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-zinc-300 font-bold mb-1 uppercase tracking-wider text-[10px]">Asesor Responsable</label>
@@ -5753,7 +5911,7 @@ export default function AdvisorDashboard({
                     ).map((nota) => (
                       <tr key={nota.id} className="border-b border-slate-100 hover:bg-amber-50/40 transition-colors">
                         <td className="p-3 font-mono font-bold text-amber-700">#{nota.numero}</td>
-                        <td className="p-3 text-slate-600">{nota.fecha}</td>
+                        <td className="p-3 text-slate-600">{formatDateToDisplay(nota.fecha)}</td>
                         <td className="p-3 font-bold text-slate-800">{nota.clienteNombre}</td>
                         <td className="p-3 text-slate-600">{nota.marcaMotor} ({nota.matriculaVin})</td>
                         <td className="p-3 text-slate-600 font-mono">#{nota.ordenServicioNumero || 'S/N'}</td>
@@ -5853,7 +6011,7 @@ export default function AdvisorDashboard({
                     {presupuestos.map((pres) => (
                       <tr key={pres.id} className="border-b border-slate-100 hover:bg-indigo-50/40 transition-colors">
                         <td className="p-3 font-mono font-bold text-indigo-700">#{pres.numero}</td>
-                        <td className="p-3 text-slate-600">{pres.fecha}</td>
+                        <td className="p-3 text-slate-600">{formatDateToDisplay(pres.fecha)}</td>
                         <td className="p-3 font-bold text-slate-800">{pres.clienteNombre}</td>
                         <td className="p-3 text-slate-600">{pres.marcaMotor} ({pres.matriculaVin})</td>
                         <td className="p-3 text-center font-bold text-slate-700">{pres.items.length}</td>

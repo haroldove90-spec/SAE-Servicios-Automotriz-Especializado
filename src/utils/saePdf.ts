@@ -2,6 +2,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { ServiceOrder, Client, Vehicle, Employee, Presupuesto, OrdenReparacion, NotaSalida } from '../types';
 import { getTemplateConfig } from './pdfTemplateStorage';
+import { formatDateToDisplay } from './dateUtils';
 
 /**
  * Returns the raw HTML string representing the official SAE Presupuesto form,
@@ -95,7 +96,7 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
 
         <!-- Fecha -->
         <div style="${getStyle('fecha', { x: 620, y: 206, fontSize: 11, fontWeight: 'bold', color: '#000000', align: 'left' })}">
-          ${presupuesto.fecha}
+          ${formatDateToDisplay(presupuesto.fecha)}
         </div>
 
         <!-- CLIENTE (Nombre / Razón Social) -->
@@ -196,7 +197,7 @@ export function getSaeHtml(
   const mechanicName = order.tecnico || employees.find(e => e.id === order.mechanicId)?.name || 'Mecánico Asignado';
 
   // Get date and time
-  const dateStr = order.fecha || (order.dateOpened ? order.dateOpened.split(' ')[0] : new Date().toISOString().split('T')[0]);
+  const dateStr = formatDateToDisplay(order.fecha || (order.dateOpened ? order.dateOpened.split(' ')[0] : ''));
   const timeStr = order.hora || (order.dateOpened && order.dateOpened.split(' ').length > 1 ? order.dateOpened.split(' ')[1].substring(0, 5) : '10:00');
 
   // Load calibrated template configuration
@@ -909,7 +910,7 @@ export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
         
         <!-- Fecha -->
         <div style="${getStyle('fecha', { x: 454, y: 138, fontSize: 11, fontWeight: 'bold', align: 'left' })}">
-          ${orden.fecha}
+          ${formatDateToDisplay(orden.fecha)}
         </div>
 
         <!-- Número de Orden -->
@@ -1151,6 +1152,11 @@ export function getSaeNotaSalidaHtml(nota: NotaSalida): string {
         <!-- Número de Salida -->
         <div style="${getStyle('numero_salida', { x: 488, y: 206, fontSize: 14, fontFamily: 'monospace', fontWeight: '900', color: '#DC2626', align: 'left' })}">
           ${nota.numero}
+        </div>
+
+        <!-- Fecha de Salida -->
+        <div style="${getStyle('fecha', { x: 620, y: 206, fontSize: 11, fontWeight: 'bold', color: '#000000', align: 'left' })}">
+          ${formatDateToDisplay(nota.fecha)}
         </div>
 
         <!-- Datos del Cliente -->

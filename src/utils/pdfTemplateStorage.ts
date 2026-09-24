@@ -1380,6 +1380,17 @@ export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
       color: '#DC2626',
       align: 'left'
     },
+    {
+      id: 'fecha',
+      label: 'Fecha de Salida',
+      section: 'encabezado_control',
+      x: 620,
+      y: 206,
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#000000',
+      align: 'left'
+    },
     // Datos del Cliente
     {
       id: 'cliente_nombre',
