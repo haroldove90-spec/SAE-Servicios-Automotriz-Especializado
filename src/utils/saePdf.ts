@@ -37,28 +37,43 @@ export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
   const colTot = template.fields.find(f => f.id === 'tabla_r1_total') || { x: 674, y: 329, align: 'right', fontSize: 11 };
 
   const r2Cod = template.fields.find(f => f.id === 'tabla_r2_codigo');
-  const startY = (colCod as any).y ?? 330;
+  const startY = (colCod as any).y ?? (colDesc as any).y ?? 330;
   const rowSpacing = r2Cod && (r2Cod as any).y ? Math.max(18, Math.min(45, (r2Cod as any).y - startY)) : 28;
 
   // Calculate table rows based on calibrated Y and spacing
   const items = presupuesto.items || [];
   const rowsHtml = items.slice(0, 24).map((item, idx) => {
-    const yPos = startY + (idx * rowSpacing);
+    const yCod = ((colCod as any).y ?? startY) + (idx * rowSpacing);
+    const yDesc = ((colDesc as any).y ?? startY) + (idx * rowSpacing);
+    const yCant = ((colCant as any).y ?? startY) + (idx * rowSpacing);
+    const yUnit = ((colUnit as any).y ?? startY) + (idx * rowSpacing);
+    const yTot = ((colTot as any).y ?? startY) + (idx * rowSpacing);
     const itemTotal = item.total || ((item.cantidad || 1) * (item.importeUnitario || 0));
+    const descText = (item.descripcion || '').replace(/\r?\n/g, ' ').trim();
+    let descFontSize = colDesc.fontSize || 11;
+    if (descText.length > 85) {
+      descFontSize = Math.min(descFontSize, 8);
+    } else if (descText.length > 68) {
+      descFontSize = Math.min(descFontSize, 9);
+    } else if (descText.length > 52) {
+      descFontSize = Math.min(descFontSize, 10);
+    }
+    const maxDescWidth = Math.max(380, (colCant.x || 572) - (colDesc.x || 106) - 10);
+
     return `
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCod.x}px !important; font-size: ${colCod.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colCod.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yCod}px !important; left: ${colCod.x}px !important; font-size: ${colCod.fontSize || 11}px !important; font-weight: bold !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colCod.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.codigo || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 450px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 11}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
-        ${item.descripcion || ''}
+      <div style="position: absolute !important; top: ${yDesc}px !important; left: ${colDesc.x}px !important; width: ${maxDescWidth}px !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; font-size: ${descFontSize}px !important; font-weight: normal !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
+        ${descText}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: normal !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yCant}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: normal !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.cantidad || 1}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colUnit.x}px !important; font-size: ${colUnit.fontSize || 11}px !important; text-align: ${colUnit.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yUnit}px !important; left: ${colUnit.x}px !important; font-size: ${colUnit.fontSize || 11}px !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colUnit.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         $${(item.importeUnitario || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colTot.x}px !important; font-size: ${colTot.fontSize || 11}px !important; font-weight: normal !important; text-align: ${colTot.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yTot}px !important; left: ${colTot.x}px !important; font-size: ${colTot.fontSize || 11}px !important; font-weight: normal !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colTot.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         $${itemTotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
     `;
@@ -844,21 +859,33 @@ export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
   const colCant = template.fields.find(f => f.id === 'tabla_r1_cantidad') || { x: 664, y: 320, align: 'center', fontSize: 11 };
 
   const r2Marca = template.fields.find(f => f.id === 'tabla_r2_marca');
-  const startY = (colMarca as any).y ?? 320;
+  const startY = (colMarca as any).y ?? (colDesc as any).y ?? 320;
   const rowSpacing = r2Marca && (r2Marca as any).y ? Math.max(18, Math.min(45, (r2Marca as any).y - startY)) : 24;
 
   // Calculate table rows (using calibrated coordinates and spacing)
   const items = orden.items || [];
   const rowsHtml = items.slice(0, 24).map((item, idx) => {
-    const yPos = startY + (idx * rowSpacing);
+    const yMarca = ((colMarca as any).y ?? startY) + (idx * rowSpacing);
+    const yDesc = ((colDesc as any).y ?? startY) + (idx * rowSpacing);
+    const yCant = ((colCant as any).y ?? startY) + (idx * rowSpacing);
+    const descText = (item.descripcion || '').replace(/\r?\n/g, ' ').trim();
+    let descFontSize = colDesc.fontSize || 11;
+    if (descText.length > 95) {
+      descFontSize = Math.min(descFontSize, 8);
+    } else if (descText.length > 75) {
+      descFontSize = Math.min(descFontSize, 9);
+    } else if (descText.length > 58) {
+      descFontSize = Math.min(descFontSize, 10);
+    }
+    const maxDescWidth = Math.max(400, (colCant.x || 664) - (colDesc.x || 128) - 10);
     return `
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colMarca.x}px !important; font-size: ${colMarca.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colMarca.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yMarca}px !important; left: ${colMarca.x}px !important; font-size: ${colMarca.fontSize || 11}px !important; font-weight: bold !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colMarca.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.marca || item.codigo || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 510px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 11}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
-        ${item.descripcion || ''}
+      <div style="position: absolute !important; top: ${yDesc}px !important; left: ${colDesc.x}px !important; width: ${maxDescWidth}px !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; font-size: ${descFontSize}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
+        ${descText}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yCant}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: bold !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.cantidad || 1}
       </div>
     `;
@@ -1072,27 +1099,41 @@ export function getSaeNotaSalidaHtml(nota: NotaSalida): string {
   const colTotal = template.fields.find(f => f.id === 'tabla_r1_total') || { x: 681, y: 328, align: 'right', fontSize: 11 };
 
   const r2Codigo = template.fields.find(f => f.id === 'tabla_r2_codigo');
-  const startY = (colCodigo as any).y ?? 328;
+  const startY = (colCodigo as any).y ?? (colDesc as any).y ?? 328;
   const rowSpacing = r2Codigo && (r2Codigo as any).y ? Math.max(18, Math.min(45, (r2Codigo as any).y - startY)) : 23.5;
 
   const items = nota.items || [];
   // Row limits: Y superior = 33.2% (~328px), Y inferior = 91.5% (~897px)
   const rowsHtml = items.slice(0, 24).map((item, idx) => {
-    const yPos = startY + (idx * rowSpacing);
+    const yCod = ((colCodigo as any).y ?? startY) + (idx * rowSpacing);
+    const yDesc = ((colDesc as any).y ?? startY) + (idx * rowSpacing);
+    const yCant = ((colCant as any).y ?? startY) + (idx * rowSpacing);
+    const yImp = ((colImporte as any).y ?? startY) + (idx * rowSpacing);
+    const yTot = ((colTotal as any).y ?? startY) + (idx * rowSpacing);
+    const descText = (item.descripcion || '').replace(/\r?\n/g, ' ').trim();
+    let descFontSize = colDesc.fontSize || 11;
+    if (descText.length > 78) {
+      descFontSize = Math.min(descFontSize, 8);
+    } else if (descText.length > 60) {
+      descFontSize = Math.min(descFontSize, 9);
+    } else if (descText.length > 45) {
+      descFontSize = Math.min(descFontSize, 10);
+    }
+    const maxDescWidth = Math.max(320, (colCant.x || 536) - (colDesc.x || 107) - 10);
     return `
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCodigo.x}px !important; font-size: ${colCodigo.fontSize || 11}px !important; font-weight: bold !important; font-family: monospace !important; text-align: ${colCodigo.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yCod}px !important; left: ${colCodigo.x}px !important; font-size: ${colCodigo.fontSize || 11}px !important; font-weight: bold !important; font-family: monospace !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colCodigo.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.codigo || ''}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colDesc.x}px !important; width: 410px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: ${colDesc.fontSize || 11}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
-        ${item.descripcion || ''}
+      <div style="position: absolute !important; top: ${yDesc}px !important; left: ${colDesc.x}px !important; width: ${maxDescWidth}px !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; font-size: ${descFontSize}px !important; text-align: ${colDesc.align || 'left'} !important; color: #000000 !important; z-index: 10 !important;">
+        ${descText}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: bold !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yCant}px !important; left: ${colCant.x}px !important; font-size: ${colCant.fontSize || 11}px !important; font-weight: bold !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colCant.align || 'center'} !important; color: #000000 !important; z-index: 10 !important;">
         ${item.cantidad || 1}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colImporte.x}px !important; font-size: ${colImporte.fontSize || 11}px !important; font-family: monospace !important; text-align: ${colImporte.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yImp}px !important; left: ${colImporte.x}px !important; font-size: ${colImporte.fontSize || 11}px !important; font-family: monospace !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colImporte.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         ${(item.importeUnitario || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
-      <div style="position: absolute !important; top: ${yPos}px !important; left: ${colTotal.x}px !important; font-size: ${colTotal.fontSize || 11}px !important; font-weight: bold !important; font-family: monospace !important; text-align: ${colTotal.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
+      <div style="position: absolute !important; top: ${yTot}px !important; left: ${colTotal.x}px !important; font-size: ${colTotal.fontSize || 11}px !important; font-weight: bold !important; font-family: monospace !important; line-height: normal !important; overflow: visible !important; white-space: nowrap !important; text-align: ${colTotal.align || 'right'} !important; color: #000000 !important; z-index: 10 !important;">
         ${(item.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
     `;
