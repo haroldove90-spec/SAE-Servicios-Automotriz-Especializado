@@ -15,7 +15,7 @@ import { formatDateToDisplay } from './dateUtils';
 export function getSaePresupuestoHtml(presupuesto: Presupuesto): string {
   // Load calibrated template configuration for Formato 2
   const template = getTemplateConfig('formato2');
-  const formatoBgUrl = template.bgUrl || "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202.png";
+  const formatoBgUrl = template.bgUrl || "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202%20(1).png";
 
   const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; width?: number }) => {
     const f = template.fields.find(item => item.id === fieldId);
@@ -839,7 +839,7 @@ export async function shareSaePresupuestoMobile(presupuesto: Presupuesto): Promi
 export function getSaeOrdenDeReparacionHtml(orden: OrdenReparacion): string {
   // Load calibrated template configuration for Formato 3
   const template = getTemplateConfig('formato3');
-  const formatoBgUrl = template.bgUrl || "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203.png";
+  const formatoBgUrl = template.bgUrl || "https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203%20(1).png";
 
   const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; width?: number }) => {
     const f = template.fields.find(item => item.id === fieldId);
@@ -1077,7 +1077,7 @@ export const shareSaeOrdenReparacionMobile = shareSaeOrdenDeReparacionMobile;
  */
 export function getSaeNotaSalidaHtml(nota: NotaSalida): string {
   const template = getTemplateConfig('formato4');
-  const formatoBgUrl = template.bgUrl || 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204.png';
+  const formatoBgUrl = template.bgUrl || 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204%20(1).png';
 
   const getStyle = (fieldId: string, fallback: { x: number; y: number; fontSize?: number; fontWeight?: string; color?: string; align?: string; fontFamily?: string; width?: number }) => {
     const f = template.fields.find(item => item.id === fieldId);

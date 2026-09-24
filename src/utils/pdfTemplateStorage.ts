@@ -727,7 +727,7 @@ export const DEFAULT_FORMATO_1: PdfTemplateConfig = {
 export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
   id: 'formato2',
   nombre: 'Formato 2: Presupuesto SAE',
-  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202.png',
+  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202%20(1).png',
   width: 750,
   height: 980,
   fields: [
@@ -1099,7 +1099,7 @@ export const DEFAULT_FORMATO_2: PdfTemplateConfig = {
 export const DEFAULT_FORMATO_3: PdfTemplateConfig = {
   id: 'formato3',
   nombre: 'Formato 3: Orden de Reparación SAE',
-  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203.png',
+  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203%20(1).png',
   width: 750,
   height: 980,
   fields: [
@@ -1363,7 +1363,7 @@ export const DEFAULT_FORMATO_3: PdfTemplateConfig = {
 export const DEFAULT_FORMATO_4: PdfTemplateConfig = {
   id: 'formato4',
   nombre: 'Formato 4: Salida SAE',
-  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204.png',
+  bgUrl: 'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204%20(1).png',
   width: 750,
   height: 980,
   fields: [
@@ -1616,10 +1616,13 @@ export async function initPdfTemplatesFromCloud(): Promise<void> {
       data.forEach((row: any) => {
         if (row && row.id && Array.isArray(row.fields)) {
           const def = INITIAL_TEMPLATES_MAP[row.id] || DEFAULT_FORMATO_1;
+          const cloudBgUrl = (row.bg_url && !row.bg_url.includes('formato%202.png') && !row.bg_url.includes('formato%203.png') && !row.bg_url.includes('formato%204.png'))
+            ? row.bg_url
+            : def.bgUrl;
           const config: PdfTemplateConfig = {
             id: row.id,
             nombre: row.nombre || def.nombre,
-            bgUrl: row.bg_url || def.bgUrl,
+            bgUrl: cloudBgUrl,
             width: row.canvas_width || def.width || 750,
             height: row.canvas_height || def.height || 980,
             fields: row.fields
@@ -1674,9 +1677,16 @@ export function getTemplateConfig(formatId: string = 'formato1'): PdfTemplateCon
             mergedFields.push(df);
           }
         });
+        
+        // Ensure background URL stays up to date if user didn't provide a custom one
+        const bgUrl = (parsed.bgUrl && !parsed.bgUrl.includes('formato%202.png') && !parsed.bgUrl.includes('formato%203.png') && !parsed.bgUrl.includes('formato%204.png'))
+          ? parsed.bgUrl
+          : def.bgUrl;
+
         const result: PdfTemplateConfig = {
           ...def,
           ...parsed,
+          bgUrl,
           fields: mergedFields
         };
         cachedTemplates[formatId] = result;
@@ -1827,7 +1837,7 @@ INSERT INTO sae_pdf_templates (id, nombre, bg_url, canvas_width, canvas_height, 
 VALUES (
   'formato2',
   'Formato 2: Presupuesto SAE',
-  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202.png',
+  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%202%20(1).png',
   750,
   980,
   '${JSON.stringify(DEFAULT_FORMATO_2.fields).replace(/'/g, "''")}'::jsonb
@@ -1845,7 +1855,7 @@ INSERT INTO sae_pdf_templates (id, nombre, bg_url, canvas_width, canvas_height, 
 VALUES (
   'formato3',
   'Formato 3: Orden de Reparación SAE',
-  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203.png',
+  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%203%20(1).png',
   750,
   980,
   '${JSON.stringify(DEFAULT_FORMATO_3.fields).replace(/'/g, "''")}'::jsonb
@@ -1863,7 +1873,7 @@ INSERT INTO sae_pdf_templates (id, nombre, bg_url, canvas_width, canvas_height, 
 VALUES (
   'formato4',
   'Formato 4: Salida SAE',
-  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204.png',
+  'https://gydwduicwpxznmvngwlb.supabase.co/storage/v1/object/public/formatos/formato%204%20(1).png',
   750,
   980,
   '${JSON.stringify(DEFAULT_FORMATO_4.fields).replace(/'/g, "''")}'::jsonb
