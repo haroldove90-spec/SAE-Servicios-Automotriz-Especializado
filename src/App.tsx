@@ -48,14 +48,19 @@ export default function App() {
     // Actions
     addClient,
     updateClient,
+    deleteClient,
     addVehicle,
     updateVehicle,
+    deleteVehicle,
     addEmployee,
     updateEmployee,
+    deleteEmployee,
     addInventoryItem,
     updateInventoryItem,
+    deleteInventoryItem,
     addPurchaseOrder,
     receivePurchaseOrder,
+    deletePurchaseOrder,
     createServiceOrder,
     deleteServiceOrder,
     updateOrderStatus,
@@ -68,10 +73,13 @@ export default function App() {
     clockOutOrder,
     submitPartRequisition,
     handleRequisitionStatus,
+    deleteRequisition,
     addTransaction,
+    deleteTransaction,
     registerOrderPayment,
     handleClientCreditPayment,
     addSupplier,
+    deleteSupplier,
     addPresupuesto,
     updatePresupuesto,
     deletePresupuesto,
@@ -516,7 +524,11 @@ export default function App() {
                     setSettings={setSettings}
                     addEmployee={addEmployee}
                     updateEmployee={updateEmployee}
+                    deleteEmployee={deleteEmployee}
                     addTransaction={addTransaction}
+                    deleteTransaction={deleteTransaction}
+                    deleteClient={deleteClient}
+                    deleteVehicle={deleteVehicle}
                     handleClientCreditPayment={handleClientCreditPayment}
                     resetDatabase={resetDatabase}
                     activeTab={adminTab}
@@ -540,8 +552,10 @@ export default function App() {
                     notasSalida={notasSalida}
                     addClient={addClient}
                     updateClient={updateClient}
+                    deleteClient={deleteClient}
                     addVehicle={addVehicle}
                     updateVehicle={updateVehicle}
+                    deleteVehicle={deleteVehicle}
                     createServiceOrder={createServiceOrder}
                     deleteServiceOrder={deleteServiceOrder}
                     addOrderItem={addOrderItem}
@@ -592,10 +606,14 @@ export default function App() {
                     orders={orders}
                     addInventoryItem={addInventoryItem}
                     updateInventoryItem={updateInventoryItem}
+                    deleteInventoryItem={deleteInventoryItem}
                     addPurchaseOrder={addPurchaseOrder}
                     receivePurchaseOrder={receivePurchaseOrder}
+                    deletePurchaseOrder={deletePurchaseOrder}
                     handleRequisitionStatus={handleRequisitionStatus}
+                    deleteRequisition={deleteRequisition}
                     addSupplier={addSupplier}
+                    deleteSupplier={deleteSupplier}
                     activeTab={warehouseTab}
                     setActiveTab={setWarehouseTab}
                   />

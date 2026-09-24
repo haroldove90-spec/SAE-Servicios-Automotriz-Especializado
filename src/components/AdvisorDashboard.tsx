@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, Search, UserPlus, Car, CheckSquare, Calendar, History, Send, 
-  Trash, Check, X, FileText, ChevronRight, AlertCircle, MapPin, Sparkles, UserCheck, User,
+  Trash, Check, X, FileText, ChevronRight, AlertCircle, MapPin, Sparkles, UserCheck, User, Users,
   Camera, Upload, Trash2, AlertTriangle, Download, Sparkle, Copy, Image, Share2, Mail,
   HelpCircle, Printer, RefreshCw, Edit2, Eye, DollarSign, ClipboardList, LogOut, Sliders, Wrench,
   CheckCircle, Clock, ShieldCheck, Gauge, FileSpreadsheet
@@ -39,6 +39,8 @@ interface AdvisorDashboardProps {
   updateClient: (c: Client) => void;
   addVehicle: (v: Omit<Vehicle, 'id'>) => Vehicle;
   updateVehicle: (v: Vehicle) => void;
+  deleteClient?: (id: string) => void;
+  deleteVehicle?: (id: string) => void;
   createServiceOrder: (o: Omit<ServiceOrder, 'id' | 'items' | 'timeLogs' | 'isClockedIn' | 'isPaused' | 'totalHoursWorked' | 'payments' | 'folio' | 'fecha' | 'hora' | 'tecnico'> & { folio?: string; fecha?: string; hora?: string; tecnico?: string }) => ServiceOrder;
   deleteServiceOrder?: (id: string) => void;
   addOrderItem: (orderId: string, item: Omit<BudgetLineItem, 'id' | 'approved'>) => void;
@@ -73,6 +75,8 @@ export default function AdvisorDashboard({
   updateClient,
   addVehicle,
   updateVehicle,
+  deleteClient,
+  deleteVehicle,
   createServiceOrder,
   deleteServiceOrder,
   addOrderItem,
@@ -116,6 +120,8 @@ export default function AdvisorDashboard({
   
   // New Client Form
   const [showAddClient, setShowAddClient] = useState(false);
+  const [showClientsDirectory, setShowClientsDirectory] = useState(false);
+  const [clientSearchTerm, setClientSearchTerm] = useState('');
   const [newClientName, setNewClientName] = useState('');
   const [newClientPhone, setNewClientPhone] = useState('');
   const [newClientEmail, setNewClientEmail] = useState('');
@@ -1663,34 +1669,77 @@ export default function AdvisorDashboard({
                 {/* Clients scrollable list */}
                 <div className="border border-slate-800 bg-slate-950 rounded-xl max-h-[120px] overflow-y-auto text-xs divide-y divide-slate-900">
                   {filteredClients.map(c => (
-                    <button
+                    <div
                       key={c.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedClientId(c.id);
-                        setSelectedVehicleId('');
-                      }}
-                      className={`w-full text-left p-2.5 hover:bg-slate-900/50 transition-colors flex items-center justify-between ${
+                      className={`w-full text-left p-2.5 hover:bg-slate-900/50 transition-colors flex items-center justify-between group ${
                         selectedClientId === c.id ? 'bg-amber-950/20 text-white' : 'text-slate-400'
                       }`}
                     >
-                      <div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedClientId(c.id);
+                          setSelectedVehicleId('');
+                        }}
+                        className="flex-1 text-left cursor-pointer"
+                      >
                         <p className="font-bold">{c.name}</p>
-                        <p className="text-[10px] text-slate-500">{c.phone} • {c.email}</p>
+                        <p className="text-[10px] text-slate-500">{c.phone} • {c.email || 'Sin correo'}</p>
+                      </button>
+                      <div className="flex items-center gap-1">
+                        {deleteClient && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm(`¿Estás seguro de eliminar permanentemente al cliente "${c.name}" y todos sus vehículos asociados?`)) {
+                                deleteClient(c.id);
+                                if (selectedClientId === c.id) {
+                                  setSelectedClientId('');
+                                  setSelectedVehicleId('');
+                                }
+                              }
+                            }}
+                            className="p-1 text-slate-500 hover:text-red-400 hover:bg-red-950/40 rounded transition-colors cursor-pointer"
+                            title="Eliminar cliente"
+                          >
+                            <Trash size={13} />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedClientId(c.id);
+                            setSelectedVehicleId('');
+                          }}
+                          className="p-1 text-slate-600 hover:text-slate-300"
+                        >
+                          <ChevronRight size={14} />
+                        </button>
                       </div>
-                      <ChevronRight size={14} className="text-slate-600" />
-                    </button>
+                    </div>
                   ))}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowAddClient(true)}
-                  className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-amber-500 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl transition-all border border-dashed border-amber-500/20"
-                >
-                  <UserPlus size={13} />
-                  Registrar Nuevo Cliente
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddClient(true)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-amber-500 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl transition-all border border-dashed border-amber-500/20 cursor-pointer"
+                  >
+                    <UserPlus size={13} />
+                    Nuevo Cliente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowClientsDirectory(true)}
+                    className="px-3 py-2 text-xs font-bold text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all border border-slate-800 cursor-pointer flex items-center gap-1"
+                    title="Directorio completo de clientes"
+                  >
+                    <Users size={13} />
+                    <span>Directorio</span>
+                  </button>
+                </div>
               </div>
 
               {/* SELECT VEHICLE */}
@@ -1708,19 +1757,41 @@ export default function AdvisorDashboard({
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[120px] overflow-y-auto">
                         {clientVehicles.map(v => (
-                          <button
+                          <div
                             key={v.id}
-                            type="button"
-                            onClick={() => setSelectedVehicleId(v.id)}
-                            className={`text-left p-2.5 border rounded-xl text-xs hover:bg-slate-900/50 transition-all ${
+                            className={`p-2.5 border rounded-xl text-xs hover:bg-slate-900/50 transition-all flex items-center justify-between ${
                               selectedVehicleId === v.id 
                                 ? 'border-amber-500 bg-amber-500/10 text-white' 
                                 : 'border-slate-800 bg-slate-950 text-slate-400'
                             }`}
                           >
-                            <p className="font-bold">{v.brand} {v.model} ({v.year})</p>
-                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">Placa: {v.plate} • Kilómetros: {v.mileage.toLocaleString()}</p>
-                          </button>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedVehicleId(v.id)}
+                              className="flex-1 text-left cursor-pointer"
+                            >
+                              <p className="font-bold">{v.brand} {v.model} ({v.year})</p>
+                              <p className="text-[10px] text-slate-500 font-mono mt-0.5">Placa: {v.plate} • {v.mileage.toLocaleString()} km</p>
+                            </button>
+                            {deleteVehicle && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm(`¿Estás seguro de eliminar el vehículo "${v.brand} ${v.model} (${v.plate})"?`)) {
+                                    deleteVehicle(v.id);
+                                    if (selectedVehicleId === v.id) {
+                                      setSelectedVehicleId('');
+                                    }
+                                  }
+                                }}
+                                className="p-1 text-slate-500 hover:text-red-400 hover:bg-red-950/40 rounded transition-colors cursor-pointer ml-1"
+                                title="Eliminar vehículo"
+                              >
+                                <Trash size={13} />
+                              </button>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}
@@ -3035,6 +3106,197 @@ export default function AdvisorDashboard({
                     <button type="submit" className="px-4 py-1.5 bg-indigo-600 text-white font-bold rounded-lg shadow-sm">Registrar Auto</button>
                   </div>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* DIRECTORIO DE CLIENTES Y VEHÍCULOS (ADVISOR) */}
+          {showClientsDirectory && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+              <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+                <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+                  <div>
+                    <h4 className="font-bold text-base flex items-center gap-2">
+                      <Users size={18} className="text-amber-500" />
+                      Directorio de Clientes y Vehículos Registrados
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Consulta, administra o elimina clientes y vehículos del sistema.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowClientsDirectory(false)}
+                    className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="p-4 border-b border-slate-100 bg-slate-50">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={clientSearchTerm}
+                      onChange={(e) => setClientSearchTerm(e.target.value)}
+                      placeholder="Buscar por cliente, teléfono, auto o placas..."
+                      className="w-full pl-9 pr-4 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                    />
+                    <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                  {clients.filter(c => {
+                    const term = clientSearchTerm.toLowerCase();
+                    const vList = vehicles.filter(v => v.ownerId === c.id);
+                    const hasMatchingVehicle = vList.some(v => 
+                      v.brand.toLowerCase().includes(term) || 
+                      v.model.toLowerCase().includes(term) || 
+                      v.plate.toLowerCase().includes(term)
+                    );
+                    return c.name.toLowerCase().includes(term) || 
+                           c.phone.toLowerCase().includes(term) || 
+                           (c.email && c.email.toLowerCase().includes(term)) || 
+                           hasMatchingVehicle;
+                  }).length === 0 ? (
+                    <div className="text-center py-12 text-slate-400">
+                      <Users size={32} className="mx-auto mb-2 opacity-50" />
+                      <p className="text-xs">No se encontraron clientes.</p>
+                    </div>
+                  ) : (
+                    clients.filter(c => {
+                      const term = clientSearchTerm.toLowerCase();
+                      const vList = vehicles.filter(v => v.ownerId === c.id);
+                      const hasMatchingVehicle = vList.some(v => 
+                        v.brand.toLowerCase().includes(term) || 
+                        v.model.toLowerCase().includes(term) || 
+                        v.plate.toLowerCase().includes(term)
+                      );
+                      return c.name.toLowerCase().includes(term) || 
+                             c.phone.toLowerCase().includes(term) || 
+                             (c.email && c.email.toLowerCase().includes(term)) || 
+                             hasMatchingVehicle;
+                    }).map(client => {
+                      const clientVehicles = vehicles.filter(v => v.ownerId === client.id);
+                      return (
+                        <div key={client.id} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-amber-300 transition-all space-y-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h5 className="font-bold text-slate-800 text-sm">{client.name}</h5>
+                                {client.creditBalance > 0 && (
+                                  <span className="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                    Deuda: ${client.creditBalance.toLocaleString()} MXN
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-500 mt-0.5">
+                                Tel / WhatsApp: <strong className="text-slate-700">{client.phone}</strong> • Email: {client.email || 'Sin correo'}
+                              </p>
+                              {client.address && (
+                                <p className="text-[11px] text-slate-400 mt-0.5">Dir: {client.address}</p>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedClientId(client.id);
+                                  setSelectedVehicleId(clientVehicles[0]?.id || '');
+                                  setShowClientsDirectory(false);
+                                }}
+                                className="px-3 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all cursor-pointer"
+                              >
+                                Seleccionar para Recepción
+                              </button>
+                              {deleteClient && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (confirm(`¿Estás seguro de eliminar permanentemente al cliente "${client.name}" y todos sus vehículos asociados?`)) {
+                                      deleteClient(client.id);
+                                      if (selectedClientId === client.id) {
+                                        setSelectedClientId('');
+                                        setSelectedVehicleId('');
+                                      }
+                                    }
+                                  }}
+                                  className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1.5 rounded-lg border border-red-200 transition-all cursor-pointer"
+                                  title="Eliminar cliente"
+                                >
+                                  <Trash size={13} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* VEHÍCULOS DEL CLIENTE */}
+                          <div className="space-y-1.5">
+                            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                              Vehículos ({clientVehicles.length}):
+                            </p>
+                            {clientVehicles.length === 0 ? (
+                              <p className="text-xs text-slate-400 italic">No tiene vehículos registrados.</p>
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {clientVehicles.map(v => (
+                                  <div key={v.id} className="p-2.5 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between text-xs">
+                                    <div>
+                                      <p className="font-bold text-slate-800">{v.brand} {v.model} ({v.year})</p>
+                                      <p className="text-[10px] text-slate-500 font-mono">Placas: <strong className="text-slate-700">{v.plate}</strong> • {v.mileage.toLocaleString()} km</p>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedClientId(client.id);
+                                          setSelectedVehicleId(v.id);
+                                          setShowClientsDirectory(false);
+                                        }}
+                                        className="text-[11px] text-amber-600 hover:underline px-1"
+                                      >
+                                        Elegir
+                                      </button>
+                                      {deleteVehicle && (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            if (confirm(`¿Estás seguro de eliminar el vehículo "${v.brand} ${v.model} (${v.plate})"?`)) {
+                                              deleteVehicle(v.id);
+                                              if (selectedVehicleId === v.id) {
+                                                setSelectedVehicleId('');
+                                              }
+                                            }
+                                          }}
+                                          className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                                          title="Eliminar vehículo"
+                                        >
+                                          <Trash size={13} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowClientsDirectory(false)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+                  >
+                    Cerrar Directorio
+                  </button>
+                </div>
               </div>
             </div>
           )}

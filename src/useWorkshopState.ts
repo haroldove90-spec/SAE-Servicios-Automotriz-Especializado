@@ -397,6 +397,19 @@ export function useWorkshopState() {
     setClients(prev => prev.map(c => c.id === updatedClient.id ? updatedClient : c));
   };
 
+  const deleteClient = (clientId: string) => {
+    setClients(prev => prev.filter(c => c.id !== clientId));
+    setVehicles(prev => prev.filter(v => v.ownerId !== clientId));
+    if (supabaseConnected) {
+      supabase.from('clients').delete().eq('id', clientId).then(({ error }) => {
+        if (error) console.error('Error deleting client from Supabase:', error);
+      });
+      supabase.from('vehicles').delete().eq('ownerId', clientId).then(({ error }) => {
+        if (error) console.error('Error deleting vehicles of client from Supabase:', error);
+      });
+    }
+  };
+
   // 2. Vehicles
   const addVehicle = (vehicle: Omit<Vehicle, 'id'>) => {
     const newVehicle: Vehicle = {
@@ -409,6 +422,15 @@ export function useWorkshopState() {
 
   const updateVehicle = (updatedVehicle: Vehicle) => {
     setVehicles(prev => prev.map(v => v.id === updatedVehicle.id ? updatedVehicle : v));
+  };
+
+  const deleteVehicle = (vehicleId: string) => {
+    setVehicles(prev => prev.filter(v => v.id !== vehicleId));
+    if (supabaseConnected) {
+      supabase.from('vehicles').delete().eq('id', vehicleId).then(({ error }) => {
+        if (error) console.error('Error deleting vehicle from Supabase:', error);
+      });
+    }
   };
 
   // 3. Employees & Commissions
@@ -424,6 +446,15 @@ export function useWorkshopState() {
     setEmployees(prev => prev.map(e => e.id === updatedEmployee.id ? updatedEmployee : e));
   };
 
+  const deleteEmployee = (employeeId: string) => {
+    setEmployees(prev => prev.filter(e => e.id !== employeeId));
+    if (supabaseConnected) {
+      supabase.from('employees').delete().eq('id', employeeId).then(({ error }) => {
+        if (error) console.error('Error deleting employee from Supabase:', error);
+      });
+    }
+  };
+
   // 4. Inventory
   const addInventoryItem = (item: Omit<InventoryItem, 'id'>) => {
     const newItem: InventoryItem = {
@@ -437,6 +468,15 @@ export function useWorkshopState() {
     setInventory(prev => prev.map(i => i.id === updatedItem.id ? updatedItem : i));
   };
 
+  const deleteInventoryItem = (itemId: string) => {
+    setInventory(prev => prev.filter(i => i.id !== itemId));
+    if (supabaseConnected) {
+      supabase.from('inventory').delete().eq('id', itemId).then(({ error }) => {
+        if (error) console.error('Error deleting inventory item from Supabase:', error);
+      });
+    }
+  };
+
   // 5. Purchase Orders
   const addPurchaseOrder = (po: Omit<PurchaseOrder, 'id' | 'status'>) => {
     const newPO: PurchaseOrder = {
@@ -445,6 +485,15 @@ export function useWorkshopState() {
       status: 'Pendiente'
     };
     setPurchaseOrders(prev => [newPO, ...prev]);
+  };
+
+  const deletePurchaseOrder = (poId: string) => {
+    setPurchaseOrders(prev => prev.filter(p => p.id !== poId));
+    if (supabaseConnected) {
+      supabase.from('purchase_orders').delete().eq('id', poId).then(({ error }) => {
+        if (error) console.error('Error deleting purchase order from Supabase:', error);
+      });
+    }
   };
 
   const receivePurchaseOrder = (poId: string) => {
@@ -727,6 +776,15 @@ export function useWorkshopState() {
     }
   };
 
+  const deleteRequisition = (reqId: string) => {
+    setRequisitions(prev => prev.filter(r => r.id !== reqId));
+    if (supabaseConnected) {
+      supabase.from('requisitions').delete().eq('id', reqId).then(({ error }) => {
+        if (error) console.error('Error deleting requisition from Supabase:', error);
+      });
+    }
+  };
+
   // 8. Financial Transactions (Payments / Invoicing)
   const addTransaction = (tx: Omit<Transaction, 'id' | 'date'>) => {
     const newTx: Transaction = {
@@ -735,6 +793,15 @@ export function useWorkshopState() {
       date: new Date().toISOString().split('T')[0]
     };
     setTransactions(prev => [newTx, ...prev]);
+  };
+
+  const deleteTransaction = (txId: string) => {
+    setTransactions(prev => prev.filter(t => t.id !== txId));
+    if (supabaseConnected) {
+      supabase.from('transactions').delete().eq('id', txId).then(({ error }) => {
+        if (error) console.error('Error deleting transaction from Supabase:', error);
+      });
+    }
   };
 
   const registerOrderPayment = (orderId: string, amount: number, method: 'Efectivo' | 'Tarjeta' | 'Transferencia' | 'Credito') => {
@@ -806,6 +873,15 @@ export function useWorkshopState() {
     setSuppliers(prev => [newSupplier, ...prev]);
   };
 
+  const deleteSupplier = (supplierId: string) => {
+    setSuppliers(prev => prev.filter(s => s.id !== supplierId));
+    if (supabaseConnected) {
+      supabase.from('suppliers').delete().eq('id', supplierId).then(({ error }) => {
+        if (error) console.error('Error deleting supplier from Supabase:', error);
+      });
+    }
+  };
+
   // 7. Presupuestos (Budgets / Estimates)
   const addPresupuesto = (p: Omit<Presupuesto, 'id' | 'createdAt'>): Presupuesto => {
     const newId = `pres-${Date.now()}`;
@@ -824,6 +900,11 @@ export function useWorkshopState() {
 
   const deletePresupuesto = (id: string) => {
     setPresupuestos(prev => prev.filter(p => p.id !== id));
+    if (supabaseConnected) {
+      supabase.from('presupuestos').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Error deleting presupuesto from Supabase:', error);
+      });
+    }
   };
 
   const addOrdenReparacion = (ord: Omit<OrdenReparacion, 'id' | 'createdAt'>) => {
@@ -843,6 +924,11 @@ export function useWorkshopState() {
 
   const deleteOrdenReparacion = (id: string) => {
     setOrdenesReparacion(prev => prev.filter(o => o.id !== id));
+    if (supabaseConnected) {
+      supabase.from('ordenes_reparacion').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Error deleting orden de reparacion from Supabase:', error);
+      });
+    }
   };
 
   const convertPresupuestoToOrder = (presupuestoId: string): ServiceOrder | null => {
@@ -959,6 +1045,11 @@ export function useWorkshopState() {
 
   const deleteNotaSalida = (id: string) => {
     setNotasSalida(prev => prev.filter(n => n.id !== id));
+    if (supabaseConnected) {
+      supabase.from('notas_salida').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Error deleting nota de salida from Supabase:', error);
+      });
+    }
   };
 
   // Reset database to initial values
@@ -1018,14 +1109,19 @@ export function useWorkshopState() {
     // Actions
     addClient,
     updateClient,
+    deleteClient,
     addVehicle,
     updateVehicle,
+    deleteVehicle,
     addEmployee,
     updateEmployee,
+    deleteEmployee,
     addInventoryItem,
     updateInventoryItem,
+    deleteInventoryItem,
     addPurchaseOrder,
     receivePurchaseOrder,
+    deletePurchaseOrder,
     createServiceOrder,
     deleteServiceOrder,
     updateOrderStatus,
@@ -1038,10 +1134,13 @@ export function useWorkshopState() {
     clockOutOrder,
     submitPartRequisition,
     handleRequisitionStatus,
+    deleteRequisition,
     addTransaction,
+    deleteTransaction,
     registerOrderPayment,
     handleClientCreditPayment,
     addSupplier,
+    deleteSupplier,
     addPresupuesto,
     updatePresupuesto,
     deletePresupuesto,

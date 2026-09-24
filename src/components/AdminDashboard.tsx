@@ -19,7 +19,11 @@ interface AdminDashboardProps {
   setSettings: (s: WorkshopSettings) => void;
   addEmployee: (e: Omit<Employee, 'id'>) => void;
   updateEmployee: (e: Employee) => void;
+  deleteEmployee?: (id: string) => void;
   addTransaction: (t: Omit<Transaction, 'id' | 'date'>) => void;
+  deleteTransaction?: (id: string) => void;
+  deleteClient?: (id: string) => void;
+  deleteVehicle?: (id: string) => void;
   handleClientCreditPayment: (clientId: string, amount: number, method: 'Efectivo' | 'Tarjeta' | 'Transferencia') => void;
   resetDatabase: () => void;
   activeTab?: 'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador';
@@ -43,7 +47,11 @@ export default function AdminDashboard({
   setSettings,
   addEmployee,
   updateEmployee,
+  deleteEmployee,
   addTransaction,
+  deleteTransaction,
+  deleteClient,
+  deleteVehicle,
   handleClientCreditPayment,
   resetDatabase,
   activeTab: controlledActiveTab,
@@ -56,6 +64,9 @@ export default function AdminDashboard({
   const [localActiveTab, setLocalActiveTab] = useState<'metrics' | 'finances' | 'personnel' | 'config' | 'calibrador'>('metrics');
   const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : localActiveTab;
   const setActiveTab = controlledSetActiveTab !== undefined ? controlledSetActiveTab : setLocalActiveTab;
+  
+  const [showClientsDirectory, setShowClientsDirectory] = useState(false);
+  const [clientSearchTerm, setClientSearchTerm] = useState('');
   
   // Financial metrics calculations
   const totalIncome = transactions
@@ -299,7 +310,15 @@ export default function AdminDashboard({
         </div>
         
         <div className="flex items-center justify-between lg:justify-end gap-2 w-full lg:w-auto">
-          <span className="text-xs text-slate-400 block lg:hidden font-medium">Panel General</span>
+          <button
+            type="button"
+            onClick={() => setShowClientsDirectory(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-amber-800 bg-white hover:bg-amber-50 border border-slate-300 rounded-lg transition-all shadow-sm cursor-pointer"
+            title="Administrar y depurar directorio de clientes y sus vehículos"
+          >
+            <Users size={13} className="text-amber-600" />
+            <span>Directorio Clientes / Autos</span>
+          </button>
           <button
             onClick={() => {
               if (confirm('¿Estás seguro de restablecer todos los datos del taller a los valores de prueba originales? Se perderán los cambios de esta sesión.')) {
@@ -548,6 +567,7 @@ export default function AdminDashboard({
                       <th className="p-3">Categoría</th>
                       <th className="p-3">Monto</th>
                       <th className="p-3">Descripción</th>
+                      <th className="p-3 text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -576,6 +596,22 @@ export default function AdminDashboard({
                         </td>
                         <td className="p-3 text-slate-500 max-w-xs truncate" title={tx.description}>
                           {tx.description}
+                        </td>
+                        <td className="p-3 text-right">
+                          {deleteTransaction && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm(`¿Estás seguro de eliminar el registro de transacción "${tx.id}" (${tx.type} $${tx.amount.toLocaleString()})?`)) {
+                                  deleteTransaction(tx.id);
+                                }
+                              }}
+                              className="text-slate-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition-colors inline-flex items-center cursor-pointer"
+                              title="Eliminar transacción del libro diario"
+                            >
+                              <Trash size={14} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -842,10 +878,24 @@ export default function AdminDashboard({
                       </button>
                       <button
                         onClick={() => updateEmployee({ ...emp, active: !emp.active })}
-                        className={`text-xs font-bold ${emp.active ? 'text-red-500 hover:text-red-700' : 'text-emerald-600 hover:text-emerald-800'}`}
+                        className={`text-xs font-bold ${emp.active ? 'text-amber-600 hover:text-amber-800' : 'text-emerald-600 hover:text-emerald-800'}`}
                       >
                         {emp.active ? 'Baja' : 'Reactivar'}
                       </button>
+                      {deleteEmployee && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`¿Estás seguro de eliminar definitivamente al empleado "${emp.name}" (${emp.role})? Esta acción borrará su registro por completo.`)) {
+                              deleteEmployee(emp.id);
+                            }
+                          }}
+                          className="text-xs font-bold text-red-600 hover:text-red-800 p-1 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                          title="Eliminar empleado del sistema"
+                        >
+                          Eliminar
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -1123,6 +1173,165 @@ export default function AdminDashboard({
           vehicles={vehicles}
           employees={employees}
         />
+      )}
+
+      {/* DIRECTORIO Y DEPÓSITO DE CLIENTES Y VEHÍCULOS */}
+      {showClientsDirectory && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
+              <div>
+                <h4 className="font-bold text-base flex items-center gap-2">
+                  <Users size={18} className="text-amber-500" />
+                  Directorio de Clientes y Vehículos Registrados
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Consulta o elimina registros de clientes y sus vehículos vinculados en el sistema.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowClientsDirectory(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-4 border-b border-slate-100 bg-slate-50">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={clientSearchTerm}
+                  onChange={(e) => setClientSearchTerm(e.target.value)}
+                  placeholder="Buscar por nombre de cliente, teléfono, auto o placas..."
+                  className="w-full pl-9 pr-4 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                />
+                <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {clients.filter(c => {
+                const term = clientSearchTerm.toLowerCase();
+                const vList = vehicles.filter(v => v.ownerId === c.id);
+                const hasMatchingVehicle = vList.some(v => 
+                  v.brand.toLowerCase().includes(term) || 
+                  v.model.toLowerCase().includes(term) || 
+                  v.plate.toLowerCase().includes(term)
+                );
+                return c.name.toLowerCase().includes(term) || 
+                       c.phone.toLowerCase().includes(term) || 
+                       c.email.toLowerCase().includes(term) || 
+                       hasMatchingVehicle;
+              }).length === 0 ? (
+                <div className="text-center py-12 text-slate-400">
+                  <Users size={32} className="mx-auto mb-2 opacity-50" />
+                  <p className="text-xs">No se encontraron clientes que coincidan con la búsqueda.</p>
+                </div>
+              ) : (
+                clients.filter(c => {
+                  const term = clientSearchTerm.toLowerCase();
+                  const vList = vehicles.filter(v => v.ownerId === c.id);
+                  const hasMatchingVehicle = vList.some(v => 
+                    v.brand.toLowerCase().includes(term) || 
+                    v.model.toLowerCase().includes(term) || 
+                    v.plate.toLowerCase().includes(term)
+                  );
+                  return c.name.toLowerCase().includes(term) || 
+                         c.phone.toLowerCase().includes(term) || 
+                         c.email.toLowerCase().includes(term) || 
+                         hasMatchingVehicle;
+                }).map(client => {
+                  const clientVehicles = vehicles.filter(v => v.ownerId === client.id);
+                  return (
+                    <div key={client.id} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-amber-300 transition-all space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h5 className="font-bold text-slate-800 text-sm">{client.name}</h5>
+                            {client.creditBalance > 0 && (
+                              <span className="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                Deuda: ${client.creditBalance.toLocaleString()} MXN
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Tel / WhatsApp: <strong className="text-slate-700">{client.phone}</strong> • Email: {client.email || 'Sin correo'}
+                          </p>
+                          {client.address && (
+                            <p className="text-[11px] text-slate-400 mt-0.5">Dir: {client.address}</p>
+                          )}
+                        </div>
+
+                        {deleteClient && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm(`¿Estás seguro de eliminar permanentemente al cliente "${client.name}" y todos sus vehículos asociados?`)) {
+                                deleteClient(client.id);
+                              }
+                            }}
+                            className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2.5 py-1.5 rounded-lg border border-red-200 transition-all cursor-pointer self-start sm:self-auto"
+                            title="Eliminar cliente y sus vehículos vinculados"
+                          >
+                            <Trash size={13} />
+                            <span>Eliminar Cliente</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* VEHÍCULOS DEL CLIENTE */}
+                      <div className="space-y-1.5">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                          Vehículos Asociados ({clientVehicles.length}):
+                        </p>
+                        {clientVehicles.length === 0 ? (
+                          <p className="text-xs text-slate-400 italic">No tiene vehículos registrados.</p>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {clientVehicles.map(v => (
+                              <div key={v.id} className="p-2.5 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-between text-xs">
+                                <div>
+                                  <p className="font-bold text-slate-800">{v.brand} {v.model} ({v.year})</p>
+                                  <p className="text-[10px] text-slate-500 font-mono">Placas: <strong className="text-slate-700">{v.plate}</strong> • {v.mileage.toLocaleString()} km</p>
+                                </div>
+                                {deleteVehicle && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (confirm(`¿Estás seguro de eliminar el vehículo "${v.brand} ${v.model} (${v.plate})"?`)) {
+                                        deleteVehicle(v.id);
+                                      }
+                                    }}
+                                    className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                                    title="Eliminar vehículo"
+                                  >
+                                    <Trash size={13} />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowClientsDirectory(false)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+              >
+                Cerrar Directorio
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

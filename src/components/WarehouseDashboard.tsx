@@ -14,10 +14,14 @@ interface WarehouseDashboardProps {
   orders: ServiceOrder[];
   addInventoryItem: (item: Omit<InventoryItem, 'id'>) => void;
   updateInventoryItem: (item: InventoryItem) => void;
+  deleteInventoryItem?: (id: string) => void;
   addPurchaseOrder: (po: Omit<PurchaseOrder, 'id' | 'status'>) => void;
   receivePurchaseOrder: (poId: string) => void;
+  deletePurchaseOrder?: (id: string) => void;
   handleRequisitionStatus: (reqId: string, status: 'Despachado' | 'Rechazado') => void;
+  deleteRequisition?: (id: string) => void;
   addSupplier: (s: Omit<Supplier, 'id'>) => void;
+  deleteSupplier?: (id: string) => void;
   activeTab?: 'catalog' | 'requisitions' | 'purchases';
   setActiveTab?: (tab: 'catalog' | 'requisitions' | 'purchases') => void;
 }
@@ -31,10 +35,14 @@ export default function WarehouseDashboard({
   orders,
   addInventoryItem,
   updateInventoryItem,
+  deleteInventoryItem,
   addPurchaseOrder,
   receivePurchaseOrder,
+  deletePurchaseOrder,
   handleRequisitionStatus,
+  deleteRequisition,
   addSupplier,
+  deleteSupplier,
   activeTab: controlledActiveTab,
   setActiveTab: controlledSetActiveTab
 }: WarehouseDashboardProps) {
@@ -243,6 +251,7 @@ export default function WarehouseDashboard({
                     <th className="p-3 text-right">Costo Prom.</th>
                     <th className="p-3 text-right">Precio Venta</th>
                     <th className="p-3 text-center">Estado Alerta</th>
+                    <th className="p-3 text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -275,6 +284,22 @@ export default function WarehouseDashboard({
                             <span className="inline-block bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full text-[9px]">
                               Suficiente
                             </span>
+                          )}
+                        </td>
+                        <td className="p-3 text-right">
+                          {deleteInventoryItem && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (confirm(`¿Estás seguro de eliminar la refacción "${item.name}" (${item.code}) del catálogo?`)) {
+                                  deleteInventoryItem(item.id);
+                                }
+                              }}
+                              className="text-slate-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition-colors inline-flex items-center cursor-pointer"
+                              title="Eliminar refacción"
+                            >
+                              <Trash size={14} />
+                            </button>
                           )}
                         </td>
                       </tr>
@@ -399,34 +424,50 @@ export default function WarehouseDashboard({
                           </span>
                         </td>
                         <td className="p-3 text-right">
-                          {req.status === 'Pendiente' && (
-                            <div className="flex justify-end gap-1.5">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {req.status === 'Pendiente' && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    if (item && item.stock < req.qty) {
+                                      alert('¡Atención! No cuentas con suficiente stock físico para despachar esta requisición.');
+                                      return;
+                                    }
+                                    handleRequisitionStatus(req.id, 'Despachado');
+                                  }}
+                                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 text-[11px] rounded transition-all flex items-center gap-0.5"
+                                >
+                                  <Check size={12} /> Despachar
+                                </button>
+                                <button
+                                  onClick={() => handleRequisitionStatus(req.id, 'Rechazado')}
+                                  className="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-2 py-1 text-[11px] rounded border border-red-200 transition-all"
+                                >
+                                  Rechazar
+                                </button>
+                              </>
+                            )}
+                            {req.status === 'Despachado' && (
+                              <span className="text-slate-400 text-[10px] italic">Surtido el {req.date}</span>
+                            )}
+                            {req.status === 'Rechazado' && (
+                              <span className="text-red-500 text-[10px] italic">Rechazada</span>
+                            )}
+                            {deleteRequisition && (
                               <button
+                                type="button"
                                 onClick={() => {
-                                  if (item && item.stock < req.qty) {
-                                    alert('¡Atención! No cuentas con suficiente stock físico para despachar esta requisición.');
-                                    return;
+                                  if (confirm(`¿Estás seguro de eliminar esta requisición para la orden ${req.orderId}?`)) {
+                                    deleteRequisition(req.id);
                                   }
-                                  handleRequisitionStatus(req.id, 'Despachado');
                                 }}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 text-[11px] rounded transition-all flex items-center gap-0.5"
+                                className="text-slate-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition-colors ml-1 cursor-pointer"
+                                title="Eliminar requisición"
                               >
-                                <Check size={12} /> Despachar
+                                <Trash size={13} />
                               </button>
-                              <button
-                                onClick={() => handleRequisitionStatus(req.id, 'Rechazado')}
-                                className="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-2 py-1 text-[11px] rounded border border-red-200 transition-all"
-                              >
-                                Rechazar
-                              </button>
-                            </div>
-                          )}
-                          {req.status === 'Despachado' && (
-                            <span className="text-slate-400 text-[10px] italic">Surtido el {req.date}</span>
-                          )}
-                          {req.status === 'Rechazado' && (
-                            <span className="text-red-500 text-[10px] italic">Rechazada</span>
-                          )}
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -494,19 +535,35 @@ export default function WarehouseDashboard({
                           </span>
                         </td>
                         <td className="p-3 text-right">
-                          {po.status === 'Pendiente' ? (
-                            <button
-                              onClick={() => {
-                                receivePurchaseOrder(po.id);
-                                alert(`¡Orden ${po.id} ingresada! El stock ha sido actualizado e incorporado con promedio de costo.`);
-                              }}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 text-[11px] rounded transition-all"
-                            >
-                              Dar Entrada Almacén
-                            </button>
-                          ) : (
-                            <span className="text-slate-400 text-[10px] italic">Ingresada</span>
-                          )}
+                          <div className="flex items-center justify-end gap-1.5">
+                            {po.status === 'Pendiente' ? (
+                              <button
+                                onClick={() => {
+                                  receivePurchaseOrder(po.id);
+                                  alert(`¡Orden ${po.id} ingresada! El stock ha sido actualizado e incorporado con promedio de costo.`);
+                                }}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 text-[11px] rounded transition-all"
+                              >
+                                Dar Entrada Almacén
+                              </button>
+                            ) : (
+                              <span className="text-slate-400 text-[10px] italic">Ingresada</span>
+                            )}
+                            {deletePurchaseOrder && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (confirm(`¿Estás seguro de eliminar la orden de compra ${po.id}?`)) {
+                                    deletePurchaseOrder(po.id);
+                                  }
+                                }}
+                                className="text-slate-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition-colors ml-1 cursor-pointer"
+                                title="Eliminar orden de compra"
+                              >
+                                <Trash size={13} />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -533,7 +590,23 @@ export default function WarehouseDashboard({
               <div className="space-y-2.5 max-h-[300px] overflow-y-auto">
                 {suppliers.map((s) => (
                   <div key={s.id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs space-y-1">
-                    <p className="font-bold text-slate-800">{s.name}</p>
+                    <div className="flex items-start justify-between">
+                      <p className="font-bold text-slate-800">{s.name}</p>
+                      {deleteSupplier && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`¿Estás seguro de eliminar al proveedor "${s.name}"?`)) {
+                              deleteSupplier(s.id);
+                            }
+                          }}
+                          className="text-slate-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                          title="Eliminar proveedor"
+                        >
+                          <Trash size={13} />
+                        </button>
+                      )}
+                    </div>
                     <p className="text-slate-500">Contacto: <strong>{s.contact}</strong></p>
                     <p className="text-slate-500 font-mono">Tel: {s.phone}</p>
                     <p className="text-slate-400 text-[10px] truncate">{s.email}</p>
